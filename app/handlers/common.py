@@ -14,17 +14,18 @@ async def start(message: types.Message):
 
     create_room = types.KeyboardButton(text="Создать комнату 🔨")
     join_room = types.KeyboardButton(text="Войти в комнату 🏠")
-    about_game = types.KeyboardButton(text="Об игре ℹ️")
+    about = types.KeyboardButton(text="Об игре ℹ️")
     user_profile = types.KeyboardButton(text="Мой профиль 👤")
 
     keyboard.add(join_room, create_room)
     keyboard.add(user_profile)
-    keyboard.add(about_game)
+    keyboard.add(about)
 
     async with async_session() as db_session:
         async with db_session.begin():
             user_db = UserDB(db_session)
             telegram_user = await user_db.get_user(user_id=user_id)
+            logging.info(message.chat)
             if not telegram_user:
                 logging.info(f'INFO: create new user: {user_id}')
                 await user_db.create_user(
@@ -40,3 +41,9 @@ async def start(message: types.Message):
         "Создай свою комнату для друзей, или подключись к существующей.",
         reply_markup=keyboard
     )
+
+
+@dp.message_handler(lambda message: message.text == "Об игре ℹ️")
+async def about_game(message: types.Message):
+    msg = 'Это адаптированная игра "Тайный Санта"'
+    await message.answer(msg)
