@@ -2,24 +2,16 @@ from aiogram.dispatcher.filters import Text
 
 from app import dispatcher as dp, bot
 from aiogram import types
-from app.database.operations import UserDB
+from app.database.operations import UserDB, RoomDB
 from app.database.config import async_session
 import logging
-
+from aiogram.types.message import ParseMode
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     user_id = message.chat.id
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-
-    create_room = types.KeyboardButton(text="Создать комнату 🔨")
-    join_room = types.KeyboardButton(text="Войти в комнату 🏠")
-    about = types.KeyboardButton(text="Об игре ℹ️")
-    user_profile = types.KeyboardButton(text="Мой профиль 👤")
-
-    keyboard.add(join_room, create_room)
-    keyboard.add(user_profile)
-    keyboard.add(about)
+    users_list_rooms = []
 
     async with async_session() as db_session:
         async with db_session.begin():
@@ -34,6 +26,26 @@ async def start(message: types.Message):
                     first_name=message.chat.first_name,
                     last_name=message.chat.last_name
                 )
+
+            rooms = await RoomDB(db_session).get_joined_rooms(user_id)
+
+            if rooms:
+                for room in rooms:
+                    users_list_rooms.append(
+                        f'Ваша комната: {room.name} ({room.number})'
+                    )
+
+    create_room = types.KeyboardButton(text="Создать комнату 🔨")
+    join_room = types.KeyboardButton(text="Войти в комнату 🏠")
+    about = types.KeyboardButton(text="Об игре ℹ️")
+    user_profile = types.KeyboardButton(text="Мой профиль 👤")
+
+    keyboard.add(join_room, create_room)
+    if users_list_rooms:
+        for room in users_list_rooms:
+            keyboard.add(room)
+    keyboard.add(user_profile)
+    keyboard.add(about)
 
     await message.answer(
         "Хо-хо-хо! 🎅\n\n"
