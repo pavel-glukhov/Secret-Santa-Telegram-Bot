@@ -42,7 +42,7 @@ class Room(Base):
     finished_at = Column(DateTime, nullable=True)
 
     def __repr__(self):
-        return f'room name:{self.name} number:{self.number}'
+        return f'Room name:{self.name} Number:{self.number}'
 
 
 class RoomUser(Base):
