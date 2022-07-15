@@ -9,20 +9,18 @@ from app.handlers.profiles import edit_profile
 async def edit_user_profile(callback: types.CallbackQuery):
     if callback.data == 'profile_edit':
         await edit_profile(callback.message)
+
     if callback.data == 'profile_edit_name':
         pass
+
     if callback.data == 'profile_edit_address':
         pass
+
     if callback.data == 'profile_edit_number':
         pass
+
     if callback.data == 'profile_edit_delete_all':
         pass
-
-
-@dp.message_handler(lambda message: message.text == "Об игре ℹ️")
-async def about_game(message: types.Message):
-    msg = 'Это адаптированная игра "Тайный Санта"'
-    await message.answer(msg)
 
 
 # TODO потом переделать под callback
