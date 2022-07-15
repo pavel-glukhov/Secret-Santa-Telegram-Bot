@@ -1,8 +1,10 @@
-import aiogram.types
-from aiogram.dispatcher.filters import Text
 from aiogram.types.message import ParseMode
 from app import dispatcher as dp, bot
 from aiogram import types
+
+from app.database.config import async_session
+from app.database.operations import UserDB
+from app.misc.formatters import user_information_formatter
 
 
 @dp.message_handler(lambda message: message.text == "Мой профиль 👤")
@@ -12,13 +14,16 @@ async def my_profile(message: types.Message):
         callback_data="profile_edit"
     )
     keyboard_inline = types.InlineKeyboardMarkup().add(edit_user_profile)
+
+    async with async_session() as db_session:
+        async with db_session.begin():
+            user = await UserDB(db_session).get_user(user_id=message.chat.id)
+            user_information = await user_information_formatter(user)
+
     await message.answer("Предоставленными вами данные необходимы для отправки"
                          " подарка вашим Тайным Сантой.\n\n"
                          "*Ваш профиль*:\n\n"
-                         "Полное имя: \n"
-                         "Адрес:\n"
-                         "Номер телефона:\n"
-                         "Email:\n"
+                         f"{user_information}"
                          "\n", parse_mode=ParseMode.MARKDOWN)
     await message.answer("Если вы желаете изменить личные данные,"
                          " или удалить их, нажмите на кнопку "
