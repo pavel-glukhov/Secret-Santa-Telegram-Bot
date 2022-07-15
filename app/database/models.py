@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, \
+    DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.database.config import Base
 
@@ -43,12 +44,14 @@ class Room(Base):
     def __repr__(self):
         return f'room name:{self.name} number:{self.number}'
 
+
 class RoomUser(Base):
     __tablename__ = "rooms_users"
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     room_id = Column(Integer, ForeignKey('rooms.id'))
+
 
 class Note(Base):
     __tablename__ = 'notes'
