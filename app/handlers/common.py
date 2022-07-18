@@ -1,51 +1,28 @@
-from aiogram.dispatcher.filters import Text
-
-from app import dispatcher as dp, bot
+from app import dispatcher as dp
 from aiogram import types
 from app.database.operations import UserDB, RoomDB
 from app.database.config import async_session
-import logging
-from aiogram.types.message import ParseMode
+
+from app.keyborads.common import create_common_keyboards
+
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     user_id = message.chat.id
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    users_list_rooms = []
+    username = message.chat.username
+    first_name = message.chat.first_name
+    last_name = message.chat.last_name
 
     async with async_session() as db_session:
         async with db_session.begin():
-            user_db = UserDB(db_session)
-            telegram_user = await user_db.get_user(user_id=user_id)
-            logging.info(message.chat)
-            if not telegram_user:
-                logging.info(f'INFO: create new user: {user_id}')
-                await user_db.create_user(
-                    username=message.chat.username,
-                    user_id=message.chat.id,
-                    first_name=message.chat.first_name,
-                    last_name=message.chat.last_name
-                )
+            await UserDB(db_session).create_if_not_exist(username,
+                                                         user_id,
+                                                         first_name,
+                                                         last_name)
 
-            rooms = await RoomDB(db_session).get_joined_rooms(user_id)
+            rooms = await RoomDB(db_session).get_joined_in_rooms(user_id)
 
-            if rooms:
-                for room in rooms:
-                    users_list_rooms.append(
-                        f'Ваша комната: {room.name} ({room.number})'
-                    )
-
-    create_room = types.KeyboardButton(text="Создать комнату 🔨")
-    join_room = types.KeyboardButton(text="Войти в комнату 🏠")
-    about = types.KeyboardButton(text="Об игре ℹ️")
-    user_profile = types.KeyboardButton(text="Мой профиль 👤")
-
-    keyboard.add(join_room, create_room)
-    if users_list_rooms:
-        for room in users_list_rooms:
-            keyboard.add(room)
-    keyboard.add(user_profile)
-    keyboard.add(about)
+    keyboard = await create_common_keyboards(rooms)
 
     await message.answer(
         "Хо-хо-хо! 🎅\n\n"
