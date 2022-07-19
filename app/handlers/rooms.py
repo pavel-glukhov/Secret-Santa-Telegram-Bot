@@ -1,16 +1,15 @@
 import re
 
-import sqlalchemy.databases
 from aiogram.dispatcher.filters import Text
 
-from app.keyborads.common import create_common_keyboards, check_user_rooms
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from app.database.config import async_session
 from app.database.operations import RoomDB
 from app import dispatcher as dp
 from aiogram.types.message import ParseMode
+
+from app.keyborads.common import create_common_keyboards
 
 
 class CreateRoom(StatesGroup):
@@ -23,15 +22,18 @@ class JoinRoom(StatesGroup):
     waiting_for_room_number = State()
 
 
-@dp.message_handler(state='*', commands='cancel')
-@dp.message_handler(Text(equals='cancel', ignore_case=True), state='*')
+class DeleteRoom(StatesGroup):
+    waiting_for_room_number = State()
+
+
+@dp.message_handler(state='*', commands='отмена')
+@dp.message_handler(Text(equals='отмена',
+                         ignore_case=True), state='*')
 async def cancel_handler(message: types.Message, state: FSMContext):
-    rooms = await check_user_rooms(message)
-    keyboard = await create_common_keyboards(rooms)
+    keyboard = await create_common_keyboards(message)
     await state.finish()
-    await message.reply('Создание комнаты отменено, '
-                        'но ты всегда можешь начать сначала 👻',
-                        reply_markup=keyboard)
+    await message.answer("Действие отменено",
+                         reply_markup=keyboard)
 
 
 @dp.message_handler(lambda message: message.text == "Создать комнату 🔨",
@@ -42,7 +44,7 @@ async def create_room(message: types.Message):
         '"Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
         'Напиши мне ее название и мы пойдем дальше\n\n'
-        'Что бы отменить процесс, напишите в чате *cancel*',
+        'Что бы отменить процесс, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN,
     )
 
@@ -60,7 +62,7 @@ async def process_name(message: types.Message, state: FSMContext):
         'Напиши в чат сумму в любом формате, '
         'например 2000 тенге,'
         '200 руб или 20$\n\n'
-        'Что бы отменить процесс, напишите в чате *cancel*',
+        'Что бы отменить процесс, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN,
     )
 
@@ -77,31 +79,24 @@ async def process_budget(message: types.Message, state: FSMContext):
         'Напиши свои пожелания по подарку. '
         'Возможно у тебя есть хобби и '
         'ты хочешь получить что-то особое?\n\n'
-        'Что бы отменить процесс, напишите в чате *cancel*',
+        'Что бы отменить процесс, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN
     )
 
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_notes)
 async def process_notes(message: types.Message, state: FSMContext):
-    user_id = message.chat.id
-
     async with state.proxy() as data:
         data['user_notes'] = message.text
 
     await state.finish()
 
-    async with async_session() as db_session:
-        async with db_session.begin():
-            room = await RoomDB(db_session).create_room(
-                name=data['room_name'],
-                owner=user_id,
-                budget=data['room_budget'],
-                user_note=data['user_notes']
-            )
-            rooms = await RoomDB(db_session).get_joined_in_rooms(user_id)
+    room = await RoomDB().create_room(user_note=data['user_notes'],
+                                      owner=message.chat.id,
+                                      name=data['room_name'],
+                                      budget=data['room_budget'])
 
-    keyboard = await create_common_keyboards(rooms)
+    keyboard = await create_common_keyboards(message)
 
     await message.answer(
         '"Хо-хо-хо! 🎅\n\n'
@@ -110,14 +105,12 @@ async def process_notes(message: types.Message, state: FSMContext):
         f'Держи номер комнаты *{room.number}*\n'
         f'Этот код нужно сообщить своим друзьям, '
         f'что бы они присоединились '
-        f'к твоей игре.\n\n'
-        'Что бы отменить процесс, напишите в чате *cancel*',
+        f'к твоей игре.\n\n',
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard
     )
 
 
-# TODO
 @dp.message_handler(lambda message: message.text == "Войти в комнату 🏠",
                     state=None)
 async def join_room(message: types.Message):
@@ -125,42 +118,44 @@ async def join_room(message: types.Message):
     await message.answer(
         '"Хо-хо-хо! 🎅\n\n'
         'Введи номер комнаты в которую ты хочешь зайти.\n\n'
-        'Что бы отменить процесс, напишите в чате *cancel*',
+        'Что бы отменить процесс, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN,
     )
 
 
 @dp.message_handler(state=JoinRoom.waiting_for_room_number)
 async def joined_room(message: types.Message, state: FSMContext):
-    user_id = message.chat.id
-
     async with state.proxy() as data:
         data['room_number'] = message.text
 
+    if isinstance(int, data['room_number']):
+        result = await RoomDB().add_member(
+            user_id=message.chat.id,
+            room_number=data['room_number']
+        )
+    else:
+        result = False
+
+    keyboard = await create_common_keyboards(message)
+
     await state.finish()
-    async with async_session() as db_session:
-        async with db_session.begin():
-            result = await RoomDB(db_session).add_member(user=user_id,
-                                                         room_number=data[
-                                                             'room_number']
-                                                         )
     if result:
         await message.answer(
             '"Хо-хо-хо! 🎅\n\n'
             'Теперь ты можешь поиграть',
             parse_mode=ParseMode.MARKDOWN,
+            reply_markup=keyboard
         )
     else:
         await message.answer(
-            'Что-то пошло не так',
+            'Вы ввели несуществующий номер комнаты, попробуйте снова',
             parse_mode=ParseMode.MARKDOWN,
         )
 
 
 @dp.message_handler(lambda message: message.text.startswith("Ваша комната:"))
 async def my_room(message: types.Message):
-    number_room = re.findall(r'\d+', message.text)[0]
-
+    number_room = re.findall(r'\d{6}', message.text)[0]
     keyboard_inline = types.InlineKeyboardMarkup()
 
     keyboard_list = [
@@ -176,7 +171,7 @@ async def my_room(message: types.Message):
             text="Изменить пожелания 🎁",
             callback_data=f"room_chnotes_{number_room}"
         ), types.InlineKeyboardButton(
-            text="Выйти из комнаты ❌",
+            text="Выйти из комнаты 🚪",
             callback_data=f"room_exit_{number_room}"
         ), types.InlineKeyboardButton(
             text="Удалить комнату ❌",
@@ -191,18 +186,41 @@ async def my_room(message: types.Message):
                          reply_markup=keyboard_inline)
 
 
-async def delete_room(message: types.Message, room_number):
-    user_id = message.chat.id
-    async with async_session() as db_session:
-        async with db_session.begin():
-            await RoomDB(db_session).delete_room(room_number=room_number)
-            rooms = await RoomDB(db_session).get_joined_in_rooms(user_id)
+@dp.message_handler(state=None)
+async def delete_room(message: types.Message, room_number: int):
+    await DeleteRoom.waiting_for_room_number.set()
+    state = dp.get_current().current_state()
+    await state.update_data(room_number=room_number)
 
-    keyboard = await create_common_keyboards(rooms)
-    await message.edit_text('Комната успешно удалена')
-
-    await message.answer(
-        'Вы можете создать новую комнату в меню ниже',
+    await message.edit_text(
+        f'Для подтверждения удаления комнаты {room_number}, '
+        f'введите в чат *подтверждаю*.\n\n '
+        'Что бы отменить удаление, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN,
-        reply_markup=keyboard
     )
+
+
+@dp.message_handler(state=DeleteRoom.waiting_for_room_number)
+async def answer_delete_room(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['confirmation'] = message.text.lower()
+
+    if data['confirmation'] == 'подтверждаю':
+        await RoomDB().delete_room(room_number=data['room_number'])
+
+        keyboard = await create_common_keyboards(message)
+
+        await message.answer(
+            'Комната успешно удалена\n\n'
+            'Вы можете создать новую комнату в меню ниже',
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=keyboard
+        )
+
+    else:
+        # TODO добавить состояние возврата
+        await message.answer(
+            'Вы ввели неверную команду для подтверждения, попробуйте снова.',
+            parse_mode=ParseMode.MARKDOWN,
+        )
+    await state.finish()

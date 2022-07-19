@@ -1,85 +1,55 @@
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger, \
-    DateTime, Boolean
-from sqlalchemy.orm import relationship
-from app.database.config import Base
+from tortoise.models import Model
+from tortoise import fields
 
 
-class User(Base):
-    __tablename__ = 'users'
+class User(Model):
+    id = fields.IntField(pk=True)
+    telegram_id = fields.IntField(null=False, unique=True)
+    username = fields.CharField(max_length=64)
+    first_name = fields.CharField(max_length=64, null=True)
+    last_name = fields.CharField(max_length=64, null=True)
+    email = fields.CharField(max_length=64, null=True)
+    address = fields.CharField(max_length=256, null=True)
+    contact_number = fields.CharField(max_length=12, null=True)
+    registered_at = fields.DatetimeField(auto_now_add=True)
+    is_active = fields.BooleanField(default=True)
+    is_superuser = fields.BooleanField(default=False)
 
-    id = Column(Integer, primary_key=True)
-    telegram_id = Column(BigInteger, nullable=False)
-    username = Column(String(56), nullable=False)
-    first_name = Column(String(56), nullable=True)
-    last_name = Column(String(56), nullable=True)
-    email = Column(String(56), nullable=True)
-    address = Column(String(), nullable=True)
-    contact_number = Column(String(18), nullable=True)
-    registered_at = Column(DateTime, nullable=False, default=datetime.now())
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
-    rooms = relationship('Room',
-                         secondary='rooms_users', back_populates='members',
-                         cascade="all, delete")
-
-    room_owner = relationship('Room', back_populates='owner')
-    notes = relationship('Note', back_populates='user')
-
-    def __repr__(self):
-        return f'username:{self.username} user_id:{self.telegram_id}'
+    def __str__(self):
+        return f"User {self.telegram_id} : {self.username}"
 
 
-class Room(Base):
-    __tablename__ = 'rooms'
+class Room(Model):
+    id = fields.IntField(pk=True)
+    name = fields.CharField(max_length=64, null=False)
+    number = fields.IntField(null=False)
+    budget = fields.CharField(max_length=64, null=False)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    is_started = fields.BooleanField(default=False)
+    started_at = fields.DatetimeField(null=True)
+    finished_at = fields.DatetimeField(null=True)
+    owner = fields.ForeignKeyField('models.User', related_name='room_owner')
+    members = fields.ManyToManyField('models.User', related_name='members',
+                                     through='rooms_users', on_delete='CASCADE')
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(12), nullable=False)
-    number = Column(Integer(), nullable=False, unique=True)
-    budget = Column(String(12), nullable=False)
-    created_ad = Column(DateTime, default=datetime.now())
-    is_started = Column(Boolean, default=False)
-    started_at = Column(DateTime, nullable=True)
-    finished_at = Column(DateTime, nullable=True)
-    owner_id = Column(Integer, ForeignKey('users.id'))
-    members = relationship('User',
-                           secondary='rooms_users', back_populates='rooms',
-                           cascade="all, delete")
-    owner = relationship('User', back_populates='room_owner')
-    game_result = relationship('GameResult', back_populates='room')
-    notes = relationship('Note', back_populates='room',
-                         cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f'Room name:{self.name} Number:{self.number}'
+    def __str__(self):
+        return f"Room {self.number}: {self.name}"
 
 
-class RoomUser(Base):
-    __tablename__ = "rooms_users"
+class Note(Model):
+    id = fields.IntField(pk=True)
+    note = fields.CharField(max_length=256, null=False)
+    room = fields.ForeignKeyField('models.Room', related_name='room',
+                                  on_delete='CASCADE')
+    user = fields.ForeignKeyField('models.User', related_name='note_owner')
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    room_id = Column(Integer, ForeignKey('rooms.id'))
-
-
-class Note(Base):
-    __tablename__ = 'notes'
-
-    id = Column(Integer, primary_key=True)
-    note = Column(String(1024), nullable=True)
-    room_id = Column(Integer, ForeignKey('rooms.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='notes')
-    room = relationship('Room', back_populates='notes')
+    def __str__(self):
+        return f"Room {self.room}: {self.user}"
 
 
-class GameResult(Base):
-    __tablename__ = "games_results"
-
-    id = Column(Integer, primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.id', ondelete='CASCADE'))
-    room = relationship('Room', back_populates='game_result')
-    recipient_id = Column(Integer, ForeignKey('users.id'))
-    sender_id = Column(Integer, ForeignKey('users.id'))
-    assigned_at = Column(DateTime)
+class GameResult(Model):
+    id = fields.IntField(pk=True)
+    room = fields.ForeignKeyField('models.Room', related_name='result_of_game')
+    recipient = fields.ForeignKeyField('models.User', related_name='recipient')
+    sender = fields.ForeignKeyField('models.User', related_name='sender')
+    assigned_at = fields.DatetimeField(null=True)

@@ -1,10 +1,13 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, sessionmaker
+from tortoise import Tortoise
 
+# TODO PSQL
 # DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost/postgres'
-DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+DATABASE_URL = 'sqlite:db.db'
 
-engine = create_async_engine(DATABASE_URL, future=True, echo=True)
-async_session = sessionmaker(engine, expire_on_commit=False,
-                             class_=AsyncSession)
-Base = declarative_base()
+
+async def database_initialization():
+    await Tortoise.init(
+        db_url=DATABASE_URL,
+        modules={'models': ['app.database.models']}
+    )
+

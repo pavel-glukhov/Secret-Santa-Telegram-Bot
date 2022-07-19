@@ -1,19 +1,11 @@
 from aiogram import types
 
-from app.database.config import async_session
 from app.database.operations import RoomDB
 
 
-async def check_user_rooms(message: types.Message) -> list:
+async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
     user_id = message.chat.id
-    async with async_session() as db_session:
-        async with db_session.begin():
-            rooms = await RoomDB(db_session).get_joined_in_rooms(user_id)
-
-    return rooms
-
-
-async def create_common_keyboards(rooms: list) -> types.ReplyKeyboardMarkup:
+    rooms = await RoomDB().get_joined_in_rooms(user_id)
     users_list_rooms = []
     if rooms:
         for room in rooms:
