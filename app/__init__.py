@@ -1,6 +1,6 @@
 from aiogram import Bot, Dispatcher, executor
 import logging
-
+from app.database.operations import UserDB, RoomDB, WishDB
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from app.settings import config
@@ -10,4 +10,8 @@ bot = Bot(token=config.bot.token)
 storage = MemoryStorage()
 dispatcher = Dispatcher(bot, storage=storage)
 
-from app.handlers import *
+user_db = UserDB
+room_db = RoomDB
+wish_db = WishDB
+
+from app import handlers

@@ -1,24 +1,30 @@
-from app import dispatcher as dp
-from aiogram import types
-from app.database.operations import UserDB, RoomDB
+from aiogram.dispatcher import FSMContext
 
+from aiogram import types
+from app import room_db, user_db
 from app.keyborads.common import create_common_keyboards
 
 
-@dp.message_handler(commands=['start'])
+async def cancel_handler(message: types.Message, state: FSMContext):
+    keyboard = await create_common_keyboards(message)
+    await state.finish()
+    await message.answer("Действие отменено",
+                         reply_markup=keyboard)
+
+
 async def start(message: types.Message):
     user_id = message.chat.id
     username = message.chat.username
     first_name = message.chat.first_name
     last_name = message.chat.last_name
 
-    await UserDB().create_user_or_get(username=username,
-                                      user_id=user_id,
-                                      first_name=first_name,
-                                      last_name=last_name)
+    await user_db().create_user_or_get(username=username,
+                                       user_id=user_id,
+                                       first_name=first_name,
+                                       last_name=last_name)
 
     keyboard = await create_common_keyboards(message)
-    await RoomDB().get_joined_in_rooms(user_id)
+    await room_db().get_joined_in_rooms(user_id)
     await message.answer(
         "Хо-хо-хо! 🎅\n\n"
         "Вот и настало поиграть в Тайного Санту!\n\n"
@@ -27,7 +33,6 @@ async def start(message: types.Message):
     )
 
 
-@dp.message_handler(lambda message: message.text == "Об игре ℹ️")
 async def about_game(message: types.Message):
     msg = 'Это адаптированная игра "Тайный Санта"'
     await message.answer(msg)

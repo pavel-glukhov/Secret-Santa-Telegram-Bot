@@ -1,5 +1,5 @@
 from aiogram import types
-
+from app.keyborads.constants import MAIN_BUTTONS
 from app.database.operations import RoomDB
 
 
@@ -14,10 +14,10 @@ async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
             )
 
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    create_room = types.KeyboardButton(text="Создать комнату 🔨")
-    join_room = types.KeyboardButton(text="Войти в комнату 🏠")
-    about = types.KeyboardButton(text="Об игре ℹ️")
-    user_profile = types.KeyboardButton(text="Мой профиль 👤")
+    create_room = types.KeyboardButton(text=MAIN_BUTTONS['create_room'])
+    join_room = types.KeyboardButton(text=MAIN_BUTTONS['join_room'])
+    about = types.KeyboardButton(text=MAIN_BUTTONS['about'])
+    user_profile = types.KeyboardButton(text=MAIN_BUTTONS['user_profile'])
 
     keyboard.add(join_room, create_room)
     if users_list_rooms:

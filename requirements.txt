@@ -3,3 +3,4 @@ python-dotenv==0.20.0
 SQLAlchemy==1.4.39
 asyncpg==0.26.0
 tortoise_orm==0.19.2
+aerich

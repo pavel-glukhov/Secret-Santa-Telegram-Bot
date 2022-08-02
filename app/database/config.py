@@ -11,3 +11,4 @@ async def database_initialization():
         modules={'models': ['app.database.models']}
     )
 
+
