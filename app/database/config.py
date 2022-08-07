@@ -2,7 +2,7 @@ from tortoise import Tortoise
 
 # TODO PSQL
 # DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost/postgres'
-DATABASE_URL = 'sqlite:db.db'
+DATABASE_URL = 'sqlite:db_t.db'
 
 
 async def database_initialization():

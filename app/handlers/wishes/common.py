@@ -1,8 +1,9 @@
 from typing import Union
 
 from aiogram import types
-from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
+
 from app import dispatcher as dp
 
 

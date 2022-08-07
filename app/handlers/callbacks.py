@@ -1,11 +1,12 @@
-from aiogram.dispatcher.filters import Text
 from aiogram import types
+from aiogram.dispatcher.filters import Text
 
-from app import dispatcher as dp, bot
+from app import bot
+from app import dispatcher as dp
 from app.handlers.profiles.common import edit_profile
 from app.handlers.rooms.change_owner import change_room_owner
-from app.handlers.rooms.delete_room import delete_room
 from app.handlers.rooms.common import members_list
+from app.handlers.rooms.delete_room import delete_room
 from app.handlers.rooms.unsubscribe_room import left_room
 from app.handlers.rooms.update_room import update_room_name
 from app.handlers.wishes.common import update_wishes

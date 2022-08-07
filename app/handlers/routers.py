@@ -1,28 +1,21 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text
 
-from app.handlers.common import cancel_handler, start, about_game
+from app.handlers.common import about_game, cancel_handler, start
 from app.handlers.rooms.common import my_room
-from app.handlers.rooms.create_room import (
-    create_room,
-    process_wishes, process_budget,
-    process_name, CreateRoom
-)
-from app.handlers.rooms.validators import (
-    room_name_invalid,
-    process_join_room_invalid_text_type)
-from app.handlers.rooms.delete_room import (
-    DeleteRoom,
-    process_delete_room_invalid,
-    completed_process_delete_room
-)
-from app.handlers.rooms.subscribe_room import (
-    join_room,
-    JoinRoom, process_room_number,
-    process_room_wishes
-)
+from app.handlers.rooms.create_room import (CreateRoom, create_room,
+                                            process_budget, process_name,
+                                            process_wishes)
+from app.handlers.rooms.delete_room import (DeleteRoom,
+                                            completed_process_delete_room,
+                                            process_delete_room_invalid)
+from app.handlers.rooms.subscribe_room import (JoinRoom, join_room,
+                                               process_room_number,
+                                               process_room_wishes)
 from app.handlers.rooms.update_room import (ChangeRoomName,
                                             update_room_name_get_value)
+from app.handlers.rooms.validators import (process_join_room_invalid_text_type,
+                                           room_name_invalid)
 from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 

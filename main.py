@@ -1,14 +1,13 @@
 import asyncio
 import logging
+
 from tortoise import Tortoise
-from app.handlers.routers import (
-    setup_cancel_handlers,
-    setup_profile_handlers,
-    setup_room_handlers,
-    setup_root_handlers
-)
-from app import dispatcher, bot
+
+from app import bot, dispatcher
 from app.database.config import database_initialization
+from app.handlers.routers import (setup_cancel_handlers,
+                                  setup_profile_handlers, setup_room_handlers,
+                                  setup_root_handlers)
 
 
 async def on_startup():

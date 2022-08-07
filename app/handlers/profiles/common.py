@@ -1,7 +1,7 @@
-from aiogram.types.message import ParseMode
-from app import dispatcher as dp
 from aiogram import types
 from aiogram.types.message import ParseMode
+
+from app import dispatcher as dp
 from app.database import user_db
 from app.misc.formatters import user_information_formatter
 
