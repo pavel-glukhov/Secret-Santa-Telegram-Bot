@@ -8,7 +8,9 @@ from app.handlers.rooms.create_room import (
     process_wishes, process_budget,
     process_name, CreateRoom
 )
-from app.handlers.rooms.validators import room_name_invalid
+from app.handlers.rooms.validators import (
+    room_name_invalid,
+    process_join_room_invalid_text_type)
 from app.handlers.rooms.delete_room import (
     DeleteRoom,
     process_delete_room_invalid,
@@ -16,19 +18,18 @@ from app.handlers.rooms.delete_room import (
 )
 from app.handlers.rooms.subscribe_room import (
     join_room,
-    process_join_room_invalid_text_type,
     JoinRoom, process_room_number,
-    joined_room
+    process_room_wishes
 )
 from app.handlers.rooms.update_room import (ChangeRoomName,
                                             update_room_name_get_value)
-from app.keyborads.constants import MAIN_BUTTONS
+from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 
 def setup_cancel_handlers(dp: Dispatcher):
     # cancel handlers
     dp.register_message_handler(
-        cancel_handler, Text(contains=[x for x in MAIN_BUTTONS.values()]),
+        cancel_handler, Text(contains=[x for x in MAIN_REPLY_BUTTONS.values()]),
         state='*'
     )
     dp.register_message_handler(
@@ -49,7 +50,7 @@ def setup_root_handlers(dp: Dispatcher):
     )
     dp.register_message_handler(
         about_game,
-        lambda message: message.text == MAIN_BUTTONS['about']
+        lambda message: message.text == MAIN_REPLY_BUTTONS['about']
     )
 
 
@@ -65,7 +66,7 @@ def setup_room_handlers(dp: Dispatcher):
     dp.register_message_handler(
         create_room,
         lambda
-            message: message.text == MAIN_BUTTONS['create_room'],
+            message: message.text == MAIN_REPLY_BUTTONS['create_room'],
         state=None
     )
     dp.register_message_handler(
@@ -88,18 +89,20 @@ def setup_room_handlers(dp: Dispatcher):
 
     # Join room
     dp.register_message_handler(join_room, lambda
-        message: message.text == MAIN_BUTTONS['join_room'],
+        message: message.text == MAIN_REPLY_BUTTONS['join_room'],
                                 state=None)
-
     dp.register_message_handler(process_join_room_invalid_text_type,
                                 lambda message: not message.text.isdigit(),
                                 state=JoinRoom.waiting_for_room_number)
-
     dp.register_message_handler(process_room_number,
+                                state=JoinRoom.waiting_for_room_number)
+    dp.register_message_handler(process_room_wishes,
                                 state=JoinRoom.waiting_for_wishes)
 
-    dp.register_message_handler(joined_room,
-                                state=JoinRoom.waiting_for_room_number)
+
+
+
+
 
     # delete rooms
     dp.register_message_handler(process_delete_room_invalid,

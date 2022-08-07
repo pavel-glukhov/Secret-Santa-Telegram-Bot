@@ -2,9 +2,9 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
-from app.keyborads.constants import MAIN_BUTTONS
+from app.keyborads.constants import MAIN_REPLY_BUTTONS
 from app import dispatcher as dp
-from app import room_db
+from app.database import room_db
 from app.keyborads.common import create_common_keyboards
 
 

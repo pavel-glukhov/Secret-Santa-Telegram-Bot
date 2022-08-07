@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 
 from app import dispatcher as dp
-from app import room_db
+from app.database import room_db
 from app.keyborads.common import create_common_keyboards
 
 
@@ -29,13 +29,11 @@ async def delete_room(message: types.Message,
     )
 
 
-
 async def process_delete_room_invalid(message: types.Message):
     return await message.reply(
         'Вы ввели неверную команду для подтверждения, попробуйте снова.\n'
         'Что бы отменить удаление, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN, )
-
 
 
 async def completed_process_delete_room(message: types.Message,

@@ -4,14 +4,13 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 
 from app import dispatcher as dp
-from app import room_db
+from app.database import room_db, wish_db
 from app.keyborads.common import create_common_keyboards
 
 
 class JoinRoom(StatesGroup):
     waiting_for_room_number = State()
     waiting_for_wishes = State()
-
 
 
 async def join_room(message: types.Message):
@@ -24,16 +23,6 @@ async def join_room(message: types.Message):
     )
 
 
-# TODO добавить выбор пожелания
-async def process_join_room_invalid_text_type(message: types.Message):
-    return await message.reply(
-        text='Номер комнаты может содержать только цифры, '
-             'попробуйте снова.\n'
-             'Что бы отменить процесс, введите в чате *отмена*',
-        parse_mode=ParseMode.MARKDOWN, )
-
-
-
 async def process_room_number(message: types.Message, state: FSMContext):
     user_id = message.chat.id
 
@@ -41,8 +30,8 @@ async def process_room_number(message: types.Message, state: FSMContext):
         data['room_number'] = message.text
 
     room_number = message.text
-
     is_exists = await room_db().is_exists(room_number=room_number)
+
     if not is_exists:
         await message.answer(
             'Введенной комнаты не существует.',
@@ -50,7 +39,7 @@ async def process_room_number(message: types.Message, state: FSMContext):
         )
     else:
         is_member = await room_db().is_member(user_id=user_id,
-                                             room_number=room_number)
+                                              room_number=room_number)
 
         if is_member:
             keyboard = await create_common_keyboards(message)
@@ -74,16 +63,15 @@ async def process_room_number(message: types.Message, state: FSMContext):
             )
 
 
-# TODO добавить создание желания
-async def joined_room(message: types.Message, state: FSMContext):
+async def process_room_wishes(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['room_number'] = message.text
-
+        data['wishes'] = message.text
         user_id = message.chat.id
-        wishes = message.text
         await room_db().add_member(user_id=user_id,
-                                  room_number=data['room_number'])
-
+                                   room_number=data['room_number'])
+        await wish_db().update_or_create(wish=data['wishes'],
+                                         user_id=user_id,
+                                         room_id=data['room_number'])
         keyboard = await create_common_keyboards(message)
         await message.answer(
             '"Хо-хо-хо! 🎅\n\n'

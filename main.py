@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from tortoise import Tortoise
-from app.routers import (
+from app.handlers.routers import (
     setup_cancel_handlers,
     setup_profile_handlers,
     setup_room_handlers,

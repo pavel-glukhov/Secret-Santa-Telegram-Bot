@@ -1,11 +1,11 @@
 from aiogram import types
-from app.keyborads.constants import MAIN_BUTTONS
-from app.database.operations import RoomDB
+from app.keyborads.constants import MAIN_REPLY_BUTTONS
+from app.database import room_db
 
 
 async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
     user_id = message.chat.id
-    rooms = await RoomDB().get_joined_in_rooms(user_id)
+    rooms = await room_db().get_joined_in_rooms(user_id)
     users_list_rooms = []
     if rooms:
         for room in rooms:
@@ -14,10 +14,10 @@ async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
             )
 
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    create_room = types.KeyboardButton(text=MAIN_BUTTONS['create_room'])
-    join_room = types.KeyboardButton(text=MAIN_BUTTONS['join_room'])
-    about = types.KeyboardButton(text=MAIN_BUTTONS['about'])
-    user_profile = types.KeyboardButton(text=MAIN_BUTTONS['user_profile'])
+    create_room = types.KeyboardButton(text=MAIN_REPLY_BUTTONS['create_room'])
+    join_room = types.KeyboardButton(text=MAIN_REPLY_BUTTONS['join_room'])
+    about = types.KeyboardButton(text=MAIN_REPLY_BUTTONS['about'])
+    user_profile = types.KeyboardButton(text=MAIN_REPLY_BUTTONS['user_profile'])
 
     keyboard.add(join_room, create_room)
     if users_list_rooms:
