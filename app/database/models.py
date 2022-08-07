@@ -14,6 +14,9 @@ class User(Model):
     is_active = fields.BooleanField(default=True)
     is_superuser = fields.BooleanField(default=False)
 
+    class Meta:
+        table = "users"
+
     def __str__(self):
         return f"User {self.user_id} : {self.username}"
 
@@ -31,6 +34,8 @@ class Room(Model):
     members = fields.ManyToManyField('models.User', related_name='members',
                                      through='rooms_users', on_delete='CASCADE')
 
+    class Meta:
+        table = "rooms"
 
     def __str__(self):
         return f"Room {self.number}: {self.name}"
@@ -43,6 +48,10 @@ class Wish(Model):
                                   on_delete='CASCADE')
     user = fields.ForeignKeyField('models.User', related_name='wishes_of_owner')
 
+    class Meta:
+        table = "wishes"
+        unique_together = (("room", "user"),)
+
     def __str__(self):
         return f"Room {self.room}: {self.user}"
 
@@ -53,3 +62,6 @@ class GameResult(Model):
     recipient = fields.ForeignKeyField('models.User', related_name='recipient')
     sender = fields.ForeignKeyField('models.User', related_name='sender')
     assigned_at = fields.DatetimeField(null=True)
+
+    class Meta:
+        table = "game_results"
