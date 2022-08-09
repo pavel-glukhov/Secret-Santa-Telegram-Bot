@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 
-from app import bot
 from app import dispatcher as dp
 from app.handlers.profiles.common import edit_profile
 from app.handlers.rooms.change_owner import change_room_owner
