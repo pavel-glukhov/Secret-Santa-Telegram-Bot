@@ -28,6 +28,10 @@ async def my_room(message: types.Message):
     if is_owner:
         keyboard_list.extend([
             types.InlineKeyboardButton(
+                text="Начать игру 🎲",  # TODO реализовать
+                callback_data=f"room_member-list_{room_number}"
+            ),
+            types.InlineKeyboardButton(
                 text="Список участников 👥",  # TODO Добавить пагинацию
                 callback_data=f"room_member-list_{room_number}"
             ),

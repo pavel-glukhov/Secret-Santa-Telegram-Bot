@@ -5,13 +5,14 @@ from tortoise import Tortoise
 
 from app import bot, dispatcher
 from app.database.config import database_initialization
-from app.handlers.routers import (setup_cancel_handlers,
-                                  setup_profile_handlers, setup_room_handlers,
-                                  setup_root_handlers)
+from app.routers.room_routers import setup_room_handlers
+from app.routers.profile_routers import setup_profile_handlers
+from app.routers.root_routers import setup_cancel_handlers, setup_root_handlers
 
 
-async def on_startup():
-    logging.info("Register handlers...")
+async def register_handlers():
+    logging.info("Register handlers")
+
     setup_cancel_handlers(dispatcher)
     setup_root_handlers(dispatcher)
     setup_profile_handlers(dispatcher)
@@ -19,7 +20,7 @@ async def on_startup():
 
 
 async def main():
-    await on_startup()
+    await register_handlers()
     await database_initialization()
     await Tortoise.generate_schemas()
     await dispatcher.start_polling(bot)

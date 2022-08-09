@@ -3,10 +3,10 @@ from aiogram.types.message import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-from app.misc.formatters import user_information_formatter
+from app.utils.formatters import user_information_formatter
 
 
-@dp.message_handler(lambda message: message.text == "Мой профиль 👤")
+
 async def my_profile(message: types.Message):
     edit_user_profile = types.InlineKeyboardButton(
         text="Изменить профиль 👋",

@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from app import room_db, user_db
+from app.database import room_db, user_db
 from app.keyborads.common import create_common_keyboards
 
 
