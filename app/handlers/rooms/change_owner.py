@@ -29,9 +29,11 @@ async def change_room_owner(message: types.Message, room_number):
 
 async def process_changing_owner(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        new_owner: User = await room_db().change_owner(message.text,
-                                                       room_number=data[
-                                                           'room_number'])
+        username = message.text
+        room_number = data['room_number']
+
+        new_owner: User = await room_db().change_owner(username,
+                                                       room_number)
         keyboard = await create_common_keyboards(message)
         await state.finish()
         if new_owner:
