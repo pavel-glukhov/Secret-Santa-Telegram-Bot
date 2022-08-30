@@ -71,14 +71,14 @@ class RoomDB:
         return await self._class.filter(number=room_number).first()
 
     # TODO Требуется протестировать
-    async def change_owner(self, user_id,
-                           room_number: Union[int, str]):
-        user = await UserDB().get_user_or_none(user_id)
+    async def change_owner(self, user_name: str,
+                           room_number: int):
+        user = await UserDB().get_user_or_none(user_name)
         room = await self._class.filter(number=room_number).first()
-        if user in room.members:
-            owner = await self._class.filter(number=room_number).update(
-                owner__user_id=user_id)
-            return owner
+        if user in await room.members:
+            await self._class.filter(number=room_number).update(
+                owner=user)
+            return user
         return False
 
     async def get_joined_in_rooms(self, user_id: int) -> list[Room]:
