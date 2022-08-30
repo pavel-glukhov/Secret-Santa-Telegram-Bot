@@ -3,10 +3,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 
-from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import create_common_keyboards
-from app.keyborads.constants import MAIN_REPLY_BUTTONS
+
 
 
 class CreateRoom(StatesGroup):
@@ -27,6 +26,11 @@ async def create_room(message: types.Message):
 
 
 async def process_name(message: types.Message, state: FSMContext):
+    cancel_button = types.InlineKeyboardButton(
+        text="Отмена",
+        callback_data="cancel"
+    )
+    keyboard_inline = types.InlineKeyboardMarkup().add(cancel_button)
     async with state.proxy() as data:
         data['room_name'] = message.text
 
@@ -40,10 +44,16 @@ async def process_name(message: types.Message, state: FSMContext):
         '200 руб или 20$\n\n'
         'Что бы отменить процесс, введите в чате *отмена*',
         parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard_inline
     )
 
 
 async def process_budget(message: types.Message, state: FSMContext):
+    cancel_button = types.InlineKeyboardButton(
+        text="Отмена",
+        callback_data="cancel"
+    )
+    keyboard_inline = types.InlineKeyboardMarkup().add(cancel_button)
     async with state.proxy() as data:
         data['room_budget'] = message.text
 
@@ -55,7 +65,8 @@ async def process_budget(message: types.Message, state: FSMContext):
         'Возможно у тебя есть хобби и '
         'ты хочешь получить что-то особое?\n\n'
         'Что бы отменить процесс, введите в чате *отмена*',
-        parse_mode=ParseMode.MARKDOWN
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard_inline
     )
 
 
