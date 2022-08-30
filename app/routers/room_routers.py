@@ -1,4 +1,7 @@
 from aiogram import Dispatcher
+
+from app.handlers.rooms.change_owner import change_room_owner, ChangeOwner, \
+    process_changing_owner
 from app.handlers.rooms.common import my_room
 from app.handlers.rooms.create_room import (CreateRoom, create_room,
                                             process_budget, process_name,
@@ -77,3 +80,7 @@ def setup_room_handlers(dp: Dispatcher):
     dp.register_message_handler(room_name_invalid,
                                 lambda message: len(message.text) > 12,
                                 state=ChangeRoomName.waiting_for_room_name)
+
+    # Change owner
+    dp.register_message_handler(process_changing_owner,
+                                state=ChangeOwner.waiting_for_owner_name)
