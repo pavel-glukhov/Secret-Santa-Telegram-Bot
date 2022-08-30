@@ -1,10 +1,8 @@
 import asyncio
 import logging
 
-from tortoise import Tortoise
-
 from app import bot, dispatcher
-from app.database.config import database_initialization
+from app.database import database_initialization
 from app.routers.room_routers import setup_room_handlers
 from app.routers.profile_routers import setup_profile_handlers
 from app.routers.root_routers import setup_cancel_handlers, setup_root_handlers
@@ -22,7 +20,6 @@ async def register_handlers():
 async def main():
     await register_handlers()
     await database_initialization()
-    await Tortoise.generate_schemas()
     await dispatcher.start_polling(bot)
 
 
