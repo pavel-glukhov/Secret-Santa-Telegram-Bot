@@ -13,8 +13,8 @@ async def my_profile(message: types.Message):
         callback_data="profile_edit"
     )
     keyboard_inline = types.InlineKeyboardMarkup().add(edit_user_profile)
-
-    user = await user_db().get_user_or_none(user_id=message.chat.id)
+    user_id = message.chat.id
+    user = await user_db().get_user_or_none(user_id)
     user_information = await user_information_formatter(user)
 
     await message.answer("Предоставленные вами данные необходимы для отправки"
