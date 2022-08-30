@@ -1,7 +1,7 @@
 import random
 from typing import Union
 
-from app.database.models import Room, Wish
+from app.database.models import Room, Wish, User
 from app.database.operations.user_model import UserDB
 
 
@@ -13,6 +13,15 @@ class RoomDB:
                           owner: int,
                           budget: str,
                           user_wish: str) -> Room:
+        """
+        Create a new room for The Secret Santa Game
+
+        :param name: Name of the new room
+        :param owner: Owner of the new room
+        :param budget: Planned budget for the game
+        :param user_wish: The wishes of the creator of the room
+        :return: Room instance
+        """
         user = await UserDB().get_user_or_none(owner)
 
         unique_number = await self._get_room_unique_number()
@@ -31,11 +40,25 @@ class RoomDB:
 
         return room
 
-    async def update_room(self, room_number, **kwargs):
+    async def update_room(self, room_number: int, **kwargs) -> None:
+        """
+        Update data of a selected room
+
+        :param room_number:  Number of game room
+        :param kwargs:
+        :return: None
+        """
         await self._class.filter(number=room_number).update(**kwargs)
 
     async def add_member(self, user_id: int,
-                         room_number: Union[int, str]) -> bool:
+                         room_number: int) -> bool:
+        """
+        Add new member to the room
+
+        :param user_id: The telegram user_id of a user
+        :param room_number: Number of game room
+        :return: Bool
+        """
 
         user = await UserDB().get_user_or_none(user_id)
         room = await self._class.filter(number=room_number).first()
@@ -46,34 +69,66 @@ class RoomDB:
         await room.members.add(user)
         return True
 
-    async def list_members(self, room_number: Union[int, str]) -> Room:
+    async def list_members(self, room_number: int) -> Room:
+        """
+        Get all members of room
+
+        :param room_number: Number of game room
+        :return: Room instance
+        """
         room = await self._class.filter(number=room_number).first()
         return await room.members
 
     async def remove_member(self, user_id: int,
-                            room_number: Union[int, str]) -> None:
+                            room_number: int) -> None:
+        """
+        Remove member from a room
+
+        :param user_id: The telegram user_id of a user
+        :param room_number: Number of game room
+        :return: None
+        """
         user = await UserDB().get_user_or_none(user_id)
         room = await self._class.filter(number=room_number).first()
         await room.members.remove(user)
 
-    async def is_exists(self, room_number: Union[int, str]) -> bool:
+    async def is_exists(self, room_number: int) -> bool:
         result = await self._class.filter(number=room_number).exists()
         return result
 
-    async def is_member(self, user_id, room_number: Union[int, str]) -> bool:
+    async def is_member(self, user_id, room_number: int) -> bool:
+        """
+        Checking if user is member of room
+
+        :param user_id: The telegram user_id of a user
+        :param room_number:  Number of game room
+        :return: Bool
+        """
         result = await self._class.filter(
             number=room_number,
             members__user_id=user_id
         ).exists()
         return result
 
-    async def get_room(self, room_number):
+    async def get_room(self, room_number: int) -> Room:
+        """
+        Get Room instance
+
+        :param room_number: Number of game room
+        :return: Room instance
+        """
         return await self._class.filter(number=room_number).first()
 
-    # TODO Требуется протестировать
-    async def change_owner(self, user_name: str,
-                           room_number: int):
-        user = await UserDB().get_user_or_none(user_name)
+    async def change_owner(self, username: str,
+                           room_number: int) -> Union[User, bool]:
+        """
+        Change of owner in the room
+
+        :param username: Telegram username of a user
+        :param room_number: Room number of the Santa Game
+        :return: User instance or False if the user is not found.
+        """
+        user = await UserDB().get_user_or_none(username)
         room = await self._class.filter(number=room_number).first()
         if user in await room.members:
             await self._class.filter(number=room_number).update(
@@ -82,15 +137,34 @@ class RoomDB:
         return False
 
     async def get_joined_in_rooms(self, user_id: int) -> list[Room]:
+        """
+        Get the entire list of the user's rooms in which he is a member
+
+        :param user_id: The telegram user_id of a user
+        :return: List of Room instances
+        """
         rooms = await self._class.filter(members__user_id=user_id)
         return rooms
 
-    async def delete(self, room_number: Union[int, str]) -> None:
+    async def delete(self, room_number: int) -> None:
+        """
+        Delete room
+
+        :param room_number:
+        :return: None
+        """
         room = await self._class.filter(number=room_number).first()
         await Wish.filter(room=room).delete()
         await room.delete()
 
-    async def is_owner(self, user_id, room_number: Union[int, str]) -> bool:
+    async def is_owner(self, user_id, room_number: int) -> bool:
+        """
+        Checking if user is owner of room
+
+        :param user_id: Telegram user ID of user
+        :param room_number: Room number for checking on the owner
+        :return: True or False
+        """
         result = await self._class.filter(
             number=room_number,
             owner__user_id=user_id
@@ -99,6 +173,11 @@ class RoomDB:
         return result
 
     async def _get_room_unique_number(self) -> int:
+        """
+        Non-public method for generate of individual room number.
+
+        :return: int value
+        """
         rooms: list[Room] = await self._class.all()
         while True:
             number = random.randint(100_000, 999_999)
