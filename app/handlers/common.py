@@ -5,9 +5,9 @@ from app.database import room_db, user_db
 from app.keyborads.common import create_common_keyboards
 
 
-async def cancel_handler(message: types.Message, state: FSMContext):
+async def cancel_handler(message: types.Message):
     keyboard = await create_common_keyboards(message)
-    await state.finish()
+
     await message.answer("Действие отменено",
                          reply_markup=keyboard)
 
