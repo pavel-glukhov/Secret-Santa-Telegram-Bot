@@ -9,7 +9,7 @@ def setup_cancel_handlers(dp: Dispatcher):
 
     dp.register_message_handler(
         cancel_handler,
-        state='*', commands='отмена'
+        state='*', commands='cancel'
     )
     dp.register_message_handler(
         cancel_handler, Text(equals='отмена',
