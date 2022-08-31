@@ -6,7 +6,6 @@ from app.database import user_db
 from app.utils.formatters import user_information_formatter
 
 
-
 async def my_profile(message: types.Message):
     edit_user_profile = types.InlineKeyboardButton(
         text="Изменить профиль 👋",

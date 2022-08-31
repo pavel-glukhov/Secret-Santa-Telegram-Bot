@@ -1,21 +1,34 @@
 from aiogram import Dispatcher
 
-from app.handlers.rooms.change_owner import change_room_owner, ChangeOwner, \
+from app.handlers.rooms.change_owner import (
+    ChangeOwner,
     process_changing_owner
+)
 from app.handlers.rooms.common import my_room
-from app.handlers.rooms.create_room import (CreateRoom, create_room,
-                                            process_budget, process_name,
-                                            process_wishes)
-from app.handlers.rooms.delete_room import (DeleteRoom,
-                                            completed_process_delete_room,
-                                            process_delete_room_invalid)
-from app.handlers.rooms.subscribe_room import (JoinRoom, join_room,
-                                               process_room_number,
-                                               process_room_wishes)
-from app.handlers.rooms.update_room import (ChangeRoomName,
-                                            update_room_name_get_value)
-from app.handlers.rooms.validators import (process_join_room_invalid_text_type,
-                                           room_name_invalid)
+from app.handlers.rooms.create_room import (
+    CreateRoom, create_room,
+    process_budget, process_name,
+    process_wishes
+)
+from app.handlers.rooms.delete_room import (
+    DeleteRoom,
+    completed_process_delete_room,
+    process_delete_room_invalid
+)
+from app.handlers.rooms.subscribe_room import (
+    JoinRoom, join_room,
+    process_room_number,
+    process_room_wishes
+)
+from app.handlers.rooms.update_room import (
+    ChangeRoomName,
+    update_room_name_get_value
+)
+from app.handlers.rooms.validators import (
+    process_join_room_invalid_text_type,
+    room_name_invalid
+)
+from app.handlers.wishes.common import process_updating_wishes, ChangeWish
 from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 
@@ -84,3 +97,6 @@ def setup_room_handlers(dp: Dispatcher):
     # Change owner
     dp.register_message_handler(process_changing_owner,
                                 state=ChangeOwner.waiting_for_owner_name)
+
+    dp.register_message_handler(process_updating_wishes,
+                                state=ChangeWish.waiting_for_wishes)
