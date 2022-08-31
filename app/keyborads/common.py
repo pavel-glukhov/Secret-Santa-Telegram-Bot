@@ -4,6 +4,10 @@ from app.database import room_db
 from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 
+def personal_room_keyboard_form(room):
+    return f'Ваша комната: {room.name} ({room.number})'
+
+
 async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
     user_id = message.chat.id
     rooms = await room_db().get_joined_in_rooms(user_id)
@@ -11,7 +15,7 @@ async def create_common_keyboards(message) -> types.ReplyKeyboardMarkup:
     if rooms:
         for room in rooms:
             users_list_rooms.append(
-                f'Ваша комната: {room.name} ({room.number})'
+                personal_room_keyboard_form(room)
             )
 
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
