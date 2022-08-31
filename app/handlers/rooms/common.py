@@ -15,8 +15,8 @@ async def my_room(message: types.Message):
 
     keyboard_list = [
         types.InlineKeyboardButton(
-            text="Изменить пожелания 🎁",  # TODO Реализовать
-            callback_data=f"room_change-wish_{room_number}"
+            text="Ваши желания 🎁",  # TODO Реализовать и переименовать в посмотреть пожелания
+            callback_data=f"room_show-wish_{room_number}"
         ), types.InlineKeyboardButton(
             text="Выйти из комнаты 🚪",
             callback_data=f"room_exit_{room_number}"
@@ -40,7 +40,7 @@ async def my_room(message: types.Message):
                 callback_data=f"room_change-name_{room_number}"
             ),
             types.InlineKeyboardButton(
-                text="Изменить владельца 👤",  # TODO Реализовать
+                text="Изменить владельца 👤",
                 callback_data=f"room_change-owner_{room_number}"
             ),
             types.InlineKeyboardButton(
@@ -57,7 +57,7 @@ async def my_room(message: types.Message):
 
 
 async def members_list(message: types.Message,
-                       room_number: Union[int, str]) -> None:
+                       room_number: int) -> None:
     room = await room_db().get_room(room_number)
     members = await room.members
     member_str = ''
