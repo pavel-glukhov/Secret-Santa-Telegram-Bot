@@ -3,7 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from app.settings import config
+from app.config import config
 
 logging.basicConfig(level=logging.DEBUG)
 bot = Bot(token=config.bot.token)

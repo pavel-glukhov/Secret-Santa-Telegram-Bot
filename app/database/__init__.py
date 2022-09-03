@@ -4,9 +4,11 @@ from app.database.operations.room_model import RoomDB
 from app.database.operations.user_model import UserDB
 from app.database.operations.wish_model import WishDB
 
-# TODO PSQL
-# DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost/postgres'
-DATABASE_URL = 'sqlite:db_t.db'
+from app.config import config
+
+DATABASE_URL = f'postgres://{config.db.user}:'\
+               f'{config.db.password}@{config.db.host}:{config.db.port}/' \
+               f'{config.db.name}'
 
 TORTOISE_ORM = {
     'connections': {'default': DATABASE_URL},
