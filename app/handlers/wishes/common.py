@@ -16,13 +16,23 @@ class ChangeWish(StatesGroup):
 
 async def show_wishes(message: types.Message,
                       room_number: int):
+    keyboard_inline = types.InlineKeyboardMarkup()
+
     change_wish = types.InlineKeyboardButton(
         text="Изменить желание ✒️",
         callback_data=f"room_change-wish_{room_number}"
     )
-    keyboard_inline = types.InlineKeyboardMarkup().add(change_wish)
+    return_menu = types.InlineKeyboardButton(
+
+        text="Вернуться назад ◀️",
+        callback_data=f"room_menu_{room_number}"
+    )
+
     user_id = message.chat.id
     wishes = await wish_db().get_wishes(user_id, room_number)
+
+    keyboard_inline.add(change_wish)
+    keyboard_inline.add(return_menu)
 
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
@@ -36,18 +46,24 @@ async def update_wishes(message: types.Message,
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
     await message.edit_text(
-        '*Напиши новое желание:*\n\n'
-        'Что бы отменить процесс, введите в чате *отмена*',
+        '*Напиши новое желание:*\n',
         parse_mode=ParseMode.MARKDOWN,
     )
 
 
+@dp.message_handler(state=ChangeWish.waiting_for_wishes)
 async def process_updating_wishes(message: types.Message, state: FSMContext):
+    data = await dp.current_state().get_data()
+    room_number = data['room_number']
+    wish = message.text
     user_id = message.chat.id
-    keyboard = await create_common_keyboards(message)
-    async with state.proxy() as data:
-        wish = message.text
-        room_number = data['room_number']
+
+    keyboard_inline = types.InlineKeyboardMarkup()
+    return_back = types.InlineKeyboardButton(
+        text="Вернуться назад ◀️",
+        callback_data=f"room_menu_{room_number}"
+    )
+    keyboard_inline.add(return_back)
 
     await wish_db().update_or_create(
         wish,
@@ -63,5 +79,5 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
         f'{wish}\n\n'
         f'Санта обязательно учтет ваши пожелания! 🎅',
         parse_mode=ParseMode.MARKDOWN,
-        reply_markup=keyboard
+        reply_markup=keyboard_inline
     )

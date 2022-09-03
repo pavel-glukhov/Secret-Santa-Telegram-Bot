@@ -1,6 +1,7 @@
 import random
 from typing import Union
 
+from app.config import config
 from app.database.models import Room, Wish, User
 from app.database.operations.user_model import UserDB
 
@@ -117,7 +118,8 @@ class RoomDB:
         :param room_number: Number of game room
         :return: Room instance
         """
-        return await self._class.filter(number=room_number).first()
+        room = await self._class.filter(number=room_number).first()
+        return room
 
     async def change_owner(self, username: str,
                            room_number: int) -> Union[User, bool]:
@@ -130,13 +132,14 @@ class RoomDB:
         """
         user = await UserDB().get_user_or_none(username)
         room = await self._class.filter(number=room_number).first()
-        if user in await room.members:
-            await self._class.filter(number=room_number).update(
-                owner=user)
+        room_members = await room.members
+
+        if user in room_members:
+            await self._class.filter(number=room_number).update(owner=user)
             return user
         return False
 
-    async def get_joined_in_rooms(self, user_id: int) -> list[Room]:
+    async def get_all_user_rooms(self, user_id: int) -> list[Room]:
         """
         Get the entire list of the user's rooms in which he is a member
 
@@ -146,16 +149,20 @@ class RoomDB:
         rooms = await self._class.filter(members__user_id=user_id)
         return rooms
 
-    async def delete(self, room_number: int) -> None:
+    async def delete(self, room_number: int) -> bool:
         """
         Delete room
 
         :param room_number:
-        :return: None
+        :return: Return True if is deleted else False
         """
         room = await self._class.filter(number=room_number).first()
+        if not room:
+            return False
+
         await Wish.filter(room=room).delete()
         await room.delete()
+        return True
 
     async def is_owner(self, user_id, room_number: int) -> bool:
         """
@@ -173,14 +180,20 @@ class RoomDB:
         return result
 
     async def _get_room_unique_number(self) -> int:
+
         """
         Non-public method for generate of individual room number.
 
         :return: int value
         """
+        length = config.room.room_number_length
+        min_number = int("1" + "0" * (length - 1))
+        max_number = int("9" + "9" * (length - 1))
+
         rooms: list[Room] = await self._class.all()
+
         while True:
-            number = random.randint(100_000, 999_999)
+            number = random.randint(min_number, max_number)
             if number in [x.number for x in rooms]:
                 continue
             else:
