@@ -4,12 +4,12 @@ from tortoise.models import Model
 
 class User(Model):
     user_id = fields.IntField(pk=True)
-    username = fields.CharField(max_length=64)
-    first_name = fields.CharField(max_length=64, null=True)
-    last_name = fields.CharField(max_length=64, null=True)
+    username = fields.CharField(max_length=256, unique=True, null=False)
+    first_name = fields.CharField(max_length=128, null=True)
+    last_name = fields.CharField(max_length=128, null=True)
     email = fields.CharField(max_length=64, null=True)
-    address = fields.CharField(max_length=256, null=True)
-    contact_number = fields.CharField(max_length=12, null=True)
+    address = fields.CharField(max_length=150, null=True)
+    contact_number = fields.CharField(max_length=18, null=True)
     registered_at = fields.DatetimeField(auto_now_add=True)
     is_active = fields.BooleanField(default=True)
     is_superuser = fields.BooleanField(default=False)
@@ -24,7 +24,7 @@ class User(Model):
 class Room(Model):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=12, null=False)
-    number = fields.IntField(null=False)
+    number = fields.IntField(null=False, unique=True)
     budget = fields.CharField(max_length=12, null=False)
     created_at = fields.DatetimeField(auto_now_add=True)
     is_started = fields.BooleanField(default=False)
