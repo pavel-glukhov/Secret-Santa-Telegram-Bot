@@ -1,7 +1,5 @@
 from typing import Tuple, Union
 
-from tortoise.expressions import Q
-
 from app.database.models import User
 
 
@@ -9,17 +7,14 @@ class UserDB:
     def __init__(self, _class: User = User):
         self._class = _class
 
-    async def create_user_or_get(
-            self,
-            username: str,
-            user_id: int,
-            **kwargs
-    ) -> Tuple[User, bool]:
-        return await self._class.get_or_create(
-            username=username,
+    async def get_or_create(self, user_id, **kwargs
+                            ) -> Tuple[User, bool]:
+
+        user, created = await self._class.get_or_create(
             user_id=user_id,
-            **kwargs
+            defaults=kwargs
         )
+        return user, created
 
     async def get_user_or_none(self, user: Union[int, str]) -> User:
         if isinstance(user, int):
@@ -28,11 +23,5 @@ class UserDB:
             user = await self._class.filter(username=user).first()
         return user
 
-    async def update_user(self):
-        pass
-
-    async def activate_user(self):
-        pass
-
-    async def deactivate_user(self):
-        pass
+    async def update_user(self, user_id: int, **kwargs: str) -> None:
+        await self._class.filter(user_id=user_id).update(**kwargs)
