@@ -6,7 +6,7 @@ from app.database.operations.wish_model import WishDB
 
 from app.config import config
 
-DATABASE_URL = f'postgres://{config.db.user}:'\
+DATABASE_URL = f'postgres://{config.db.user}:' \
                f'{config.db.password}@{config.db.host}:{config.db.port}/' \
                f'{config.db.name}'
 
