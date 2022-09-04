@@ -2,15 +2,15 @@ from app.database.models import User
 
 
 async def user_information_formatter(user: User) -> str:
-    first_name = user.first_name or ''
-    last_name = user.last_name or ''
+    f_n = user.first_name
+    l_n = user.last_name
+    full_name = f'{f_n} {l_n}' if any([f_n, l_n]) else 'Имя не указано'
     address = user.address or 'адрес не указан'
     number = user.contact_number or 'номер не указан'
-    email = user.email or 'email не указан'
 
-    formatted_text = (f"*Полное имя*: {first_name} {last_name}\n"
+    formatted_text = (f"*Полное имя*: {full_name}\n"
                       f"*Адрес*: {address}\n"
                       f"*Номер телефона*: {number}\n"
-                      f"*Email*: {email}")
+                      )
 
     return formatted_text
