@@ -5,6 +5,11 @@ from aiogram.dispatcher.filters import Text
 from app import dispatcher as dp
 from app.handlers.common import about_game, root_menu
 from app.handlers.profiles.common import edit_profile, my_profile
+from app.handlers.profiles.profile_change_address import change_user_address
+from app.handlers.profiles.profile_change_name import change_username
+from app.handlers.profiles.profile_change_number import change_phone_number
+from app.handlers.profiles.profile_delete_information import \
+    delete_user_information
 from app.handlers.rooms.change_owner import change_room_owner
 from app.handlers.rooms.common import members_list, my_room
 from app.handlers.rooms.config_room import configuration_room
@@ -48,16 +53,16 @@ async def edit_user_profile(callback: types.CallbackQuery):
         await edit_profile(callback.message)
 
     if callback.data == 'profile_edit_name':
-        pass
+        await change_username(callback.message)
 
     if callback.data == 'profile_edit_address':
-        pass
+        await change_user_address(callback.message)
 
     if callback.data == 'profile_edit_number':
-        pass
+        await change_phone_number(callback.message)
 
     if callback.data == 'profile_edit_delete_all':
-        pass
+        await delete_user_information(callback.message)
 
 
 @dp.callback_query_handler(Text(startswith="room_"))
