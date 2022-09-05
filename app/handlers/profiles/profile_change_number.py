@@ -21,9 +21,10 @@ async def change_phone_number(message: types.Message):
     keyboard_inline = keyboard_button(text="Отмена",
                                       callback='cancel')
     await message.answer(
-        'Укажите ваш номер телефона, что бы почта смогла оповестить '
-        ' вас о прибывшем подарке\n'
-        '*Укажи свой номер используя формат: +7|8(___)___-__-__ * ',
+        'Укажите ваш номер телефона, что бы почтовые служащие '
+        'смогли оповестить вас о прибывшем подарке\n'
+        '*Укажи свой номер используя формат: +7|8(___)___-__-__ * \n'
+        '*Например:* 8 999 700 000 00 00',
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )

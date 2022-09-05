@@ -61,7 +61,7 @@ async def process_deleting_information(message: types.Message,
     keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
                                       callback=f"menu_user_profile")
     await message.answer(
-        '*Все данные о вас были удалены.*\n\n'
+        'Все данные о вас были удалены.\n\n'
         ,
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
