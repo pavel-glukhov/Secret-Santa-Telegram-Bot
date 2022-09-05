@@ -1,12 +1,26 @@
+from asyncio import FIRST_COMPLETED, ALL_COMPLETED
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import ParseMode
+import asyncio
 from app import dispatcher as dp
 from app.database import room_db, user_db
-from app.keyborads.common import create_common_keyboards
+from app.keyborads.common import create_common_keyboards, keyboard_button
 
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
+    await message.answer(
+        "Хо-хо-хо! 🎅\n\n"
+        "Вот и настало поиграть в Тайного Санту!\n\n"
+        "Создай свою комнату для друзей, или подключись к существующей.",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+    await root_menu(message)
+
+
+async def create_user(message: types.Message):
     user_id = message.chat.id
     username = message.chat.username
     first_name = message.chat.first_name
@@ -18,35 +32,47 @@ async def start(message: types.Message):
         first_name=first_name,
         last_name=last_name
     )
+    return user, created
 
-    await message.answer(
-        "Хо-хо-хо! 🎅\n\n"
-        "Вот и настало поиграть в Тайного Санту!\n\n"
-        "Создай свою комнату для друзей, или подключись к существующей.",
+
+@dp.message_handler(commands=['menu'], )
+async def root_menu(message: types.Message, edit=False):
+    user, created = await create_user(message)
+    keyboard = await create_common_keyboards(message)
+    text = ''
+    menu_text_name = '*Меню*'
+    reminder_for_user = (
+        '👉 Не забудь обновить свои контактные данные '
+        'в настройках профиля.\n'
+        'Иначе Санта не сможет отправить тебе подарок.🙁\n\n'
     )
 
-    if not any([user.address, user.contact_number]):
-        await message.answer(
-            'Не забудь обновить свои контактные данные в настройках профиля,'
-            'что бы твой Тайный Санта смог отправить тебе подарок!!\n\n'
+    is_profile_filled_out = any([user.address, user.contact_number])
 
-        )
-    await root_menu(message)
-
-
-@dp.message_handler(commands=['menu'])
-async def root_menu(message: types.Message, edit_previous_message=False):
-    user_id = message.chat.id
-    keyboard = await create_common_keyboards(message)
-
-    await room_db().get_all_user_rooms(user_id)
-    if edit_previous_message:
-        await message.edit_text("Меню", reply_markup=keyboard)
+    if not is_profile_filled_out:
+        text = reminder_for_user + menu_text_name
     else:
-        await message.answer("Меню", reply_markup=keyboard)
+        text = menu_text_name
+
+    if edit:
+        await message.edit_text(text,
+                                reply_markup=keyboard,
+                                parse_mode=ParseMode.MARKDOWN,
+                                )
+    else:
+        await message.answer(text,
+                             reply_markup=keyboard,
+                             parse_mode=ParseMode.MARKDOWN,
+                             )
 
 
 @dp.message_handler(commands=['about'])
 async def about_game(message: types.Message):
-    msg = 'Это адаптированная игра "Тайный Санта"'
-    await message.answer(msg)
+    keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
+                                      callback="root_menu")
+
+    text = 'Это адаптированная игра "Тайный Санта"'
+    await message.edit_text(text,
+                            reply_markup=keyboard_inline,
+                            parse_mode=ParseMode.MARKDOWN,
+                            )
