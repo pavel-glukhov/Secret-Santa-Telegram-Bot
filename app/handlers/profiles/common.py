@@ -26,16 +26,17 @@ async def my_profile(message: types.Message):
     user = await user_db().get_user_or_none(user_id)
     user_information = await user_information_formatter(user)
 
-    await message.answer("Предоставленные вами данные необходимы для отправки"
-                         " подарка вашим Тайным Сантой.\n\n"
-                         "*Ваш профиль*:\n\n"
-                         f"{user_information}"
-                         "\n", parse_mode=ParseMode.MARKDOWN)
-    await message.answer("Если вы желаете изменить личные данные,"
-                         " или удалить их, нажмите на кнопку "
-                         "*Изменить профиль*",
-                         parse_mode=ParseMode.MARKDOWN,
-                         reply_markup=keyboard_inline)
+    await message.edit_text(
+        'Предоставленные вами данные необходимы для отправки'
+        ' подарка вашим Тайным Сантой.\n\n'
+        '*Ваш профиль*:\n\n'
+        f'{user_information}\n\n,'
+        'Если вы желаете изменить личные данные,'
+        ' или удалить их, нажмите на кнопку '
+        '*Изменить профиль*',
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard_inline
+    )
 
 
 async def edit_profile(message: types.Message):
