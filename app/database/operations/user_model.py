@@ -16,6 +16,7 @@ class UserDB:
         )
         return user, created
 
+
     async def get_user_or_none(self, user: Union[int, str]) -> User:
         if isinstance(user, int):
             user = await self._class.filter(user_id=user).first()
