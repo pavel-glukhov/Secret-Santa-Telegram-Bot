@@ -1,0 +1,36 @@
+---
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    format: "%(asctime)s\t%(levelname)s\t%(filename)s:%(lineno)d\t%(message)s"
+
+handlers:
+  console_handler:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+    stream: ext://sys.stdout
+
+  timed_rotating_handler:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: default
+    filename: log.file
+    backupCount: 14
+    encoding: utf8
+    when: midnight
+    interval: 1
+
+loggers:
+  root:
+    level: DEBUG
+    handlers: [console_handler, timed_rotating_handler]
+
+  aiogram.event:
+    level: INFO
+    handlers: [console_handler, timed_rotating_handler]
+
+  tortoise:
+    level: INFO
+    handlers: [console_handler, timed_rotating_handler]
