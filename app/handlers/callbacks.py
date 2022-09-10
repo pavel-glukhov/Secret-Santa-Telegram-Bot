@@ -12,11 +12,11 @@ from app.handlers.profiles.delete_information import delete_user_information
 from app.handlers.rooms.change_owner import change_room_owner
 from app.handlers.rooms.common import members_list, my_room
 from app.handlers.rooms.config_room import configuration_room
-from app.handlers.rooms.create_room import create_room
+from app.handlers.rooms.create_new_room import create_room
 from app.handlers.rooms.delete_room import delete_room
-from app.handlers.rooms.start_game_room import start_game
-from app.handlers.rooms.subscribe_room import join_room
-from app.handlers.rooms.unsubscribe_room import left_room
+from app.handlers.rooms.start_game import start_game
+from app.handlers.rooms.subscribe import join_room
+from app.handlers.rooms.unsubscribe import left_room
 from app.handlers.rooms.update_room import update_room_name
 from app.handlers.wishes.common import show_wishes, update_wishes
 
