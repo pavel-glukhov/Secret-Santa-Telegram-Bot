@@ -1,13 +1,32 @@
-from app.logger import logger
+import logging
+
+from apscheduler.job import Job
+
+from app.config_logger import logger
 from app.scheduler import scheduler
+from typing import Callable
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 # TODO форматирование для даты на логгер
-async def add_task(task_func, datetime, task_id, **kwargs):
+async def add_task(task_func: Callable,
+                   date_time: datetime,
+                   task_id: str,
+                   **kwargs) -> bool:
+    """
+    Add new task to job store.
+    :param task_func:
+    :param date_time:
+    :param task_id:
+    :param kwargs:
+    :return:
+    """
     scheduler.add_job(
         task_func,
         'date',
-        run_date=datetime(datetime),
+        run_date=date_time,
         kwargs=kwargs,
         id=str(task_id)
     )
@@ -15,9 +34,9 @@ async def add_task(task_func, datetime, task_id, **kwargs):
     return True
 
 
-async def get_task(task_id):
+async def get_task(task_id: str) -> Job:
     """
-    Get task
+    Get task from job store.
     :param task_id:
     :return: Task instance or False
     """
@@ -25,15 +44,16 @@ async def get_task(task_id):
     return task
 
 
-async def remove_task(task_id):
+async def remove_task(task_id: str) -> bool:
     """
-    Remove task from job store
+    Remove task from job store.
     :param task_id:
-    :return:
+    :return: bool
     """
     task = await get_task(task_id)
     if task:
         task.remove()
-        logger.info(f'The task {task_id} has been removed')
+        logger.info(f'The task {task_id} has been removed.')
         return True
+    logger.info(f'Request of is not existed {task_id} task.')
     return False
