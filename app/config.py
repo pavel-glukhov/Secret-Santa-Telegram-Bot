@@ -1,9 +1,18 @@
 import os
 from dataclasses import dataclass
+
 from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+root_path = os.path.dirname(os.path.dirname(__file__))
+dotenv_path = os.path.join(root_path, '.env')
+
 load_dotenv(dotenv_path)
+
+
+@dataclass
+class LoggingConfig:
+    log_path: str
+
 
 @dataclass
 class RoomConfig:
@@ -38,6 +47,8 @@ class AppConfig:
     db: DataBaseConfig
     redis: RedisConfig
     room: RoomConfig
+    log: LoggingConfig
+
 
 config = AppConfig(
     bot=BotConfig(
@@ -58,5 +69,8 @@ config = AppConfig(
     ),
     room=RoomConfig(
         room_number_length=6
+    ),
+    log=LoggingConfig(
+        log_path=os.path.join(root_path, 'logs'),
     ),
 )

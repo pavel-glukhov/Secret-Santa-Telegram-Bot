@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -7,7 +9,9 @@ from app import dispatcher as dp
 from app.database import room_db, wish_db
 from app.keyborads.common import create_common_keyboards, keyboard_button
 
+logger = logging.getLogger(__name__)
 
+# TODO добавить логирование
 class JoinRoom(StatesGroup):
     waiting_for_room_number = State()
     waiting_for_wishes = State()

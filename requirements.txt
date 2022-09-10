@@ -1,6 +1,7 @@
 aiogram==2.21
 python-dotenv==0.20.0
-SQLAlchemy==1.4.39
 asyncpg==0.26.0
 tortoise_orm==0.19.2
-aerich
+aerich==0.6.3
+APScheduler=3.9.1
+redis=4.3.4

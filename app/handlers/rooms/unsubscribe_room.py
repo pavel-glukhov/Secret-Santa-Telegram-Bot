@@ -1,3 +1,4 @@
+import logging
 from typing import Union
 
 from aiogram import types
@@ -6,7 +7,9 @@ from aiogram.types import ParseMode
 from app.database import room_db
 from app.keyborads.common import keyboard_button
 
+logger = logging.getLogger(__name__)
 
+# TODO добавить логирование
 async def left_room(message: types.Message, room_number: Union[str, int]):
     user_id = message.chat.id
     await room_db().remove_member(user_id, room_number)

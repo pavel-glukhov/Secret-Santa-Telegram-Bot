@@ -1,3 +1,4 @@
+import logging
 from typing import Union
 
 from aiogram import types
@@ -9,11 +10,13 @@ from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import keyboard_button
 
+logger = logging.getLogger(__name__)
+
 
 class DeleteRoom(StatesGroup):
     waiting_conformation = State()
 
-
+# TODO добавить логирование
 async def delete_room(message: types.Message,
                       room_number: Union[int, str]):
     await DeleteRoom.waiting_conformation.set()

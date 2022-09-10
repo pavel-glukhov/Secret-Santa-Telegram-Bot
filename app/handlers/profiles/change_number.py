@@ -1,3 +1,4 @@
+import logging
 import re
 
 from aiogram import types
@@ -7,8 +8,9 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-
 from app.keyborads.common import keyboard_button
+
+logger = logging.getLogger(__name__)
 
 
 class ChangePhoneNuber(StatesGroup):

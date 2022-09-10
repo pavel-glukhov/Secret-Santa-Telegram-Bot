@@ -9,6 +9,12 @@ class UserDB:
 
     async def get_or_create(self, user_id, **kwargs
                             ) -> Tuple[User, bool]:
+        """
+        Get or create user's record in database
+        :param user_id:
+        :param kwargs:
+        :return: [User Instance, Bool: Created - True, else False]
+        """
 
         user, created = await self._class.get_or_create(
             user_id=user_id,
@@ -16,8 +22,14 @@ class UserDB:
         )
         return user, created
 
-
-    async def get_user_or_none(self, user: Union[int, str]) -> User:
+    async def get_user_or_none(
+            self, user: Union[int, str]
+    ) -> Union[User, None]:
+        """
+        Get or do nothing
+        :param user:
+        :return: User instance or None
+        """
         if isinstance(user, int):
             user = await self._class.filter(user_id=user).first()
         else:

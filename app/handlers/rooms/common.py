@@ -1,10 +1,11 @@
-import re
-from typing import Union
+import logging
 
 from aiogram import types
 from aiogram.types import ParseMode
 
 from app.database import room_db
+
+logger = logging.getLogger(__name__)
 
 
 async def my_room(message: types.Message, room_number):
@@ -31,7 +32,7 @@ async def my_room(message: types.Message, room_number):
         keyboard_list.extend([
             types.InlineKeyboardButton(
                 text="Начать игру 🎲",  # TODO реализовать
-                callback_data=f"room_member-list_{room_number}"
+                callback_data=f"room_start-game_{room_number}"
             ),
             types.InlineKeyboardButton(
                 text="Список участников 👥",
@@ -68,8 +69,8 @@ async def members_list(message: types.Message,
     members = await room.members
     member_str = ''
 
-    for i, member in enumerate(members):
-        member_str += f'{i}) @{member.username}\n'
+    for number, member in enumerate(members):
+        member_str += f'{number}) @{member.username}\n'
 
     keyboard_inline.add(return_menu)
     await message.edit_text(

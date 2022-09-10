@@ -1,12 +1,13 @@
-from asyncio import FIRST_COMPLETED, ALL_COMPLETED
+import logging
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode
-import asyncio
+
 from app import dispatcher as dp
-from app.database import room_db, user_db
+from app.database import user_db
 from app.keyborads.common import create_common_keyboards, keyboard_button
+
+logger = logging.getLogger(__name__)
 
 
 @dp.message_handler(commands=['start'])
@@ -32,6 +33,9 @@ async def create_user(message: types.Message):
         first_name=first_name,
         last_name=last_name
     )
+    if created:
+        logger.info(f'The new user "{user_id}" has been created')
+
     return user, created
 
 
@@ -39,7 +43,6 @@ async def create_user(message: types.Message):
 async def root_menu(message: types.Message, edit=False):
     user, created = await create_user(message)
     keyboard = await create_common_keyboards(message)
-    text = ''
     menu_text_name = '*Меню*'
     reminder_for_user = (
         '👉 Не забудь обновить свои контактные данные '

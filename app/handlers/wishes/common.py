@@ -1,15 +1,18 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 
-from app import dispatcher as dp, bot
-from app.database import wish_db, room_db
-from app.keyborads.common import (
-    create_common_keyboards,
-)
+from app import bot
+from app import dispatcher as dp
+from app.database import room_db, wish_db
+
+logger = logging.getLogger(__name__)
 
 
+# TODO добавить логирование
 class ChangeWish(StatesGroup):
     waiting_for_wishes = State()
 

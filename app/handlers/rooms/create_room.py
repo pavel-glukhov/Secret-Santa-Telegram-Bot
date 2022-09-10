@@ -1,11 +1,16 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ParseMode
 
-from app import bot, dispatcher as dp
+from app import bot
+from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import keyboard_button
+
+logger = logging.getLogger(__name__)
 
 
 class CreateRoom(StatesGroup):
@@ -98,6 +103,9 @@ async def process_wishes(message: types.Message, state: FSMContext):
                                        owner=message.chat.id,
                                        name=data['room_name'],
                                        budget=data['room_budget'])
+
+    logger.info(f'The new room "{room.number}" '
+                f'has been created by {message.chat.id}')
 
     await bot.delete_message(chat_id=message.from_user.id,
                              message_id=message.message_id)

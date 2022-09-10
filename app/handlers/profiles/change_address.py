@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -5,8 +7,9 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-
 from app.keyborads.common import keyboard_button
+
+logger = logging.getLogger(__name__)
 
 
 class ChangeAddress(StatesGroup):

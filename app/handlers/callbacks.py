@@ -4,17 +4,17 @@ from aiogram.dispatcher.filters import Text
 
 from app import dispatcher as dp
 from app.handlers.common import about_game, root_menu
+from app.handlers.profiles.change_address import change_user_address
+from app.handlers.profiles.change_name import change_username
+from app.handlers.profiles.change_number import change_phone_number
 from app.handlers.profiles.common import edit_profile, my_profile
-from app.handlers.profiles.profile_change_address import change_user_address
-from app.handlers.profiles.profile_change_name import change_username
-from app.handlers.profiles.profile_change_number import change_phone_number
-from app.handlers.profiles.profile_delete_information import \
-    delete_user_information
+from app.handlers.profiles.delete_information import delete_user_information
 from app.handlers.rooms.change_owner import change_room_owner
 from app.handlers.rooms.common import members_list, my_room
 from app.handlers.rooms.config_room import configuration_room
 from app.handlers.rooms.create_room import create_room
 from app.handlers.rooms.delete_room import delete_room
+from app.handlers.rooms.start_game_room import start_game
 from app.handlers.rooms.subscribe_room import join_room
 from app.handlers.rooms.unsubscribe_room import left_room
 from app.handlers.rooms.update_room import update_room_name
@@ -68,7 +68,8 @@ async def edit_user_profile(callback: types.CallbackQuery):
 @dp.callback_query_handler(Text(startswith="room_"))
 async def room_operations(callback: types.CallbackQuery):
     command, operation, room_number = callback.data.split('_')
-
+    if operation == 'start-game':
+        await start_game(callback.message, room_number)
     if operation == 'menu':
         await my_room(callback.message, room_number)
     if operation == 'delete':

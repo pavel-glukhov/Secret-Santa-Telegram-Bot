@@ -1,3 +1,4 @@
+import logging
 from typing import Union
 
 from aiogram import types
@@ -8,6 +9,8 @@ from aiogram.types import ParseMode
 from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import keyboard_button
+
+logger = logging.getLogger(__name__)
 
 
 class ChangeRoomName(StatesGroup):
@@ -29,7 +32,7 @@ async def update_room_name(message: types.Message,
                             reply_markup=keyboard_inline
                             )
 
-
+# TODO добавить логирование
 @dp.message_handler(state=ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
                                      state: FSMContext):

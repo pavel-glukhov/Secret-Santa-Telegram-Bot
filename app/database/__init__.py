@@ -1,14 +1,23 @@
-from tortoise import Tortoise
+import logging
 
-from app.database.operations.room_model import RoomDB
-from app.database.operations.user_model import UserDB
-from app.database.operations.wish_model import WishDB
+from asyncpg import InvalidPasswordError
+from tortoise import Tortoise
+from tortoise.exceptions import ConfigurationError, DBConnectionError
 
 from app.config import config
+from app.database.queries.rooms import RoomDB
+from app.database.queries.users import UserDB
+from app.database.queries.wishes import WishDB
 
-DATABASE_URL = f'postgres://{config.db.user}:' \
-               f'{config.db.password}@{config.db.host}:{config.db.port}/' \
-               f'{config.db.name}'
+logger = logging.getLogger(__name__)
+
+DATABASE_URL = (
+    f'postgres://{config.db.user}:'
+    f'{config.db.password}@'
+    f'{config.db.host}:'
+    f'{config.db.port}/'
+    f'{config.db.name}'
+)
 
 TORTOISE_ORM = {
     'connections': {'default': DATABASE_URL},
@@ -22,9 +31,14 @@ TORTOISE_ORM = {
 
 
 async def database_initialization():
-    await Tortoise.init(
-        config=TORTOISE_ORM,
-    )
+    try:
+        await Tortoise.init(
+            config=TORTOISE_ORM,
+        )
+    except (
+            ConfigurationError, DBConnectionError, InvalidPasswordError
+    ) as error:
+        logger.error(error)
 
 
 user_db = UserDB

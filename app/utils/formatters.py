@@ -1,7 +1,7 @@
 from app.database.models import User
 
 
-async def user_information_formatter(user: User) -> str:
+def user_information_formatter(user: User) -> str:
     f_n = user.first_name
     l_n = user.last_name
     full_name = f'{f_n} {l_n}' if any([f_n, l_n]) else 'Имя не указано'

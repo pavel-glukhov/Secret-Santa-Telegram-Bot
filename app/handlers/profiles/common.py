@@ -1,8 +1,12 @@
+import logging
+
 from aiogram import types
 from aiogram.types.message import ParseMode
 
 from app.database import user_db
 from app.utils.formatters import user_information_formatter
+
+logger = logging.getLogger(__name__)
 
 
 async def my_profile(message: types.Message):
@@ -24,7 +28,7 @@ async def my_profile(message: types.Message):
 
     user_id = message.chat.id
     user = await user_db().get_user_or_none(user_id)
-    user_information = await user_information_formatter(user)
+    user_information = user_information_formatter(user)
 
     await message.edit_text(
         'Предоставленные вами данные необходимы для отправки'

@@ -2,8 +2,8 @@ import random
 from typing import Union
 
 from app.config import config
-from app.database.models import Room, Wish, User
-from app.database.operations.user_model import UserDB
+from app.database.models import Room, User, Wish
+from app.database.queries.users import UserDB
 
 
 class RoomDB:
@@ -70,7 +70,7 @@ class RoomDB:
         await room.members.add(user)
         return True
 
-    async def list_members(self, room_number: int) -> Room:
+    async def get_list_members_of_room(self, room_number: int) -> Room:
         """
         Get all members of room
 
