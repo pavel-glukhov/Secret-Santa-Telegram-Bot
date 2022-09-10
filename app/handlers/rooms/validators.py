@@ -2,8 +2,8 @@ from aiogram import types
 from aiogram.types import ParseMode
 
 from app import dispatcher as dp
-from app.handlers.rooms.create_room import CreateRoom
-from app.handlers.rooms.subscribe_room import JoinRoom
+from app.handlers.rooms.create_new_room import CreateRoom
+from app.handlers.rooms.subscribe import JoinRoom
 from app.handlers.rooms.update_room import ChangeRoomName
 from app.keyborads.common import keyboard_button
 

@@ -12,6 +12,8 @@ load_dotenv(dotenv_path)
 @dataclass
 class LoggingConfig:
     log_path: str
+    log_file: str
+    config_file: str
 
 
 @dataclass
@@ -72,5 +74,7 @@ config = AppConfig(
     ),
     log=LoggingConfig(
         log_path=os.path.join(root_path, 'logs'),
+        log_file='logs.txt',
+        config_file='logging.yaml'
     ),
 )
