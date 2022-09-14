@@ -14,3 +14,25 @@ def user_information_formatter(user: User) -> str:
                       )
 
     return formatted_text
+
+
+def message_for_secret_santa(
+        santa_name,
+        receipt_name,
+        receipt_address,
+        receipt_number,
+        receipt_wish,
+) -> str:
+    formatted_text = (
+        '------------\n'
+        f'*Привет {santa_name}!*\n'
+        '*Поздравляю, ты стал тайным Сантой!!!!!* 💥💥\n\n'
+        '*Твой получатель:*\n'
+        f'*Имя:* {receipt_name}\n'
+        f'*Адрес:* {receipt_address}\n'
+        f'*Телефон:* {receipt_number}\n'
+        f'*Комментарий:* {receipt_wish}\n\n'
+        '*Скорее беги на почту и отправляй свой подарок!* 🏃 \n'
+        '------------\n'
+    )
+    return formatted_text
