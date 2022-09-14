@@ -10,24 +10,31 @@ from app.scheduler import scheduler
 logger = logging.getLogger(__name__)
 
 
+def create_directory_or_none(path: str) -> None:
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def setup_logging() -> None:
+    create_directory_or_none(config.log.log_path)
     configuration_file = os.path.join(root_path, config.log.config_file)
 
     with open(configuration_file, 'r') as stream:
         logging_config = yaml.load(stream, Loader=yaml.FullLoader)
 
-    # Create log directories if not exists
-    if not os.path.exists(config.log.log_path):
-        os.makedirs(config.log.log_path)
-
     logging_config['handlers']['timed_rotating_handler'][
-        'filename'] = os.path.join(config.log.log_path, config.log.log_file)
+        'filename'] = os.path.join(
+        config.log.log_path,
+        config.log.log_file
+    )
 
     logging.config.dictConfig(logging_config)
 
 
 async def main():
+    logger.info('-------------------')
     logger.info('Bot starting...')
+    logger.info('-------------------')
     await database_initialization()
     await dispatcher.start_polling(bot)
 

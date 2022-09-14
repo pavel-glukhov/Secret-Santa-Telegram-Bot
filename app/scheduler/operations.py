@@ -2,7 +2,6 @@ import logging
 
 from apscheduler.job import Job
 
-from app.config_logger import logger
 from app.scheduler import scheduler
 from typing import Callable
 from datetime import datetime

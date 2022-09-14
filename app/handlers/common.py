@@ -21,6 +21,7 @@ async def start(message: types.Message):
     await root_menu(message)
 
 
+# TODO заменить это на мидлварь
 async def create_user(message: types.Message):
     user_id = message.chat.id
     username = message.chat.username
@@ -45,9 +46,9 @@ async def root_menu(message: types.Message, edit=False):
     keyboard = await create_common_keyboards(message)
     menu_text_name = '*Меню*'
     reminder_for_user = (
-        '👉 Не забудь обновить свои контактные данные '
-        'в настройках профиля.\n'
-        'Иначе Санта не сможет отправить тебе подарок.🙁\n\n'
+        '❗ *Не забудь обновить свои контактные данные '
+        'в настройках профиля*.\n\n'
+        '❗ *Иначе Санта не сможет отправить тебе подарок.*\n\n'
     )
 
     is_profile_filled_out = any([user.address, user.contact_number])

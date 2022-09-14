@@ -1,11 +1,13 @@
 import asyncio
-from random import random
-
+import logging
+import random
 from aiogram.utils import exceptions
 
 from app import bot
 from app.database import room_db, wish_db
-from app.logger import logger
+from app.utils.formatters import message_for_secret_santa
+
+logger = logging.getLogger(__name__)
 
 
 class Person:
@@ -71,17 +73,13 @@ async def test(room_number):
             person.to_send.player['comment'] else ''
         print(f'{person.player["recipient_name"]} {name_to_send}')
 
-        message_text = (
-            '------------\n'
-            f'*Привет {person.player["recipient_name"]}!*\n'
-            '*Поздравляю, ты стал тайным Сантой!!!!!* 💥💥\n\n'
-            '*Твой получатель:*\n'
-            f'*Имя:* {name_to_send}\n'
-            f'*Адрес:* {address_to_send}\n'
-            f'*Телефон:* {phone_to_send}\n'
-            f'*Комментарий:* {comment_to_send}\n\n'
-            '*Скорее беги на почту и отправляй свой подарок!* 🏃 \n'
-            '------------\n'
+        message_text = message_for_secret_santa(
+            santa_name=person.player["recipient_name"],
+            receipt_name=name_to_send,
+            receipt_address=address_to_send,
+            receipt_number=phone_to_send,
+            receipt_wish=comment_to_send
+
         )
 
 

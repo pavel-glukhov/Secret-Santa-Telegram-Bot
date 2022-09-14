@@ -2,7 +2,7 @@ import logging
 
 from aiogram import types
 
-from app.utils.send_messages import broadcaster
+from app.messages.send_messages import broadcaster
 
 logger = logging.getLogger(__name__)
 
