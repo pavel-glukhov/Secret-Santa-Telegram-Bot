@@ -1,6 +1,7 @@
 from aiogram import types
 
 from app.database import room_db
+from app.database.models import Room
 from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 
@@ -17,59 +18,51 @@ def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
     return keyboard_inline
 
 
-def personal_room_keyboard_form(room, is_owner):
+def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
+    """
+    Formatter for user's room button.
+
+    :param room:
+    :param is_owner:
+    :return:
+    """
     owner_tag = ' 🤴' if is_owner else ''
     text = 'Управление комнатой' if is_owner else 'Ваша комната'
     return f'{text}: {room.name} ({room.number}){owner_tag}'
 
 
-async def create_common_keyboards(message):
-    users_list_rooms = []
-    keyboard_inline = types.InlineKeyboardMarkup()
+async def create_common_keyboards(message: types.Message) -> types.InlineKeyboardMarkup:
+    """
+    Generating main buttons
+    :param message:
+    :return:
+    """
+    # general buttons
+    keyboard_dict = {
+        MAIN_REPLY_BUTTONS['join_room']: "menu_join_room",
+        MAIN_REPLY_BUTTONS['create_room']: "menu_create_new_room",
 
-    create_room = types.InlineKeyboardButton(
-        text=MAIN_REPLY_BUTTONS['create_room'],
-        callback_data=f"menu_create_new_room"
-    )
-
-    join_room = types.InlineKeyboardButton(
-        text=MAIN_REPLY_BUTTONS['join_room'],
-        callback_data=f"menu_join_room"
-    )
-
-    profile = types.InlineKeyboardButton(
-        text=MAIN_REPLY_BUTTONS['user_profile'],
-        callback_data=f"menu_user_profile"
-    )
-
-    about = types.InlineKeyboardButton(
-        text=MAIN_REPLY_BUTTONS['about'],
-        callback_data=f"menu_about_game")
-
+    }
     user_id = message.chat.id
-    rooms = await room_db().get_all_user_rooms(user_id)
+    user_rooms = await room_db().get_all_user_rooms(user_id)
 
-    if rooms:
-        for room in rooms:
+    if user_rooms:
+        for room in user_rooms:
             owner = await room.owner
             is_owner = owner.user_id == user_id
-
-            users_list_rooms.append(
-                types.InlineKeyboardButton(
-                    text=personal_room_keyboard_form(room, is_owner),
-                    callback_data=f"room_menu_{room.number}")
+            # add all users rooms' buttons
+            keyboard_dict.update(
+                {
+                    personal_room_keyboard_formatter(room, is_owner): f"room_menu_{room.number}"
+                }
             )
-
-    # first line of buttons
-    keyboard_inline.add(create_room, join_room)
-
-    # list of user's rooms
-    if users_list_rooms:
-        for button in users_list_rooms:
-            keyboard_inline.add(button)
-
-    # profile and about list of buttons
-    keyboard_inline.add(profile)
-    keyboard_inline.add(about)
+    # general buttons that mast be in end of buttons list
+    keyboard_dict.update(
+        {
+            MAIN_REPLY_BUTTONS['user_profile']: "menu_user_profile",
+            MAIN_REPLY_BUTTONS['about']: "menu_about_game",
+        }
+    )
+    keyboard_inline = generate_inline_keyboard(keyboard_dict)
 
     return keyboard_inline
