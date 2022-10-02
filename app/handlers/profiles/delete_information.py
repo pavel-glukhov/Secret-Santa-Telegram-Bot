@@ -7,7 +7,7 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-from app.keyborads.common import keyboard_button
+from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +19,14 @@ class DeleteUserInformation(StatesGroup):
 async def delete_user_information(message: types.Message):
     await DeleteUserInformation.waiting_for_conformation.set()
 
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
     await message.answer(
         'Напиши *подтверждаю* для удаления твоих данных из профиля.\n\n'
         ,
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -33,11 +35,13 @@ async def delete_user_information(message: types.Message):
                     message.text.lower() != 'подтверждаю',
                     state=DeleteUserInformation.waiting_for_conformation)
 async def process_deleting_information_invalid(message: types.Message):
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
     return await message.reply(
         'Вы ввели неверную команду для подтверждения, попробуйте снова.\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -61,12 +65,14 @@ async def process_deleting_information(message: types.Message,
         user_id=user_id, **data
 
     )
-    keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
-                                      callback=f"menu_user_profile")
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Вернуться назад ◀️": f"menu_user_profile"
+        }
+    )
     await message.answer(
         'Все данные о вас были удалены.\n\n'
         ,
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
     await state.finish()

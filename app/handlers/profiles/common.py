@@ -38,7 +38,6 @@ async def my_profile(message: types.Message):
         'Если вы желаете изменить личные данные,'
         ' или удалить их, нажмите на кнопку '
         '*Изменить профиль*',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 

@@ -8,7 +8,7 @@ from aiogram.types import ParseMode
 from app import dispatcher as dp
 from app.database import room_db
 from app.database.models import User
-from app.keyborads.common import keyboard_button
+from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,17 @@ async def change_room_owner(message: types.Message, room_number):
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
 
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
 
     await message.answer(
         'Хочешь поменять владельца комнаты?\n'
         'Новый владелец комнаты должен являться ее участником. '
         '*Учти, что ты потеряешь контроль за комнатой.*\n\n'
         '*Для смены владельца, напиши его ник.*\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -42,8 +44,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     previous_owner = message.chat.id
     new_owner = message.text
 
-    keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
-                                      callback=f"room_menu_{room_number}")
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Вернуться назад ◀️": f"room_menu_{room_number}"
+        }
+    )
 
     owner: User = await room_db().change_owner(new_owner,
                                                room_number)
@@ -56,12 +61,10 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         await message.answer(
             '"Хо-хо-хо! 🎅\n\n'
             f'Я сменил владельца, теперь это *{owner.username}*',
-            parse_mode=ParseMode.MARKDOWN,
             reply_markup=keyboard_inline
         )
     else:
         await message.answer(
             'Такой участник не найден.',
-            parse_mode=ParseMode.MARKDOWN,
             reply_markup=keyboard_inline
         )

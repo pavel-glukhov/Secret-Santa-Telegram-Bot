@@ -7,9 +7,10 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import room_db, wish_db
-from app.keyborads.common import create_common_keyboards, keyboard_button
+from app.keyborads.common import create_common_keyboards, generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
+
 
 # TODO добавить логирование
 class JoinRoom(StatesGroup):
@@ -17,13 +18,16 @@ class JoinRoom(StatesGroup):
     waiting_for_wishes = State()
 
 
-async def join_room(message: types.Message):
+async def join_room(message: types.Message, state: FSMContext):
     await JoinRoom.waiting_for_room_number.set()
-    keyboard_inline = keyboard_button(text="Отмена", callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
     await message.answer(
         '"Хо-хо-хо! 🎅\n\n'
         'Введи номер комнаты в которую ты хочешь зайти.\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -35,14 +39,17 @@ async def process_room_number(message: types.Message, state: FSMContext):
     await state.update_data(room_number=room_number)
 
     user_id = message.chat.id
-    keyboard_inline = keyboard_button(text="Отмена", callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
 
     is_room_exist = await room_db().is_exists(room_number=room_number)
 
     if not is_room_exist:
         await message.answer(
             'Введенной комнаты не существует.',
-            parse_mode=ParseMode.MARKDOWN,
         )
     else:
         is_member_of_room = await room_db().is_member(user_id=user_id,
@@ -52,7 +59,6 @@ async def process_room_number(message: types.Message, state: FSMContext):
             keyboard_inline = await create_common_keyboards(message)
             await message.answer(
                 'Вы уже состоите в этой комнате.',
-                parse_mode=ParseMode.MARKDOWN,
                 reply_markup=keyboard_inline
             )
             await state.finish()
@@ -66,7 +72,6 @@ async def process_room_number(message: types.Message, state: FSMContext):
                 'ты хочешь получить что-то особое?\n'
                 'Ваши комментарии помогут Тайному Санте '
                 'выбрать для вас подарок.\n',
-                parse_mode=ParseMode.MARKDOWN,
                 reply_markup=keyboard_inline
             )
 
@@ -89,7 +94,6 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         'Теперь ты можешь играть с своими друзьями.\n'
         'Следи за анонсами владельца комнаты.\n\n'
         'Желаю хорошей игры! 😋',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
     await state.finish()

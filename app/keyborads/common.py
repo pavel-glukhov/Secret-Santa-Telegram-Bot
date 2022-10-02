@@ -4,13 +4,16 @@ from app.database import room_db
 from app.keyborads.constants import MAIN_REPLY_BUTTONS
 
 
-def keyboard_button(text, callback):
+def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
     keyboard_inline = types.InlineKeyboardMarkup()
-    button = types.InlineKeyboardButton(
-        text=text,
-        callback_data=callback
-    )
-    keyboard_inline.add(button)
+
+    for key, val in buttons.items():
+        button = types.InlineKeyboardButton(
+            text=key,
+            callback_data=val
+        )
+        keyboard_inline.add(button)
+
     return keyboard_inline
 
 

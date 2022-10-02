@@ -39,7 +39,6 @@ async def show_wishes(message: types.Message,
 
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
-                            parse_mode=ParseMode.MARKDOWN,
                             reply_markup=keyboard_inline)
 
 
@@ -50,7 +49,6 @@ async def update_wishes(message: types.Message,
     await state.update_data(room_number=room_number)
     await message.edit_text(
         '*Напиши новое желание:*\n',
-        parse_mode=ParseMode.MARKDOWN,
     )
 
 
@@ -81,6 +79,5 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
         f'Ваши желания в комнате *{room.name}* изменены на:\n\n'
         f'{wish}\n\n'
         f'Санта обязательно учтет ваши пожелания! 🎅',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )

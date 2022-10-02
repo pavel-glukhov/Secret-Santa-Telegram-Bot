@@ -33,5 +33,4 @@ async def configuration_room(message: types.Message, room_number):
 
     await message.edit_text("Настройки комнаты: "
                             f"*{room_name}* (*{room_number}*)",
-                            reply_markup=keyboard_inline,
-                            parse_mode=ParseMode.MARKDOWN)
+                            reply_markup=keyboard_inline,)

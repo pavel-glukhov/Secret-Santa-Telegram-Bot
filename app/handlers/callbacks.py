@@ -14,7 +14,7 @@ from app.handlers.rooms.common import members_list, my_room
 from app.handlers.rooms.config_room import configuration_room
 from app.handlers.rooms.create_new_room import create_room
 from app.handlers.rooms.delete_room import delete_room
-from app.handlers.rooms.start_game import start_game
+from app.handlers.rooms.start_game import start_game, change_game_datetime
 from app.handlers.rooms.subscribe import join_room
 from app.handlers.rooms.unsubscribe import left_room
 from app.handlers.rooms.update_room import update_room_name
@@ -70,6 +70,8 @@ async def room_operations(callback: types.CallbackQuery):
     command, operation, room_number = callback.data.split('_')
     if operation == 'start-game':
         await start_game(callback.message, room_number)
+    if operation == 'change-game-dt':
+        await change_game_datetime(callback.message, room_number)
     if operation == 'menu':
         await my_room(callback.message, room_number)
     if operation == 'delete':

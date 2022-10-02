@@ -76,6 +76,5 @@ async def members_list(message: types.Message,
     await message.edit_text(
         f'Список участников комнаты: {room.name} ({room_number}):\n\n'
         f'{member_str}',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )

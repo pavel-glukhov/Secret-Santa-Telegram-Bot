@@ -8,7 +8,7 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import room_db
-from app.keyborads.common import keyboard_button
+from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +19,11 @@ class ChangeRoomName(StatesGroup):
 
 async def update_room_name(message: types.Message,
                            room_number: Union[str, int]):
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
 
     await ChangeRoomName.waiting_for_room_name.set()
     state = dp.get_current().current_state()
@@ -28,7 +31,6 @@ async def update_room_name(message: types.Message,
 
     await message.edit_text(f'Введите новое имя для вашей комнаты.\n'
                             f'Имя не должно превышать 12 символов\n',
-                            parse_mode=ParseMode.MARKDOWN,
                             reply_markup=keyboard_inline
                             )
 
@@ -43,11 +45,13 @@ async def update_room_name_get_value(message: types.Message,
     await room_db().update_room(room_number=room_number,
                                 name=new_room_name)
 
-    keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
-                                      callback="root_menu")
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Вернуться назад ◀️":"root_menu"
+         }
+    )
     await state.finish()
     await message.answer(
         f'Имя комнаты  изменено на *{new_room_name}*',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )

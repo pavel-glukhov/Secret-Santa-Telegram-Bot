@@ -8,7 +8,7 @@ from aiogram.types import ParseMode
 from app import bot
 from app import dispatcher as dp
 from app.database import room_db
-from app.keyborads.common import keyboard_button
+from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -21,34 +21,41 @@ class CreateRoom(StatesGroup):
 
 async def create_room(message: types.Message):
     await CreateRoom.waiting_for_room_name.set()
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
 
     await message.answer(
         'Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
         'Напиши мне ее название и мы пойдем дальше\n\n'
         'Имя комнаты не должно превышать 12 символов.\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_name)
 async def process_name(message: types.Message, state: FSMContext):
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
     room_name = message.text
     await state.update_data(room_name=room_name)
 
     if not len(room_name) < 13:
-        keyboard_inline = keyboard_button(text="Отмена",
-                                          callback='cancel')
+        keyboard_inline = generate_inline_keyboard(
+            {
+                "Отмена": 'cancel'
+            }
+        )
         return await message.reply(
             text='Вы ввели слишком длинное имя, '
                  'пожалуйста придумайте другое.\n'
                  'Имя комнаты не должно превышать 12 символов.\n',
-            parse_mode=ParseMode.MARKDOWN,
             reply_markup=keyboard_inline
         )
 
@@ -63,15 +70,17 @@ async def process_name(message: types.Message, state: FSMContext):
         'Напиши в чат сумму в любом формате, '
         'например 2000 тенге,'
         '200 руб или 20$\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_budget)
 async def process_budget(message: types.Message, state: FSMContext):
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
 
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
@@ -86,7 +95,6 @@ async def process_budget(message: types.Message, state: FSMContext):
         'Напиши свои пожелания по подарку. '
         'Возможно у тебя есть хобби и '
         'ты хочешь получить что-то особое?\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -96,8 +104,11 @@ async def process_wishes(message: types.Message, state: FSMContext):
     user_wishes = message.text
     data = await state.get_data()
 
-    keyboard_inline = keyboard_button(text="Меню ◀️",
-                                      callback='root_menu')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Меню ◀️": 'root_menu'
+        }
+    )
 
     room = await room_db().create_room(user_wish=user_wishes,
                                        owner=message.chat.id,
@@ -117,11 +128,9 @@ async def process_wishes(message: types.Message, state: FSMContext):
         f'Этот код нужно сообщить своим друзьям, '
         f'что бы они присоединились '
         f'к твоей игре.\n\n',
-        parse_mode=ParseMode.MARKDOWN,
     )
     await message.answer(
         "А пока ты можешь вернуться назад и обновить свой профиль",
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline,
     )
     await state.finish()

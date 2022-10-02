@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 async def add_task(task_func: Callable,
                    date_time: datetime,
                    task_id: str,
-                   **kwargs) -> bool:
+                   **kwargs) -> Job:
     """
     Add new task to job store.
     :param task_func:
@@ -22,7 +22,8 @@ async def add_task(task_func: Callable,
     :param kwargs:
     :return:
     """
-    scheduler.add_job(
+
+    task = scheduler.add_job(
         task_func,
         'date',
         run_date=date_time,
@@ -30,7 +31,7 @@ async def add_task(task_func: Callable,
         id=str(task_id)
     )
     logger.info(f'New task {task_id} has been setup on {datetime}')
-    return True
+    return task
 
 
 async def get_task(task_id: str) -> Job:

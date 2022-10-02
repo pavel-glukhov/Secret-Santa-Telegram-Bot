@@ -7,7 +7,7 @@ from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-from app.keyborads.common import keyboard_button
+from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +19,11 @@ class ChangeAddress(StatesGroup):
 async def change_user_address(message: types.Message):
     await ChangeAddress.waiting_for_address_information.set()
 
-    keyboard_inline = keyboard_button(text="Отмена",
-                                      callback='cancel')
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel'
+        }
+    )
     await message.answer(
         'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
         'напишите ваш адрес куда необходимо отправить посылку'
@@ -36,7 +39,6 @@ async def change_user_address(message: types.Message):
         '*— индекс*\n\n'
         '*Например: Россия, Московская область, г. Фрязино, ул. Пупкина,'
         ' д. 99, кв. 999, этаж 25, индекс 123987.*\n',
-        parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard_inline
     )
 
@@ -45,8 +47,11 @@ async def change_user_address(message: types.Message):
 async def process_changing_owner(message: types.Message, state: FSMContext):
     address = message.text
     user_id = message.chat.id
-    keyboard_inline = keyboard_button(text="Вернуться назад ◀️",
-                                      callback=f"menu_user_profile")
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Вернуться назад ◀️": f"menu_user_profile"
+        }
+    )
 
     if not address > 150:
         await user_db().update_user(user_id, address=address)
