@@ -1,11 +1,11 @@
 import logging
 
 from aiogram import types
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
-from app.keyborads.common import create_common_keyboards, generate_inline_keyboard
+from app.keyborads.common import (create_common_keyboards,
+                                  generate_inline_keyboard)
 
 logger = logging.getLogger(__name__)
 
@@ -58,23 +58,18 @@ async def root_menu(message: types.Message, edit=False):
         text = menu_text_name
 
     if edit:
-        await message.edit_text(text,
-                                reply_markup=keyboard,
-                                )
+        await message.edit_text(text, reply_markup=keyboard, )
     else:
-        await message.answer(text,
-                             reply_markup=keyboard,
-                             )
+        await message.answer(text, reply_markup=keyboard, )
 
 
 @dp.message_handler(commands=['about'])
 async def about_game(message: types.Message):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "root_menu"
-        })
+            "Вернуться назад ◀️": "root_menu",
+        }
+    )
 
     text = 'Это адаптированная игра "Тайный Санта"'
-    await message.edit_text(text,
-                            reply_markup=keyboard_inline,
-                            )
+    await message.edit_text(text, reply_markup=keyboard_inline, )

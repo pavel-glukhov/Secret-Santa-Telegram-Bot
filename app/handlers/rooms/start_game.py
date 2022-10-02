@@ -2,15 +2,13 @@ import logging
 import re
 from datetime import datetime
 
-from aiogram.dispatcher import FSMContext
-
-from app.scheduler.operations import get_task, add_task, remove_task
 from aiogram import types
-from aiogram.dispatcher.filters.state import StatesGroup, State
-from app.keyborads.common import generate_inline_keyboard
-
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
+from app.keyborads.common import generate_inline_keyboard
+from app.scheduler.operations import add_task, get_task, remove_task
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ async def start_game(message: types.Message, room_number, keyboard_inline=None):
 
     keyboard = {
         "Изменить время 👋": f"room_change-game-dt_{room_number}",
-        "Вернуться назад ◀️": f"room_menu_{room_number}"
+        "Вернуться назад ◀️": f"room_menu_{room_number}",
 
     }
     keyboard_inline = generate_inline_keyboard(keyboard)
@@ -48,7 +46,7 @@ async def change_game_datetime(message: types.Message, room_number):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
 

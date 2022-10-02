@@ -1,36 +1,21 @@
 from aiogram import types
-from aiogram.types import ParseMode
 
 from app.database import room_db
+from app.keyborads.common import generate_inline_keyboard
 
 
 async def configuration_room(message: types.Message, room_number):
-    keyboard_inline = types.InlineKeyboardMarkup()
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Изменить имя комнаты ⚒": f"room_change-name_{room_number}",
+            "Изменить владельца 👤": f"room_change-owner_{room_number}",
+            "Удалить комнату ❌": f"room_delete_{room_number}",
+            "Вернуться назад ◀️": f"room_menu_{room_number}",
+        }
+    )
     room = await room_db().get_room(room_number)
     room_name = room.name
 
-    keyboard_list = [
-        types.InlineKeyboardButton(
-            text="Изменить имя комнаты ⚒",  #
-            callback_data=f"room_change-name_{room_number}"
-        ),
-        types.InlineKeyboardButton(
-            text="Изменить владельца 👤",
-            callback_data=f"room_change-owner_{room_number}"
-        ),
-        types.InlineKeyboardButton(
-            text="Удалить комнату ❌",
-            callback_data=f"room_delete_{room_number}"
-        ),
-        types.InlineKeyboardButton(
-            text="Вернуться назад ◀️",
-            callback_data=f"room_menu_{room_number}"
-        ),
-    ]
-
-    for button in keyboard_list:
-        keyboard_inline.add(button)
-
     await message.edit_text("Настройки комнаты: "
                             f"*{room_name}* (*{room_number}*)",
-                            reply_markup=keyboard_inline,)
+                            reply_markup=keyboard_inline, )

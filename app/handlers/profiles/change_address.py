@@ -3,7 +3,6 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
@@ -21,7 +20,7 @@ async def change_user_address(message: types.Message):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     await message.answer(
@@ -49,7 +48,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile"
+            "Вернуться назад ◀️": f"menu_user_profile",
         }
     )
 

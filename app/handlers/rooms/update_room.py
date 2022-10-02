@@ -4,7 +4,6 @@ from typing import Union
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import room_db
@@ -21,7 +20,7 @@ async def update_room_name(message: types.Message,
                            room_number: Union[str, int]):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
 
@@ -33,6 +32,7 @@ async def update_room_name(message: types.Message,
                             f'Имя не должно превышать 12 символов\n',
                             reply_markup=keyboard_inline
                             )
+
 
 # TODO добавить логирование
 @dp.message_handler(state=ChangeRoomName.waiting_for_room_name)
@@ -47,8 +47,8 @@ async def update_room_name_get_value(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️":"root_menu"
-         }
+            "Вернуться назад ◀️": "root_menu",
+        }
     )
     await state.finish()
     await message.answer(

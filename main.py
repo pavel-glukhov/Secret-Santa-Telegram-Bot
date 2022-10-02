@@ -1,9 +1,11 @@
 import asyncio
 import logging.config
 import os
+
 import yaml
-from app.config import root_path
+
 from app import bot, config, dispatcher
+from app.config import root_path
 from app.database import database_initialization
 from app.scheduler import scheduler
 

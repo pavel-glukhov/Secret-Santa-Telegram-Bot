@@ -4,7 +4,6 @@ from typing import Union
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import room_db
@@ -25,7 +24,7 @@ async def delete_room(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
 
@@ -56,7 +55,7 @@ async def completed_process_delete_room(message: types.Message,
     room_number = data['room_number']
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️":"root_menu"
+            "Вернуться назад ◀️":"root_menu",
          }
     )
 

@@ -3,7 +3,6 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
@@ -22,7 +21,7 @@ async def change_username(message: types.Message):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     await message.answer(
@@ -42,7 +41,7 @@ async def process_changing_first_name(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         })
 
     await ChangeUserName.next()
@@ -62,7 +61,7 @@ async def process_changing_last_name(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️":f"menu_user_profile"
+            "Вернуться назад ◀️": f"menu_user_profile",
         }
     )
     await user_db().update_user(user_id,

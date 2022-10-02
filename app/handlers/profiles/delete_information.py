@@ -3,7 +3,6 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.database import user_db
@@ -21,7 +20,7 @@ async def delete_user_information(message: types.Message):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     await message.answer(
@@ -37,7 +36,7 @@ async def delete_user_information(message: types.Message):
 async def process_deleting_information_invalid(message: types.Message):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     return await message.reply(
@@ -61,18 +60,15 @@ async def process_deleting_information(message: types.Message,
         'contact_number': None
     }
 
-    await user_db().update_user(
-        user_id=user_id, **data
+    await user_db().update_user(user_id=user_id, **data)
 
-    )
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile"
+            "Вернуться назад ◀️": f"menu_user_profile",
         }
     )
     await message.answer(
-        'Все данные о вас были удалены.\n\n'
-        ,
+        'Все данные о вас были удалены.\n\n',
         reply_markup=keyboard_inline
     )
     await state.finish()

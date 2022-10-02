@@ -1,5 +1,4 @@
 from aiogram import types
-from aiogram.types import ParseMode
 
 from app import dispatcher as dp
 from app.handlers.rooms.create_new_room import CreateRoom
@@ -15,7 +14,7 @@ from app.keyborads.common import generate_inline_keyboard
 async def room_name_invalid(message: types.Message):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     return await message.reply(
@@ -31,7 +30,7 @@ async def room_name_invalid(message: types.Message):
 async def process_join_room_invalid_text_type(message: types.Message):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     return await message.reply(

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import random
+
 from aiogram.utils import exceptions
 
 from app import bot

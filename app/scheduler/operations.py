@@ -1,10 +1,10 @@
 import logging
+from datetime import datetime
+from typing import Callable
 
 from apscheduler.job import Job
 
 from app.scheduler import scheduler
-from typing import Callable
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,6 @@ import logging
 from typing import Union
 
 from aiogram import types
-from aiogram.types import ParseMode
 
 from app.database import room_db
 from app.keyborads.common import generate_inline_keyboard
@@ -16,7 +15,7 @@ async def left_room(message: types.Message, room_number: Union[str, int]):
     await room_db().remove_member(user_id, room_number)
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "root_menu"
+            "Вернуться назад ◀️": "root_menu",
         }
     )
 

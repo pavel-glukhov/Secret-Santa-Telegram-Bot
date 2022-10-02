@@ -3,8 +3,6 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ParseMode
-
 from app import bot
 from app import dispatcher as dp
 from app.database import room_db
@@ -23,7 +21,7 @@ async def create_room(message: types.Message):
     await CreateRoom.waiting_for_room_name.set()
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
 
@@ -40,7 +38,7 @@ async def create_room(message: types.Message):
 async def process_name(message: types.Message, state: FSMContext):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
     room_name = message.text
@@ -49,7 +47,7 @@ async def process_name(message: types.Message, state: FSMContext):
     if not len(room_name) < 13:
         keyboard_inline = generate_inline_keyboard(
             {
-                "Отмена": 'cancel'
+                "Отмена": 'cancel',
             }
         )
         return await message.reply(
@@ -78,7 +76,7 @@ async def process_name(message: types.Message, state: FSMContext):
 async def process_budget(message: types.Message, state: FSMContext):
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel'
+            "Отмена": 'cancel',
         }
     )
 
@@ -106,7 +104,7 @@ async def process_wishes(message: types.Message, state: FSMContext):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Меню ◀️": 'root_menu'
+            "Меню ◀️": 'root_menu',
         }
     )
 
