@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -18,7 +19,9 @@ class JoinRoom(StatesGroup):
     waiting_for_wishes = State()
 
 
-async def join_room(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(Text(equals='menu_join_room'))
+async def join_room(callback: types.CallbackQuery, state: FSMContext):
+    message = callback.message
     await JoinRoom.waiting_for_room_number.set()
     keyboard_inline = generate_inline_keyboard(
         {

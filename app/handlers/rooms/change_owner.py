@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -16,7 +17,10 @@ class ChangeOwner(StatesGroup):
     waiting_for_owner_name = State()
 
 
-async def change_room_owner(message: types.Message, room_number):
+@dp.callback_query_handler(Text(startswith='room_change-owner'))
+async def change_room_owner(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     await ChangeOwner.waiting_for_owner_name.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)

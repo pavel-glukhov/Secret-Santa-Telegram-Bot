@@ -1,14 +1,20 @@
 import logging
 
 from aiogram import types
+from aiogram.dispatcher.filters import Text
 
+from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import generate_inline_keyboard
 
 logger = logging.getLogger(__name__)
 
 
-async def my_room(message: types.Message, room_number):
+@dp.callback_query_handler(Text(startswith='room_menu'))
+async def my_room(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
+
     room = await room_db().get_room(room_number)
     room_name = room.name
     user_id = message.chat.id
@@ -33,20 +39,20 @@ async def my_room(message: types.Message, room_number):
             "Вернуться назад ◀️": f"root_menu",
         }
     )
-
     keyboard_inline_ = generate_inline_keyboard(keyboard_dict)
     await message.edit_text(f"Управление комнатой {room_name} ({room_number})",
                             reply_markup=keyboard_inline_)
 
 
-async def members_list(message: types.Message,
-                       room_number: int) -> None:
+@dp.callback_query_handler(Text(startswith='room_member-list'))
+async def members_list(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-
     room = await room_db().get_room(room_number)
     members = await room.members
     member_str = ''

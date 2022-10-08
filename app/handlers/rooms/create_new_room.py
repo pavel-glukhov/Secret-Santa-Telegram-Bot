@@ -2,7 +2,9 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
+
 from app import bot
 from app import dispatcher as dp
 from app.database import room_db
@@ -17,14 +19,15 @@ class CreateRoom(StatesGroup):
     waiting_for_room_wishes = State()
 
 
-async def create_room(message: types.Message):
+@dp.callback_query_handler(Text(equals='menu_create_new_room'))
+async def create_room(callback: types.CallbackQuery, ):
+    message = callback.message
     await CreateRoom.waiting_for_room_name.set()
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-
     await message.answer(
         'Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
@@ -35,7 +38,8 @@ async def create_room(message: types.Message):
 
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_name)
-async def process_name(message: types.Message, state: FSMContext):
+async def process_name(callback: types.CallbackQuery, state: FSMContext):
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',

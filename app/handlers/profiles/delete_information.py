@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -15,7 +16,9 @@ class DeleteUserInformation(StatesGroup):
     waiting_for_conformation = State()
 
 
-async def delete_user_information(message: types.Message):
+@dp.callback_query_handler(Text(equals='profile_edit_delete_all'))
+async def delete_user_information(callback: types.CallbackQuery):
+    message = callback.message
     await DeleteUserInformation.waiting_for_conformation.set()
 
     keyboard_inline = generate_inline_keyboard(

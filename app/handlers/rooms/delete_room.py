@@ -3,6 +3,7 @@ from typing import Union
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -15,9 +16,12 @@ logger = logging.getLogger(__name__)
 class DeleteRoom(StatesGroup):
     waiting_conformation = State()
 
+
 # TODO добавить логирование
-async def delete_room(message: types.Message,
-                      room_number: Union[int, str]):
+@dp.callback_query_handler(Text(startswith='room_delete'))
+async def delete_room(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     await DeleteRoom.waiting_conformation.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
@@ -55,8 +59,8 @@ async def completed_process_delete_room(message: types.Message,
     room_number = data['room_number']
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️":"root_menu",
-         }
+            "Вернуться назад ◀️": "root_menu",
+        }
     )
 
     is_deleted = await room_db().delete(room_number=room_number)

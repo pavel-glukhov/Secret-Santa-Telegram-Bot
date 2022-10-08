@@ -1,6 +1,8 @@
 import logging
 
 from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 
 from app import dispatcher as dp
 from app.database import user_db
@@ -8,6 +10,14 @@ from app.keyborads.common import (create_common_keyboards,
                                   generate_inline_keyboard)
 
 logger = logging.getLogger(__name__)
+
+
+@dp.callback_query_handler(text_contains="cancel", state='*')
+async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
+    message = callback.message
+    await state.reset_state()
+    await message.answer('Действие отменено')
+    await root_menu(message)
 
 
 @dp.message_handler(commands=['start'])
@@ -39,37 +49,40 @@ async def create_user(message: types.Message):
     return user, created
 
 
+@dp.callback_query_handler(Text(equals='root_menu'), )
 @dp.message_handler(commands=['menu'], )
-async def root_menu(message: types.Message, edit=False):
+async def root_menu(data: types.Message | types.CallbackQuery, edit_message=False):
+    message = data.message if isinstance(data, types.CallbackQuery) else data
+
     user, created = await create_user(message)
     keyboard = await create_common_keyboards(message)
     menu_text_name = '*Меню*'
+
+    is_profile_filled_out = all([user.address, user.contact_number])
+
     reminder_for_user = (
-        '❗ *Не забудь обновить свои контактные данные '
+        '❗ *Не забудь обновить свои конт актные данные '
         'в настройках профиля*.\n\n'
         '❗ *Иначе Санта не сможет отправить тебе подарок.*\n\n'
     )
 
-    is_profile_filled_out = any([user.address, user.contact_number])
+    text = menu_text_name if is_profile_filled_out else reminder_for_user + menu_text_name
 
-    if not is_profile_filled_out:
-        text = reminder_for_user + menu_text_name
-    else:
-        text = menu_text_name
-
-    if edit:
+    if edit_message:
         await message.edit_text(text, reply_markup=keyboard, )
     else:
         await message.answer(text, reply_markup=keyboard, )
 
 
-@dp.message_handler(commands=['about'])
-async def about_game(message: types.Message):
+@dp.callback_query_handler(Text(equals='menu_about_game'))
+@dp.message_handler(commands=['about'], )
+async def about_game(data: types.Message | types.CallbackQuery, ):
+    message = data.message if isinstance(data, types.CallbackQuery) else data
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
         }
     )
-
-    text = 'Это адаптированная игра "Тайный Санта"'
+    text = 'Это адаптированная игра "Тайный Санта"'  # TODO добавить текст об игре
     await message.edit_text(text, reply_markup=keyboard_inline, )

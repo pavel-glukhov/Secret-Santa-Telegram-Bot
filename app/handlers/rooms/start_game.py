@@ -4,6 +4,7 @@ from datetime import datetime
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -17,8 +18,10 @@ class StartGame(StatesGroup):
     waiting_for_datetime = State()
 
 
-# TODO реализовать
-async def start_game(message: types.Message, room_number, keyboard_inline=None):
+@dp.callback_query_handler(Text(startswith='room_start-game'))
+async def start_game(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     task = await get_task(task_id=room_number)
 
     keyboard = {
@@ -39,7 +42,10 @@ async def start_game(message: types.Message, room_number, keyboard_inline=None):
         )
 
 
-async def change_game_datetime(message: types.Message, room_number):
+@dp.callback_query_handler(Text(startswith='room_change-game-dt'))
+async def change_game_datetime(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     await StartGame.waiting_for_datetime.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
@@ -72,7 +78,7 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️":f"room_menu_{room_number}"
+            "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
 

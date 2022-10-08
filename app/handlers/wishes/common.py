@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import bot
@@ -17,8 +18,10 @@ class ChangeWish(StatesGroup):
     waiting_for_wishes = State()
 
 
-async def show_wishes(message: types.Message,
-                      room_number: int):
+@dp.callback_query_handler(Text(startswith='room_show-wish'))
+async def show_wishes(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Изменить желание ✒️": f"room_change-wish_{room_number}",
@@ -35,8 +38,10 @@ async def show_wishes(message: types.Message,
                             reply_markup=keyboard_inline)
 
 
-async def update_wishes(message: types.Message,
-                        room_number: int):
+@dp.callback_query_handler(Text(startswith='room_change-wish'))
+async def update_wishes(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     await ChangeWish.waiting_for_wishes.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)

@@ -3,6 +3,7 @@ from typing import Union
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -16,8 +17,10 @@ class ChangeRoomName(StatesGroup):
     waiting_for_room_name = State()
 
 
-async def update_room_name(message: types.Message,
-                           room_number: Union[str, int]):
+@dp.callback_query_handler(Text(startswith='room_change-name'))
+async def update_room_name(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',

@@ -1,7 +1,9 @@
 import logging
 
 from aiogram import types
+from aiogram.dispatcher.filters import Text
 
+from app import dispatcher as dp
 from app.database import user_db
 from app.keyborads.common import generate_inline_keyboard
 from app.utils.formatters import user_information_formatter
@@ -9,7 +11,9 @@ from app.utils.formatters import user_information_formatter
 logger = logging.getLogger(__name__)
 
 
-async def my_profile(message: types.Message):
+@dp.callback_query_handler(Text(equals='menu_user_profile'))
+async def my_profile(callback: types.CallbackQuery):
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Изменить профиль 👋": "profile_edit",
@@ -17,8 +21,7 @@ async def my_profile(message: types.Message):
         }
     )
 
-    user_id = message.chat.id
-    user = await user_db().get_user_or_none(user_id)
+    user = await user_db().get_user_or_none(message.chat.id)
     user_information = user_information_formatter(user)
 
     await message.edit_text(
@@ -33,7 +36,9 @@ async def my_profile(message: types.Message):
     )
 
 
-async def edit_profile(message: types.Message):
+@dp.callback_query_handler(Text(equals='profile_edit'))
+async def edit_profile(callback: types.CallbackQuery, ):
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {"Изменить имя": "profile_edit_name",
          "Изменить адрес": "profile_edit_address",

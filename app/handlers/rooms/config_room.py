@@ -1,10 +1,15 @@
 from aiogram import types
+from aiogram.dispatcher.filters import Text
 
+from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import generate_inline_keyboard
 
 
-async def configuration_room(message: types.Message, room_number):
+@dp.callback_query_handler(Text(startswith='room_config'))
+async def configuration_room(callback: types.CallbackQuery):
+    command, operation, room_number = callback.data.split('_')
+    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Изменить имя комнаты ⚒": f"room_change-name_{room_number}",

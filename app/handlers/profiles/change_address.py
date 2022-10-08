@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -15,7 +16,9 @@ class ChangeAddress(StatesGroup):
     waiting_for_address_information = State()
 
 
-async def change_user_address(message: types.Message):
+@dp.callback_query_handler(Text(equals='profile_edit_address'))
+async def change_user_address(callback: types.CallbackQuery):
+    message = callback.message
     await ChangeAddress.waiting_for_address_information.set()
 
     keyboard_inline = generate_inline_keyboard(

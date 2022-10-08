@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -16,7 +17,9 @@ class ChangeUserName(StatesGroup):
     waiting_for_last_name = State()
 
 
-async def change_username(message: types.Message):
+@dp.callback_query_handler(Text(equals='profile_edit_name'))
+async def change_username(callback: types.CallbackQuery):
+    message = callback.message
     await ChangeUserName.waiting_for_first_name.set()
 
     keyboard_inline = generate_inline_keyboard(

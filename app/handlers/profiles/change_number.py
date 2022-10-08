@@ -3,6 +3,7 @@ import re
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app import dispatcher as dp
@@ -16,7 +17,9 @@ class ChangePhoneNuber(StatesGroup):
     waiting_for_phone_number = State()
 
 
-async def change_phone_number(message: types.Message):
+@dp.callback_query_handler(Text(equals='profile_edit_number'))
+async def change_phone_number(callback: types.CallbackQuery):
+    message = callback.message
     await ChangePhoneNuber.waiting_for_phone_number.set()
 
     keyboard_inline = generate_inline_keyboard(
