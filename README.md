@@ -10,5 +10,3 @@
 1. Aiogram
 2. Tortoise ORM
 3. Aerich
-4. PostgreSQL
-5. Redis
