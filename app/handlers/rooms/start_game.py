@@ -10,6 +10,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app import dispatcher as dp
 from app.keyborads.common import generate_inline_keyboard
 from app.scheduler.operations import add_task, get_task, remove_task
+from app.utils.common import get_room_number
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class StartGame(StatesGroup):
 
 @dp.callback_query_handler(Text(startswith='room_start-game'))
 async def start_game(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
+    room_number = get_room_number(callback)
     message = callback.message
     task = await get_task(task_id=room_number)
 
@@ -44,8 +45,7 @@ async def start_game(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(Text(startswith='room_change-game-dt'))
 async def change_game_datetime(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
-    message = callback.message
+    room_number = get_room_number(callback)
     await StartGame.waiting_for_datetime.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
@@ -56,7 +56,7 @@ async def change_game_datetime(callback: types.CallbackQuery):
         }
     )
 
-    await message.answer(
+    await callback.message.answer(
         '"Хо-хо-хо! 🎅\n\n'
         'Для того, что-бы назначить время рассылки, отправь сообщение в формате\n'
         '*yyyy, mm, dd, h, m* - *год, месяц, день, час, минуты*\n\n'
@@ -70,7 +70,6 @@ def pass_():
     pass
 
 
-# TODO реализовать
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -91,7 +90,7 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
         if task:
             task.remove()
 
-        task = await add_task(task_func=pass_,
+        task = await add_task(task_func=pass_,  # TODO поменять функцию на рассылку
                               date_time=datetime(*date),
                               task_id=room_number)
 

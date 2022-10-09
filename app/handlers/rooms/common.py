@@ -6,18 +6,17 @@ from aiogram.dispatcher.filters import Text
 from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import generate_inline_keyboard
+from app.utils.common import get_room_number
 
 logger = logging.getLogger(__name__)
 
 
 @dp.callback_query_handler(Text(startswith='room_menu'))
 async def my_room(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
-    message = callback.message
-
+    room_number = get_room_number(callback)
     room = await room_db().get_room(room_number)
     room_name = room.name
-    user_id = message.chat.id
+    user_id = callback.message.chat.id
 
     keyboard_dict = {
         "Ваши желания 🎁": f"room_show-wish_{room_number}",
@@ -40,13 +39,13 @@ async def my_room(callback: types.CallbackQuery):
         }
     )
     keyboard_inline_ = generate_inline_keyboard(keyboard_dict)
-    await message.edit_text(f"Управление комнатой {room_name} ({room_number})",
-                            reply_markup=keyboard_inline_)
+    await callback.message.edit_text(f"Управление комнатой {room_name} ({room_number})",
+                                     reply_markup=keyboard_inline_)
 
 
 @dp.callback_query_handler(Text(startswith='room_member-list'))
 async def members_list(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
+    room_number = get_room_number(callback)
     message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {

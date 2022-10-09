@@ -9,6 +9,7 @@ from app import dispatcher as dp
 from app.database import room_db
 from app.database.models import User
 from app.keyborads.common import generate_inline_keyboard
+from app.utils.common import get_room_number
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +20,7 @@ class ChangeOwner(StatesGroup):
 
 @dp.callback_query_handler(Text(startswith='room_change-owner'))
 async def change_room_owner(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
-    message = callback.message
+    room_number = get_room_number(callback)
     await ChangeOwner.waiting_for_owner_name.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
@@ -31,7 +31,7 @@ async def change_room_owner(callback: types.CallbackQuery):
         }
     )
 
-    await message.answer(
+    await callback.message.answer(
         'Хочешь поменять владельца комнаты?\n'
         'Новый владелец комнаты должен являться ее участником. '
         '*Учти, что ты потеряешь контроль за комнатой.*\n\n'
@@ -42,8 +42,8 @@ async def change_room_owner(callback: types.CallbackQuery):
 
 @dp.message_handler(state=ChangeOwner.waiting_for_owner_name)
 async def process_changing_owner(message: types.Message, state: FSMContext):
-    data = await dp.current_state().get_data()
-    room_number = data['room_number']
+    state_data = await dp.current_state().get_data()
+    room_number = state_data['room_number']
     previous_owner = message.chat.id
     new_owner = message.text
 

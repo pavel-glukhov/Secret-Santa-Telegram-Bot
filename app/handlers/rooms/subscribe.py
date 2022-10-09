@@ -20,15 +20,14 @@ class JoinRoom(StatesGroup):
 
 
 @dp.callback_query_handler(Text(equals='menu_join_room'))
-async def join_room(callback: types.CallbackQuery, state: FSMContext):
-    message = callback.message
+async def join_room(callback: types.CallbackQuery):
     await JoinRoom.waiting_for_room_number.set()
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+    await callback.message.answer(
         '"Хо-хо-хо! 🎅\n\n'
         'Введи номер комнаты в которую ты хочешь зайти.\n',
         reply_markup=keyboard_inline

@@ -1,5 +1,4 @@
 import logging
-from typing import Union
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -9,6 +8,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app import dispatcher as dp
 from app.database import room_db
 from app.keyborads.common import generate_inline_keyboard
+from app.utils.common import get_room_number
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +17,10 @@ class ChangeRoomName(StatesGroup):
     waiting_for_room_name = State()
 
 
+# TODO добавить логирование
 @dp.callback_query_handler(Text(startswith='room_change-name'))
 async def update_room_name(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
-    message = callback.message
+    room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -31,18 +31,18 @@ async def update_room_name(callback: types.CallbackQuery):
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
 
-    await message.edit_text(f'Введите новое имя для вашей комнаты.\n'
-                            f'Имя не должно превышать 12 символов\n',
-                            reply_markup=keyboard_inline
-                            )
+    await callback.message.edit_text(f'Введите новое имя для вашей комнаты.\n'
+                                     f'Имя не должно превышать 12 символов\n',
+                                     reply_markup=keyboard_inline
+                                     )
 
 
 # TODO добавить логирование
 @dp.message_handler(state=ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
                                      state: FSMContext):
-    data = await dp.current_state().get_data()
-    room_number = data['room_number']
+    state_data = await dp.current_state().get_data()
+    room_number = state_data['room_number']
 
     new_room_name = message.text
     await room_db().update_room(room_number=room_number,

@@ -9,6 +9,7 @@ from app import bot
 from app import dispatcher as dp
 from app.database import room_db, wish_db
 from app.keyborads.common import generate_inline_keyboard
+from app.utils.common import get_room_number
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class ChangeWish(StatesGroup):
 
 @dp.callback_query_handler(Text(startswith='room_show-wish'))
 async def show_wishes(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
+    room_number = get_room_number(callback)
     message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
@@ -40,7 +41,7 @@ async def show_wishes(callback: types.CallbackQuery):
 
 @dp.callback_query_handler(Text(startswith='room_change-wish'))
 async def update_wishes(callback: types.CallbackQuery):
-    command, operation, room_number = callback.data.split('_')
+    room_number = get_room_number(callback)
     message = callback.message
     await ChangeWish.waiting_for_wishes.set()
     state = dp.get_current().current_state()
@@ -52,8 +53,8 @@ async def update_wishes(callback: types.CallbackQuery):
 
 @dp.message_handler(state=ChangeWish.waiting_for_wishes)
 async def process_updating_wishes(message: types.Message, state: FSMContext):
-    data = await dp.current_state().get_data()
-    room_number = data['room_number']
+    state_data = await dp.current_state().get_data()
+    room_number = state_data['room_number']
     wish = message.text
     user_id = message.chat.id
 

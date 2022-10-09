@@ -21,14 +21,13 @@ class CreateRoom(StatesGroup):
 
 @dp.callback_query_handler(Text(equals='menu_create_new_room'))
 async def create_room(callback: types.CallbackQuery, ):
-    message = callback.message
     await CreateRoom.waiting_for_room_name.set()
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+    await callback.message.answer(
         'Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
         'Напиши мне ее название и мы пойдем дальше\n\n'
@@ -39,13 +38,12 @@ async def create_room(callback: types.CallbackQuery, ):
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_name)
 async def process_name(callback: types.CallbackQuery, state: FSMContext):
-    message = callback.message
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-    room_name = message.text
+    room_name = callback.message.text
     await state.update_data(room_name=room_name)
 
     if not len(room_name) < 13:
@@ -54,7 +52,7 @@ async def process_name(callback: types.CallbackQuery, state: FSMContext):
                 "Отмена": 'cancel',
             }
         )
-        return await message.reply(
+        return await callback.message.reply(
             text='Вы ввели слишком длинное имя, '
                  'пожалуйста придумайте другое.\n'
                  'Имя комнаты не должно превышать 12 символов.\n',
@@ -62,10 +60,10 @@ async def process_name(callback: types.CallbackQuery, state: FSMContext):
         )
 
     await CreateRoom.next()
-    await bot.delete_message(chat_id=message.from_user.id,
-                             message_id=message.message_id)
+    await bot.delete_message(chat_id=callback.message.from_user.id,
+                             message_id=callback.message.message_id)
 
-    await message.answer(
+    await callback.message.answer(
         f'Принято! Имя твоей комнаты *{room_name}*\n\n'
         'А теперь укажи максимальный бюджет '
         'на подарок Тайного Санты.\n'
