@@ -4,21 +4,21 @@ import os
 
 import yaml
 
-from app import bot, config, dispatcher
+from app.bot import bot, config, dispatcher
 from app.config import root_path
-from app.database import database_initialization
-from app.scheduler import scheduler
+from app.store.database import database_initialization
+from app.store.scheduler import scheduler
 
 logger = logging.getLogger(__name__)
 
 
-def create_directory_or_none(path: str) -> None:
+def create_directory(path: str) -> None:
     if not os.path.exists(path):
         os.makedirs(path)
 
 
 def setup_logging() -> None:
-    create_directory_or_none(config.log.log_path)
+    create_directory(config.log.log_path)
     configuration_file = os.path.join(root_path, config.log.config_file)
 
     with open(configuration_file, 'r') as stream:

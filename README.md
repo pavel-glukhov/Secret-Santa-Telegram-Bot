@@ -12,3 +12,7 @@
 3. Aerich
 4. PostgreSQL
 5. Redis
+
+
+### Миграция базы данных
+* aerich upgrade
