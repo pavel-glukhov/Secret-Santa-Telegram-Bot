@@ -13,6 +13,7 @@
 4. PostgreSQL
 5. Redis
 
-
+### Создать новую миграцию
+* aerich migrate
 ### Миграция базы данных
 * aerich upgrade

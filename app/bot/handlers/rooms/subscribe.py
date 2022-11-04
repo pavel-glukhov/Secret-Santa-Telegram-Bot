@@ -13,7 +13,6 @@ from app.bot.keyborads.common import (create_common_keyboards,
 logger = logging.getLogger(__name__)
 
 
-# TODO добавить логирование
 class JoinRoom(StatesGroup):
     waiting_for_room_number = State()
     waiting_for_wishes = State()
@@ -27,7 +26,7 @@ async def join_room(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await callback.message.answer(
+    await callback.message.edit_text(
         '"Хо-хо-хо! 🎅\n\n'
         'Введи номер комнаты в которую ты хочешь зайти.\n',
         reply_markup=keyboard_inline
@@ -39,26 +38,34 @@ async def process_room_number(message: types.Message, state: FSMContext):
     room_number = message.text
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-    
-    user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
     
+    if not message.text.isdigit():
+        return await message.answer(
+            text='Номер комнаты может содержать только цифры, '
+                 'попробуйте снова.',
+            reply_markup=keyboard_inline
+        )
+    
     is_room_exist = await room_db().is_exists(room_number=room_number)
     
     if not is_room_exist:
         await message.answer(
-            'Введенной комнаты не существует.',
+            'Введенной комнаты не существует, введите корректный номер.',
+            reply_markup=keyboard_inline
         )
+        logger.info(f'Incorrect room number [{room_number}] from [{message.from_user.id}]')
     else:
-        is_member_of_room = await room_db().is_member(user_id=user_id,
+        is_member_of_room = await room_db().is_member(user_id=message.chat.id,
                                                       room_number=room_number)
         
         if is_member_of_room:
             keyboard_inline = await create_common_keyboards(message)
+            logger.info(f'The user[{message.from_user.id}] already is member of the room [{room_number}]')
             await message.answer(
                 'Вы уже состоите в этой комнате.',
                 reply_markup=keyboard_inline
@@ -66,7 +73,6 @@ async def process_room_number(message: types.Message, state: FSMContext):
             await state.finish()
         
         else:
-            
             await JoinRoom.next()
             await message.answer(
                 'А теперь напишите свои пожелания к подарку. '

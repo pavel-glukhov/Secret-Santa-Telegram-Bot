@@ -10,10 +10,10 @@ class RoomDB:
     def __init__(self, _class: Room = Room):
         self._class = _class
 
-    async def create_room(self, name: str,
-                          owner: int,
-                          budget: str,
-                          user_wish: str) -> Room:
+    async def create(self, name: str,
+                     owner: int,
+                     budget: str,
+                     user_wish: str) -> Room:
         """
         Create a new room for The Secret Santa Game
 
@@ -41,7 +41,7 @@ class RoomDB:
 
         return room
 
-    async def update_room(self, room_number: int, **kwargs) -> None:
+    async def update(self, room_number: int, **kwargs) -> None:
         """
         Update data of a selected room
 
@@ -70,7 +70,7 @@ class RoomDB:
         await room.members.add(user)
         return True
 
-    async def get_list_members_of_room(self, room_number: int) -> Room:
+    async def get_list_members(self, room_number: int) -> Room:
         """
         Get all members of room
 
@@ -111,7 +111,7 @@ class RoomDB:
         ).exists()
         return result
 
-    async def get_room(self, room_number: int) -> Room:
+    async def get(self, room_number: int) -> Room:
         """
         Get Room instance
 
@@ -139,7 +139,7 @@ class RoomDB:
             return user
         return False
 
-    async def get_all_user_rooms(self, user_id: int) -> list[Room]:
+    async def get_all_users_of_room(self, user_id: int) -> list[Room]:
         """
         Get the entire list of the user's rooms in which he is a member
 

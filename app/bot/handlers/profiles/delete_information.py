@@ -27,7 +27,7 @@ async def delete_user_information(callback: types.CallbackQuery):
         }
     )
     await message.answer(
-        'Напиши *подтверждаю* для удаления твоих данных из профиля.\n\n'
+        'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
         ,
         reply_markup=keyboard_inline
     )
@@ -42,7 +42,7 @@ async def process_deleting_information_invalid(message: types.Message):
             "Отмена": 'cancel',
         }
     )
-    return await message.reply(
+    return await message.answer(
         'Вы ввели неверную команду для подтверждения, попробуйте снова.\n',
         reply_markup=keyboard_inline
     )

@@ -5,6 +5,7 @@ from tortoise import Tortoise
 from tortoise.exceptions import ConfigurationError, DBConnectionError
 
 from app.config import config
+from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB
 from app.store.database.queries.wishes import WishDB
@@ -23,7 +24,7 @@ TORTOISE_ORM = {
     'connections': {'default': DATABASE_URL},
     'apps': {
         'models': {
-            'models': ['app.database.models', 'aerich.models'],
+            'models': ['app.store.database.models', 'aerich.models'],
             'default_connection': 'default',
         },
     },
@@ -44,3 +45,4 @@ async def database_initialization():
 user_db = UserDB
 room_db = RoomDB
 wish_db = WishDB
+game_result_db = GameResultDB

@@ -74,7 +74,7 @@ config = AppConfig(
     ),
     log=LoggingConfig(
         log_path=os.path.join(root_path, 'logs'),
-        log_file='logs.txt',
+        log_file='logs.log',
         config_file='logging.yaml'
     ),
 )

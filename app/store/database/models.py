@@ -4,7 +4,7 @@ from tortoise.models import Model
 
 class User(Model):
     user_id = fields.IntField(pk=True)
-    username = fields.CharField(max_length=256, unique=True, null=False)
+    username = fields.CharField(max_length=256, unique=True, null=True)
     first_name = fields.CharField(max_length=128, null=True)
     last_name = fields.CharField(max_length=128, null=True)
     email = fields.CharField(max_length=64, null=True)
@@ -27,9 +27,9 @@ class Room(Model):
     number = fields.IntField(null=False, unique=True)
     budget = fields.CharField(max_length=12, null=False)
     created_at = fields.DatetimeField(auto_now_add=True)
-    is_started = fields.BooleanField(default=False)
+    is_closed = fields.BooleanField(default=False)
     started_at = fields.DatetimeField(null=True)
-    finished_at = fields.DatetimeField(null=True)
+    closed_at = fields.DatetimeField(null=True)
     owner = fields.ForeignKeyField('models.User', related_name='room_owner')
     members = fields.ManyToManyField('models.User', related_name='members',
                                      through='rooms_users', on_delete='CASCADE')
@@ -58,10 +58,13 @@ class Wish(Model):
 
 class GameResult(Model):
     id = fields.IntField(pk=True)
-    room = fields.ForeignKeyField('models.Room', related_name='result_of_game')
-    recipient = fields.ForeignKeyField('models.User', related_name='recipient')
-    sender = fields.ForeignKeyField('models.User', related_name='sender')
-    assigned_at = fields.DatetimeField(null=True)
+    room = fields.ForeignKeyField('models.Room', related_name='results_of_rooms')
+    recipient = fields.ForeignKeyField('models.User', related_name='recipients')
+    sender = fields.ForeignKeyField('models.User', related_name='senders')
+    assigned_at = fields.DatetimeField(auto_now_add=True)
 
     class Meta:
         table = "game_results"
+    
+    def __str__(self):
+        return f"Room {self.room}: {self.recipient} {self.sender}"

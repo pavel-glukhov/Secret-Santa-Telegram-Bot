@@ -30,7 +30,7 @@ async def change_username(callback: types.CallbackQuery):
     await message.answer(
         'Хохохо, пора указать твои данные для Санты 🎅\n'
         'Учти, что оно будет использоваться для отправки подарка Сантой.\n\n'
-        '*Сначала напиши свое имя*\n\n'
+        '<b>Сначала напиши свое имя</b>\n\n'
         ,
         reply_markup=keyboard_inline
     )
@@ -49,7 +49,7 @@ async def process_changing_first_name(message: types.Message,
 
     await ChangeUserName.next()
     await message.answer(
-        '*Теперь укажи свою фамилию*\n\n',
+        '<b>Теперь укажи свою фамилию</b>\n\n',
         reply_markup=keyboard_inline
     )
 

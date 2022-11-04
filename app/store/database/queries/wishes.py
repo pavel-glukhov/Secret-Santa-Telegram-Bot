@@ -5,11 +5,12 @@ class WishDB:
     def __init__(self, _class: Wish = Wish):
         self._class = _class
 
-    async def get_wishes(self, user_id: int, room_id: int) -> Wish:
+    async def get(self, user_id: int, room_id: int) -> Wish:
         result = await self._class.filter(
             room__number=room_id,
             user__user_id=user_id
         ).first()
+
         return result
 
     async def update_or_create(self, wish: str,
@@ -23,8 +24,7 @@ class WishDB:
             }
         )
 
-    # TODO протестировать метод
-    async def delete_wishes(self, room_id: int, user_id: int) -> None:
+    async def delete(self, room_id: int, user_id: int) -> None:
         wishes = await self._class.filter(
             room__number=room_id,
             user__user_id=user_id

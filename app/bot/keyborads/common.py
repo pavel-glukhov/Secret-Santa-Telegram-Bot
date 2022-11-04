@@ -1,20 +1,20 @@
 from aiogram import types
 
 from app.store.database import room_db
-from app.store.database.models import Room
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
+from app.store.database.models import Room
 
 
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
     keyboard_inline = types.InlineKeyboardMarkup()
-
+    
     for key, val in buttons.items():
         button = types.InlineKeyboardButton(
             text=key,
             callback_data=val
         )
         keyboard_inline.add(button)
-
+    
     return keyboard_inline
 
 
@@ -41,11 +41,11 @@ async def create_common_keyboards(message: types.Message) -> types.InlineKeyboar
     keyboard_dict = {
         MAIN_REPLY_BUTTONS['join_room']: "menu_join_room",
         MAIN_REPLY_BUTTONS['create_room']: "menu_create_new_room",
-
+        
     }
     user_id = message.chat.id
-    user_rooms = await room_db().get_all_user_rooms(user_id)
-
+    user_rooms = await room_db().get_all_users_of_room(user_id)
+    
     if user_rooms:
         for room in user_rooms:
             owner = await room.owner
@@ -64,5 +64,5 @@ async def create_common_keyboards(message: types.Message) -> types.InlineKeyboar
         }
     )
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
-
+    
     return keyboard_inline

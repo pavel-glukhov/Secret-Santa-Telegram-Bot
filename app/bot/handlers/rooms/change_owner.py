@@ -9,7 +9,7 @@ from app.bot import dispatcher as dp
 from app.store.database import room_db
 from app.store.database.models import User
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.handlers.utils.common import get_room_number
+from app.bot.handlers.operations import get_room_number
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +34,8 @@ async def change_room_owner(callback: types.CallbackQuery):
     await callback.message.answer(
         'Хочешь поменять владельца комнаты?\n'
         'Новый владелец комнаты должен являться ее участником. '
-        '*Учти, что ты потеряешь контроль за комнатой.*\n\n'
-        '*Для смены владельца, напиши его ник.*\n',
+        '<b>Учти, что ты потеряешь контроль за комнатой.</b>\n\n'
+        '<b>Для смены владельца, напиши его ник.</b>\n',
         reply_markup=keyboard_inline
     )
 
@@ -63,7 +63,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     if owner:
         await message.answer(
             '"Хо-хо-хо! 🎅\n\n'
-            f'Я сменил владельца, теперь это *{owner.username}*',
+            f'Я сменил владельца, теперь это <b>{owner.username}</b>',
             reply_markup=keyboard_inline
         )
     else:

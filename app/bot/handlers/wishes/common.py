@@ -5,16 +5,14 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from app import bot
 from app.bot import dispatcher as dp
 from app.store.database import room_db, wish_db
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.handlers.utils.common import get_room_number
+from app.bot.handlers.operations import get_room_number
 
 logger = logging.getLogger(__name__)
 
 
-# TODO добавить логирование
 class ChangeWish(StatesGroup):
     waiting_for_wishes = State()
 
@@ -32,7 +30,7 @@ async def show_wishes(callback: types.CallbackQuery):
     )
 
     user_id = message.chat.id
-    wishes = await wish_db().get_wishes(user_id, room_number)
+    wishes = await wish_db().get(user_id, room_number)
 
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
@@ -47,7 +45,7 @@ async def update_wishes(callback: types.CallbackQuery):
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
     await message.edit_text(
-        '*Напиши новое желание:*\n',
+        '<b>Напиши новое желание:</b>\n',
     )
 
 
@@ -68,12 +66,12 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
         user_id,
         room_number
     )
-    room = await room_db().get_room(room_number)
+    room = await room_db().get(room_number)
     await state.finish()
-    await bot.delete_message(chat_id=message.from_user.id,
-                             message_id=message.message_id)
+    
+    
     await message.answer(
-        f'Ваши желания в комнате *{room.name}* изменены на:\n\n'
+        f'Ваши желания в комнате <b>{room.name}</b> изменены на:\n\n'
         f'{wish}\n\n'
         f'Санта обязательно учтет ваши пожелания! 🎅',
         reply_markup=keyboard_inline

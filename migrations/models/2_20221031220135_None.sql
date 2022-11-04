@@ -1,12 +1,12 @@
 -- upgrade --
 CREATE TABLE IF NOT EXISTS "users" (
     "user_id" SERIAL NOT NULL PRIMARY KEY,
-    "username" VARCHAR(64) NOT NULL,
-    "first_name" VARCHAR(64),
-    "last_name" VARCHAR(64),
+    "username" VARCHAR(256)  UNIQUE,
+    "first_name" VARCHAR(128),
+    "last_name" VARCHAR(128),
     "email" VARCHAR(64),
-    "address" VARCHAR(256),
-    "contact_number" VARCHAR(12),
+    "address" VARCHAR(150),
+    "contact_number" VARCHAR(18),
     "registered_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
     "is_active" BOOL NOT NULL  DEFAULT True,
     "is_superuser" BOOL NOT NULL  DEFAULT False

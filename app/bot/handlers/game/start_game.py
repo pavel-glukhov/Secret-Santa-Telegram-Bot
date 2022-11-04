@@ -10,7 +10,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.scheduler.operations import add_task, get_task
-from app.bot.handlers.utils.common import get_room_number
+from app.bot.handlers.operations import get_room_number
+from app.bot.messages.result_mailing import send_result_of_game
 
 logger = logging.getLogger(__name__)
 
@@ -23,21 +24,21 @@ class StartGame(StatesGroup):
 async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     message = callback.message
-    task = await get_task(task_id=room_number)
-
+    task = get_task(task_id=room_number)
+    
     keyboard = {
         "Изменить время 👋": f"room_change-game-dt_{room_number}",
         "Вернуться назад ◀️": f"room_menu_{room_number}",
-
+        
     }
     keyboard_inline = generate_inline_keyboard(keyboard)
     if task:
-        await message.answer(
+        await message.edit_text(
             f'Рассылка будет выполнена: {task.next_run_time.strftime("%b-%d-%Y %H:%M")}',
             reply_markup=keyboard_inline
         )
     else:
-        await message.answer(
+        await message.edit_text(
             f'Время не назначено',
             reply_markup=keyboard_inline
         )
@@ -49,14 +50,14 @@ async def change_game_datetime(callback: types.CallbackQuery):
     await StartGame.waiting_for_datetime.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-
-    await callback.message.answer(
+    
+    await callback.message.edit_text(
         '"Хо-хо-хо! 🎅\n\n'
         'Для того, что-бы назначить время рассылки, отправь сообщение в формате\n'
         '*yyyy, mm, dd, h, m* - *год, месяц, день, час, минуты*\n\n'
@@ -66,37 +67,42 @@ async def change_game_datetime(callback: types.CallbackQuery):
     )
 
 
-def pass_():
-    pass
+async def pass_(message):
+    await message.answer('test')
 
 
+# TODO loging
+# TODO Добавить календарь и рандомный выбор времени для рассылки
+# TODO если дата меньше, вывести ошибку
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     data = await state.get_data()
     room_number = data['room_number']
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-
+    
     match = re.fullmatch(r'\d{4},\d{1,2},\d{1,2},\d{1,2},\d{1,2}',
                          message.text)
-
+    
     if match:
         date = list(map(int, message.text.split(',')))
-        task = await get_task(task_id=room_number)
+        task = get_task(task_id=room_number)
         if task:
             task.remove()
-
-        task = await add_task(task_func=pass_,  # TODO поменять функцию на рассылку
-                              date_time=datetime(*date),
-                              task_id=room_number)
-
+        
+        add_task(task_func=send_result_of_game,
+                 date_time=datetime(*date),
+                 task_id=room_number,
+                 room_number=room_number
+                 )
         await message.answer(
-            '"Хо-хо-хо! 🎅\n\n',
-            f'Я добавил задание, ваша игра начнется: {task.next_run_time.strftime("%b-%d-%Y %H:%M")}',
+            'Дата рассылки установлена на'
+            f' {datetime(*date).strftime("%Y-%b-%d, %H:%M:%S")}',
             reply_markup=keyboard_inline
         )
+    
     await state.finish()

@@ -9,11 +9,10 @@ from app.store.scheduler import scheduler
 logger = logging.getLogger(__name__)
 
 
-# TODO форматирование для даты на логгер
-async def add_task(task_func: Callable,
-                   date_time: datetime,
-                   task_id: str,
-                   **kwargs) -> Job:
+def add_task(task_func: Callable,
+             date_time: datetime,
+             task_id: str,
+             **kwargs) -> Job:
     """
     Add new task to job store.
     :param task_func:
@@ -22,7 +21,7 @@ async def add_task(task_func: Callable,
     :param kwargs:
     :return:
     """
-
+    
     task = scheduler.add_job(
         task_func,
         'date',
@@ -30,11 +29,11 @@ async def add_task(task_func: Callable,
         kwargs=kwargs,
         id=str(task_id)
     )
-    logger.info(f'New task {task_id} has been setup on {datetime}')
+    logger.info(f'New task {task_id} has been setup on {date_time.strftime("%Y-%b-%d, %H:%M:%S")}')
     return task
 
 
-async def get_task(task_id: str) -> Job:
+def get_task(task_id: int) -> Job:
     """
     Get task from job store.
     :param task_id:
@@ -44,13 +43,13 @@ async def get_task(task_id: str) -> Job:
     return task
 
 
-async def remove_task(task_id: str) -> bool:
+def remove_task(task_id: int) -> bool:
     """
     Remove task from job store.
     :param task_id:
     :return: bool
     """
-    task = await get_task(task_id)
+    task = get_task(task_id)
     if task:
         task.remove()
         logger.info(f'The task {task_id} has been removed.')
