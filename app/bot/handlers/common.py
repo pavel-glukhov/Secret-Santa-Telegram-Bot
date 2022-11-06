@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from app.bot import dispatcher as dp
-from app.bot.handlers import texts
+from app.bot.handlers import text_messages
 from app.store.database import user_db
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
@@ -57,7 +57,8 @@ async def root_menu(data: types.Message | types.CallbackQuery, edit_message=True
     keyboard = await create_common_keyboards(message)
     
     is_profile_filled_out = all([user.address, user.contact_number])
-    text = texts.MENU_TEXT_NAME if is_profile_filled_out else texts.REMINDER_FOR_USER + texts.MENU_TEXT_NAME
+    text = text_messages.MENU_TEXT_NAME if is_profile_filled_out \
+        else text_messages.REMINDER_FOR_USER + text_messages.MENU_TEXT_NAME
     
     if edit_message:
         await message.edit_text(text, reply_markup=keyboard, )
@@ -75,5 +76,5 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    text = texts.ABOUT_SANTA_GAME
+    text = text_messages.ABOUT_SANTA_GAME
     await message.edit_text(text, reply_markup=keyboard_inline, )

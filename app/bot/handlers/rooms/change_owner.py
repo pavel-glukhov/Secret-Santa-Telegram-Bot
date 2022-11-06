@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
-from app.bot.handlers import texts
+from app.bot.handlers import text_messages
 from app.store.database import room_db
 from app.store.database.models import User
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -33,7 +33,7 @@ async def change_room_owner(callback: types.CallbackQuery):
     )
 
     await callback.message.answer(
-        texts.CHANGE_MAIN_QUESTION,
+        text_messages.CHANGE_MAIN_QUESTION,
         reply_markup=keyboard_inline
     )
 
@@ -60,11 +60,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     await state.finish()
     if owner:
         await message.answer(
-            texts.CHANGE_COMPLETE_ANSWER.format(new_owner, ),
+            text_messages.CHANGE_COMPLETE_ANSWER.format(new_owner, ),
             reply_markup=keyboard_inline
         )
     else:
         await message.answer(
-            texts.USER_NOT_FOUND,
+            text_messages.USER_NOT_FOUND,
             reply_markup=keyboard_inline
         )

@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
-from app.bot.handlers import texts
+from app.bot.handlers import text_messages
 from app.store.database import room_db, wish_db
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
@@ -29,7 +29,7 @@ async def join_room(callback: types.CallbackQuery):
     )
     
     await callback.message.edit_text(
-        texts.SUBSCRIBE_MAIN_QUESTION,
+        text_messages.SUBSCRIBE_MAIN_QUESTION,
         reply_markup=keyboard_inline
     )
 
@@ -47,7 +47,7 @@ async def process_room_number(message: types.Message):
     
     if not message.text.isdigit():
         return await message.answer(
-            texts.SUBSCRIBE_IS_NOT_DIGIT,
+            text_messages.SUBSCRIBE_IS_NOT_DIGIT,
             reply_markup=keyboard_inline
         )
     
@@ -55,7 +55,7 @@ async def process_room_number(message: types.Message):
     
     if not is_room_exist:
         await message.answer(
-            texts.SUBSCRIBE_INCORRECT_ROOM_NUMBER,
+            text_messages.SUBSCRIBE_INCORRECT_ROOM_NUMBER,
             reply_markup=keyboard_inline
         )
         logger.info(f'Incorrect room number [{room_number}] '
@@ -69,7 +69,7 @@ async def process_room_number(message: types.Message):
             logger.info(f'The user[{message.from_user.id}] '
                         f'already is member of the room [{room_number}]')
             await message.answer(
-                texts.SUBSCRIBE_ALREADY_MEMBER,
+                text_messages.SUBSCRIBE_ALREADY_MEMBER,
                 reply_markup=keyboard_inline
             )
             await state.finish()
@@ -77,7 +77,7 @@ async def process_room_number(message: types.Message):
         else:
             await JoinRoom.next()
             await message.answer(
-                texts.SUBSCRIBE_WISHES,
+                text_messages.SUBSCRIBE_WISHES,
                 reply_markup=keyboard_inline
             )
 
@@ -96,7 +96,7 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
                                      room_id=data['room_number'])
     keyboard_inline = await create_common_keyboards(message)
     await message.answer(
-        texts.SUBSCRIBE_FINAL_ANSWER,
+        text_messages.SUBSCRIBE_FINAL_ANSWER,
         reply_markup=keyboard_inline
     )
     logger.info(f'The user[{message.from_user.id}] '

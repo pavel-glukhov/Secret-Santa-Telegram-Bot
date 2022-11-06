@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers import texts
+from app.bot.handlers import text_messages
 from app.bot.handlers.formatters import profile_information_formatter
 from app.store.database import room_db, game_result_db
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -35,7 +35,7 @@ async def my_room(callback: types.CallbackQuery):
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         user_information = profile_information_formatter(recipient)
         await callback.message.edit_text(
-            texts.GENERAL_COMPLETED_GAME.format(
+            text_messages.GENERAL_COMPLETED_GAME.format(
                 user_information,
             ),
             reply_markup=keyboard_inline
@@ -67,11 +67,11 @@ async def my_room(callback: types.CallbackQuery):
         )
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         
-        menu_text_message = texts.CONTROL_ROOM.format(
+        menu_text_message = text_messages.CONTROL_ROOM.format(
             room.name, room.number,
         )
         if scheduler_task:
-            scheduler_text = texts.CONTROL_ROOM_SCHEDULER.format(
+            scheduler_text = text_messages.CONTROL_ROOM_SCHEDULER.format(
                 scheduler_task.next_run_time.strftime('%Y-%b-%d'),
             )
             message_text = scheduler_text + menu_text_message
@@ -99,7 +99,7 @@ async def my_room(callback: types.CallbackQuery):
             member_str += f'{number}) @{member.username}\n'
         
         await message.edit_text(
-            texts.LIST_MEMBERS.format(room.name,
+            text_messages.LIST_MEMBERS.format(room.name,
                                       room_number,
                                       member_str),
             reply_markup=keyboard_inline

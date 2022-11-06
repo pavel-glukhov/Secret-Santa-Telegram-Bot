@@ -9,6 +9,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.store.database import room_db
 from app.store.scheduler.operations import add_task, get_task
 from app.bot.handlers.operations import get_room_number
 from app.bot.messages.result_mailing import send_result_of_game
@@ -23,23 +24,24 @@ class StartGame(StatesGroup):
 @dp.callback_query_handler(Text(startswith='room_start-game'))
 async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
-    message = callback.message
+    room_members = await room_db().get_list_members(room_number)
     task = get_task(task_id=room_number)
+    keyboard = {}
     
-    keyboard = {
-        "Изменить время 👋": f"room_change-game-dt_{room_number}",
-        "Вернуться назад ◀️": f"room_menu_{room_number}",
-        
-    }
+    if len(list(room_members)) >= 3:
+        keyboard.update({"Изменить время 👋": f"room_change-game-dt_{room_number}"})
+    keyboard.update({"Вернуться назад ◀️": f"room_menu_{room_number}"})
+    
     keyboard_inline = generate_inline_keyboard(keyboard)
     if task:
-        await message.edit_text(
-            f'Рассылка будет выполнена: {task.next_run_time.strftime("%b-%d-%Y %H:%M")}',
+        await callback.message.edit_text(
+            f'<b>Рассылка будет выполнена:</b> {task.next_run_time.strftime("%b-%d-%Y %H:%M")}',
             reply_markup=keyboard_inline
         )
     else:
-        await message.edit_text(
-            f'Время не назначено',
+        await callback.message.edit_text(
+            '<b>Время не назначено<b>\n\n',
+            '<b>Для запуска игры требуется минимум 3 участника игры</b>',
             reply_markup=keyboard_inline
         )
 
