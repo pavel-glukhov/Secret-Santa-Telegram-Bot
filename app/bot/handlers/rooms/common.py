@@ -4,6 +4,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
+from app.bot.handlers import texts
 from app.bot.handlers.formatters import profile_information_formatter
 from app.store.database import room_db, game_result_db
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -29,17 +30,16 @@ async def my_room(callback: types.CallbackQuery):
             "Отправить сообщение получателю": f"1",  # TODO добавить коллбак
             "Вернуться в меню": "root_menu"
         }
-        recipient = await game_result_db().get_recipient(room_id=room_number, user_id=user_id)
+        recipient = await game_result_db().get_recipient(room_id=room_number,
+                                                         user_id=user_id)
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         user_information = profile_information_formatter(recipient)
-        await callback.message.edit_text("<b>Игра завершена!</b>\n\n"
-                                         "Вы стали Тайным Сантой для:\n"
-                                         f"{user_information}\n"
-                                         "Ты можешь написать сообщение своему Тайному Санте,"
-                                         "или отправить сообщение своему получателю.\n\n"
-                                         "<b>Учти, что в сутки можно отправлять не более 3х сообщений.</b>",
-                                         reply_markup=keyboard_inline
-                                         )
+        await callback.message.edit_text(
+            texts.GENERAL_COMPLETED_GAME.format(
+                user_information,
+            ),
+            reply_markup=keyboard_inline
+        )
     
     else:
         keyboard_dict = {
@@ -67,14 +67,20 @@ async def my_room(callback: types.CallbackQuery):
         )
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         
-        menu_text_message = f"<b>Управление комнатой {room.name} ({room.number})</b>"
+        menu_text_message = texts.CONTROL_ROOM.format(
+            room.name, room.number,
+        )
         if scheduler_task:
-            scheduler_text = ("<b>🕓 Игра в текущей комнате запущена на "
-                              f"{scheduler_task.next_run_time.strftime('%Y-%b-%d')}</b>\n\n")
+            scheduler_text = texts.CONTROL_ROOM_SCHEDULER.format(
+                scheduler_task.next_run_time.strftime('%Y-%b-%d'),
+            )
             message_text = scheduler_text + menu_text_message
         else:
             message_text = menu_text_message
-        await callback.message.edit_text(message_text, reply_markup=keyboard_inline)
+        await callback.message.edit_text(
+            message_text,
+            reply_markup=keyboard_inline
+        )
     
     @dp.callback_query_handler(Text(startswith='room_member-list'))
     async def members_list(callback: types.CallbackQuery):
@@ -93,7 +99,8 @@ async def my_room(callback: types.CallbackQuery):
             member_str += f'{number}) @{member.username}\n'
         
         await message.edit_text(
-            f'Список участников комнаты: {room.name} ({room_number}):\n\n'
-            f'{member_str}',
+            texts.LIST_MEMBERS.format(room.name,
+                                      room_number,
+                                      member_str),
             reply_markup=keyboard_inline
         )

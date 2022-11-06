@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers import texts
 from app.store.database import room_db, wish_db
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
@@ -26,15 +27,15 @@ async def join_room(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
+    
     await callback.message.edit_text(
-        '"Хо-хо-хо! 🎅\n\n'
-        'Введи номер комнаты в которую ты хочешь зайти.\n',
+        texts.SUBSCRIBE_MAIN_QUESTION,
         reply_markup=keyboard_inline
     )
 
 
 @dp.message_handler(state=JoinRoom.waiting_for_room_number)
-async def process_room_number(message: types.Message, state: FSMContext):
+async def process_room_number(message: types.Message):
     room_number = message.text
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
@@ -46,8 +47,7 @@ async def process_room_number(message: types.Message, state: FSMContext):
     
     if not message.text.isdigit():
         return await message.answer(
-            text='Номер комнаты может содержать только цифры, '
-                 'попробуйте снова.',
+            texts.SUBSCRIBE_IS_NOT_DIGIT,
             reply_markup=keyboard_inline
         )
     
@@ -55,19 +55,21 @@ async def process_room_number(message: types.Message, state: FSMContext):
     
     if not is_room_exist:
         await message.answer(
-            'Введенной комнаты не существует, введите корректный номер.',
+            texts.SUBSCRIBE_INCORRECT_ROOM_NUMBER,
             reply_markup=keyboard_inline
         )
-        logger.info(f'Incorrect room number [{room_number}] from [{message.from_user.id}]')
+        logger.info(f'Incorrect room number [{room_number}] '
+                    f'from [{message.from_user.id}]')
     else:
         is_member_of_room = await room_db().is_member(user_id=message.chat.id,
                                                       room_number=room_number)
         
         if is_member_of_room:
             keyboard_inline = await create_common_keyboards(message)
-            logger.info(f'The user[{message.from_user.id}] already is member of the room [{room_number}]')
+            logger.info(f'The user[{message.from_user.id}] '
+                        f'already is member of the room [{room_number}]')
             await message.answer(
-                'Вы уже состоите в этой комнате.',
+                texts.SUBSCRIBE_ALREADY_MEMBER,
                 reply_markup=keyboard_inline
             )
             await state.finish()
@@ -75,11 +77,7 @@ async def process_room_number(message: types.Message, state: FSMContext):
         else:
             await JoinRoom.next()
             await message.answer(
-                'А теперь напишите свои пожелания к подарку. '
-                'Возможно у тебя есть хобби и '
-                'ты хочешь получить что-то особое?\n'
-                'Ваши комментарии помогут Тайному Санте '
-                'выбрать для вас подарок.\n',
+                texts.SUBSCRIBE_WISHES,
                 reply_markup=keyboard_inline
             )
 
@@ -98,10 +96,9 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
                                      room_id=data['room_number'])
     keyboard_inline = await create_common_keyboards(message)
     await message.answer(
-        '"Хо-хо-хо! 🎅\n\n'
-        'Теперь ты можешь играть с своими друзьями.\n'
-        'Следи за анонсами владельца комнаты.\n\n'
-        'Желаю хорошей игры! 😋',
+        texts.SUBSCRIBE_FINAL_ANSWER,
         reply_markup=keyboard_inline
     )
+    logger.info(f'The user[{message.from_user.id}] '
+                f'successful subscribed to the room [{data["room_number"]}]')
     await state.finish()

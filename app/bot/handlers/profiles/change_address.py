@@ -55,14 +55,15 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         }
     )
 
-    if not address > 150:
+    if len(address) < 150:
         await user_db().update_user(user_id, address=address)
         await message.answer(
             'Адрес изменен.',
             reply_markup=keyboard_inline,
         )
         await state.finish()
-    await message.answer(
-        'Адресные данные не могут превышать 150 символов. Попробуйте снова.',
-        reply_markup=keyboard_inline,
+    else:
+        await message.answer(
+            'Адресные данные не могут превышать 150 символов. Попробуйте снова.',
+            reply_markup=keyboard_inline,
     )

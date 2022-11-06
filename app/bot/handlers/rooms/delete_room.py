@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers import texts
 from app.store.database import room_db
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.handlers.operations import get_room_number
@@ -31,15 +32,13 @@ async def delete_room(callback: types.CallbackQuery):
     )
     
     await callback.message.edit_text(
-        '❌ *<b>Комната будет удалена без возможности восстановления</b>.\n\n'
-        f'Для подтверждения удаления комнаты <b>{room_number}</b>, '
-        f'введите в чат </b>подтверждаю</b>.\n\n ',
+        texts.DELETE_ROOM_MAIN_QUESTION.format(room_number, ),
         reply_markup=keyboard_inline
     )
 
 
 @dp.message_handler(lambda message:
-                    message.text.lower() != 'подтверждаю',
+                    message.text.lower() != texts.DELETE_CONFIRMATION_COMMAND,
                     state=DeleteRoom.waiting_conformation)
 async def process_delete_room_invalid(message: types.Message):
     keyboard_inline = generate_inline_keyboard(
@@ -47,9 +46,10 @@ async def process_delete_room_invalid(message: types.Message):
             "Отмена": 'cancel',
         }
     )
-    logger.info(f'Incorrect confirmation command from [{message.from_user.id}] ')
+    logger.info('Incorrect confirmation'
+                f' command from [{message.from_user.id}] ')
     return await message.answer(
-        'Вы ввели неверную команду для подтверждения, попробуйте снова.\n',
+        texts.DELETE_ROOM_INCORRECT_CONF_COMMAND,
         reply_markup=keyboard_inline
     )
 
@@ -69,15 +69,17 @@ async def completed_process_delete_room(message: types.Message,
     is_deleted = await room_db().delete(room_number=room_number)
     if is_deleted:
         await message.answer(
-            'Комната успешно удалена\n\n'
-            'Вы можете создать новую комнату в основном меню.',
+            texts.DELETE_ROOM_SUCCEFUL,
             reply_markup=keyboard_inline
         )
-        logger.info(f'The user [{message.from_user.id}] removed the room [{room_number}]')
+        logger.info(f'The user [{message.from_user.id}]'
+                    f' removed the room [{room_number}]')
     else:
         await message.answer(
-            'Что-то пошло не так, комната не была удалена',
+            texts.DELETE_ROOM_SOMETHING_WRONG,
             reply_markup=keyboard_inline
         )
-        logger.info(f'The room [{room_number}]was not removed removed by[{message.from_user.id}] ')
+        logger.info(f'The room [{room_number}]'
+                    'was not removed removed'
+                    f' by[{message.from_user.id}] ')
     await state.finish()
