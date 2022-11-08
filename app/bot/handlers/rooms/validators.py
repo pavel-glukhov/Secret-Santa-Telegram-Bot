@@ -2,7 +2,6 @@ from aiogram import types
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.rooms.create_new_room import CreateRoom
-
 from app.bot.handlers.rooms.update_room import ChangeRoomName
 from app.bot.keyborads.common import generate_inline_keyboard
 

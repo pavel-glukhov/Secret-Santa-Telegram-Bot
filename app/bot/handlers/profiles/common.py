@@ -4,9 +4,9 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.store.database import user_db
-from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.handlers.formatters import profile_information_formatter
+from app.bot.keyborads.common import generate_inline_keyboard
+from app.store.database import user_db
 
 logger = logging.getLogger(__name__)
 

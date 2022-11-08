@@ -1,4 +1,4 @@
-from app.store.database.models import GameResult, User, Room
+from app.store.database.models import GameResult, Room, User
 
 
 class GameResultDB:

@@ -6,10 +6,9 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
-
-from app.store.database import room_db, wish_db
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
+from app.store.database import room_db, wish_db
 
 logger = logging.getLogger(__name__)
 

@@ -3,10 +3,10 @@ import datetime
 import logging
 import random
 
-from app.store.database import room_db, wish_db, game_result_db
 from app.bot.messages.forrmatter import format_santa_message
-from app.bot.messages.users_checker import is_active_user_chat
 from app.bot.messages.send_messages import send_message
+from app.bot.messages.users_checker import is_active_user_chat
+from app.store.database import game_result_db, room_db, wish_db
 
 logger = logging.getLogger(__name__)
 
