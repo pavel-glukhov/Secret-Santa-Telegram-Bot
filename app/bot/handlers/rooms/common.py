@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers import text_messages
+
 from app.bot.handlers.formatters import profile_information_formatter
 from app.store.database import room_db, game_result_db
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -34,11 +34,19 @@ async def my_room(callback: types.CallbackQuery):
                                                          user_id=user_id)
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         user_information = profile_information_formatter(recipient)
+        
+        message_text = (
+            "<b>Игра завершена!</b>\n\n"
+            "Вы стали Тайным Сантой для:\n"
+            f"{user_information}\n"
+            "Ты можешь написать сообщение своему Тайному Санте,"
+            "или отправить сообщение своему получателю.\n\n"
+            "<b>Учти, что в сутки можно отправлять не более 3х сообщений.</b>"
+        )
+        
         await callback.message.edit_text(
-            text_messages.GENERAL_COMPLETED_GAME.format(
-                user_information,
-            ),
-            reply_markup=keyboard_inline
+            text=message_text,
+            reply_markup=keyboard_inline,
         )
     
     else:
@@ -67,25 +75,29 @@ async def my_room(callback: types.CallbackQuery):
         )
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         
-        menu_text_message = text_messages.CONTROL_ROOM.format(
-            room.name, room.number,
+        text_control_room = (
+            f'<b>Управление комнатой {room.name}'
+            f' ({room.number})</b>'
         )
+        text_control_room_scheduler = (
+            "<b>🕓 Игра в текущей комнате запущена на "
+            f"{scheduler_task.next_run_time.strftime('%Y-%b-%d')}</b>\n\n"
+        )
+        
         if scheduler_task:
-            scheduler_text = text_messages.CONTROL_ROOM_SCHEDULER.format(
-                scheduler_task.next_run_time.strftime('%Y-%b-%d'),
-            )
-            message_text = scheduler_text + menu_text_message
+            scheduler_text = text_control_room_scheduler
+            message_text = scheduler_text + text_control_room
         else:
-            message_text = menu_text_message
+            message_text = text_control_room
+        
         await callback.message.edit_text(
-            message_text,
+            text=message_text,
             reply_markup=keyboard_inline
         )
     
     @dp.callback_query_handler(Text(startswith='room_member-list'))
     async def members_list(callback: types.CallbackQuery):
         room_number = get_room_number(callback)
-        message = callback.message
         keyboard_inline = generate_inline_keyboard(
             {
                 "Вернуться назад ◀️": f"room_menu_{room_number}"
@@ -98,9 +110,12 @@ async def my_room(callback: types.CallbackQuery):
         for number, member in enumerate(members):
             member_str += f'{number}) @{member.username}\n'
         
-        await message.edit_text(
-            text_messages.LIST_MEMBERS.format(room.name,
-                                      room_number,
-                                      member_str),
-            reply_markup=keyboard_inline
+        message_text = (
+            'Список участников комнаты: '
+            f'{room.name} ({room_number}):\n\n{member_str}'
+        )
+        
+        await callback.message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline,
         )

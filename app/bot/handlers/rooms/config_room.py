@@ -2,7 +2,6 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers import text_messages
 from app.store.database import room_db
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.handlers.operations import get_room_number
@@ -20,9 +19,11 @@ async def configuration_room(callback: types.CallbackQuery):
         }
     )
     room = await room_db().get(room_number)
-    room_name = room.name
-    
-    await callback.message.edit_text(text_messages.CONFIG_ROOM_MENU.format(
-        room_name, room_number,
-    ),
+
+    message_text = (
+        '"Настройки комнаты:" '
+        f' <b>{room.name}</b> (<b>{room_number}</b>)'
+    )
+    await callback.message.edit_text(
+        text=message_text,
         reply_markup=keyboard_inline, )
