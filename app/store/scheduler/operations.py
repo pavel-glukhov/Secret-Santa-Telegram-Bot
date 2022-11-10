@@ -9,10 +9,12 @@ from app.store.scheduler import scheduler
 logger = logging.getLogger(__name__)
 
 
-def add_task(task_func: Callable,
-             date_time: datetime,
-             task_id: str,
-             **kwargs) -> Job:
+def add_task(
+        task_func: Callable,
+        date_time: datetime,
+        task_id: str,
+        **kwargs
+) -> Job:
     """
     Add new task to job store.
     :param task_func:
@@ -21,7 +23,7 @@ def add_task(task_func: Callable,
     :param kwargs:
     :return:
     """
-
+    
     task = scheduler.add_job(
         task_func,
         'date',
