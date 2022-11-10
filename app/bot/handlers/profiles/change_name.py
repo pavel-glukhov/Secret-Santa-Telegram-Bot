@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import user_db
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ async def process_changing_last_name(message: types.Message,
             "Вернуться назад ◀️": f"menu_user_profile",
         }
     )
-    await user_db().update_user(user_id,
+    await UserDB.update_user(user_id,
                                 first_name=first_name,
                                 last_name=last_name)
     await message.answer(

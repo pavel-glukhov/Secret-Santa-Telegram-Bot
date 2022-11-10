@@ -8,7 +8,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import room_db, wish_db
+from app.store.database.queries.rooms import RoomDB
+from app.store.database.queries.wishes import WishDB
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +26,13 @@ async def show_wishes(callback: types.CallbackQuery):
         {
             "Изменить желание ✒️": f"room_change-wish_{room_number}",
             "Вернуться назад ◀️": f"room_menu_{room_number}",
-
+            
         }
     )
-
+    
     user_id = message.chat.id
-    wishes = await wish_db().get(user_id, room_number)
-
+    wishes = await WishDB.get(user_id, room_number)
+    
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
                             reply_markup=keyboard_inline)
@@ -44,8 +45,17 @@ async def update_wishes(callback: types.CallbackQuery):
     await ChangeWish.waiting_for_wishes.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
+    
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Отмена": 'cancel',
+        }
+    )
+    
+    message_text = '<b>Напиши новое желание:</b>\n'
     await message.edit_text(
-        '<b>Напиши новое желание:</b>\n',
+        text=message_text,
+        reply_markup=keyboard_inline,
     )
 
 
@@ -55,24 +65,26 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
     room_number = state_data['room_number']
     wish = message.text
     user_id = message.chat.id
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    await wish_db().update_or_create(
+    await WishDB.update_or_create(
         wish,
         user_id,
         room_number
     )
-    room = await room_db().get(room_number)
+    room = await RoomDB.get(room_number)
     await state.finish()
     
-    
-    await message.answer(
+    message_text = (
         f'Ваши желания в комнате <b>{room.name}</b> изменены на:\n\n'
         f'{wish}\n\n'
-        f'Санта обязательно учтет ваши пожелания! 🎅',
-        reply_markup=keyboard_inline
+        'Санта обязательно учтет ваши пожелания! 🎅'
+    )
+    await message.answer(
+        text=message_text,
+        reply_markup=keyboard_inline,
     )

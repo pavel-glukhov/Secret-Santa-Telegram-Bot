@@ -11,7 +11,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
-from app.store.database import room_db
+from app.store.database.queries.rooms import RoomDB
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class StartGame(StatesGroup):
 @dp.callback_query_handler(Text(startswith='room_start-game'))
 async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
-    room_members = await room_db().get_list_members(room_number)
+    room_members = await RoomDB.get_list_members(room_number)
     task = get_task(task_id=room_number)
     keyboard = {}
     

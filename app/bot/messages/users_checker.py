@@ -4,7 +4,7 @@ import logging
 from aiogram.utils import exceptions
 
 from app.bot import bot
-from app.store.database import user_db
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -18,17 +18,17 @@ async def is_active_user_chat(user_id):
         
     except exceptions.BotBlocked:
         logger.error(f"The bot was blocked by user [ID:{user_id}]")
-        await user_db().disable_user(user_id)
+        await UserDB.disable_user(user_id)
         return False
     
     except exceptions.UserDeactivated:
         logger.error(f"The user [ID:{user_id}] is deactivated")
-        await user_db().disable_user(user_id)
+        await UserDB.disable_user(user_id)
         return False
     
     except exceptions.ChatNotFound:
         logger.error(f"Target [ID:{user_id}]: invalid user ID")
-        await user_db().disable_user(user_id)
+        await UserDB.disable_user(user_id)
         return False
     
     except exceptions.RetryAfter as e:

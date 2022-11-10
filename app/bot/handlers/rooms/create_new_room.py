@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import room_db
+from app.store.database.queries.rooms import RoomDB
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,7 @@ async def process_wishes(message: types.Message, state: FSMContext):
         }
     )
     
-    room = await room_db().create(user_wish=user_wishes,
+    room = await RoomDB.create(user_wish=user_wishes,
                                   owner=message.chat.id,
                                   name=data['room_name'],
                                   budget=data['room_budget'])

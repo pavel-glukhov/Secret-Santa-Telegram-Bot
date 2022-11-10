@@ -8,7 +8,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
-from app.store.database import room_db, wish_db
+from app.store.database.queries.rooms import RoomDB
+from app.store.database.queries.wishes import WishDB
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ async def process_room_number(message: types.Message):
             reply_markup=keyboard_inline,
         )
     
-    is_room_exist = await room_db().is_exists(room_number=room_number)
+    is_room_exist = await RoomDB.is_exists(room_number=room_number)
     
     if not is_room_exist:
         message_text = (
@@ -68,10 +69,12 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-        logger.info(f'Incorrect room number [{room_number}] '
-                    f'from [{message.from_user.id}]')
+        logger.info(
+            f'Incorrect room number [{room_number}] '
+            f'from [{message.from_user.id}]'
+        )
     else:
-        is_member_of_room = await room_db().is_member(
+        is_member_of_room = await RoomDB.is_member(
             user_id=message.chat.id,
             room_number=room_number
         )
@@ -85,8 +88,10 @@ async def process_room_number(message: types.Message):
                 text=message_text,
                 reply_markup=keyboard_inline,
             )
-            logger.info(f'The user[{message.from_user.id}] '
-                        f'already is member of the room [{room_number}]')
+            logger.info(
+                f'The user[{message.from_user.id}] '
+                f'already is member of the room [{room_number}]'
+            )
             await state.finish()
         
         else:
@@ -113,11 +118,15 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
     await state.update_data(wishes=wishes)
     data = await state.get_data()
     
-    await room_db().add_member(user_id=user_id,
-                               room_number=data['room_number'])
-    await wish_db().update_or_create(wish=data['wishes'],
-                                     user_id=user_id,
-                                     room_id=data['room_number'])
+    await RoomDB.add_member(
+        user_id=user_id,
+        room_number=data['room_number']
+    )
+    await WishDB.update_or_create(
+        wish=data['wishes'],
+        user_id=user_id,
+        room_id=data['room_number']
+    )
     keyboard_inline = await create_common_keyboards(message)
     
     message_text = (
@@ -131,6 +140,8 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         text=message_text,
         reply_markup=keyboard_inline,
     )
-    logger.info(f'The user[{message.from_user.id}] '
-                f'successful subscribed to the room [{data["room_number"]}]')
+    logger.info(
+        f'The user[{message.from_user.id}] '
+        f'successful subscribed to the room [{data["room_number"]}]'
+    )
     await state.finish()

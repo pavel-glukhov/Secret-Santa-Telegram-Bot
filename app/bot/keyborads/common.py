@@ -1,8 +1,8 @@
 from aiogram import types
 
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
-from app.store.database import room_db
 from app.store.database.models import Room
+from app.store.database.queries.rooms import RoomDB
 
 
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
@@ -31,7 +31,9 @@ def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
     return f'{text}: {room.name} ({room.number}){owner_tag}'
 
 
-async def create_common_keyboards(message: types.Message) -> types.InlineKeyboardMarkup:
+async def create_common_keyboards(
+        message: types.Message
+) -> types.InlineKeyboardMarkup:
     """
     Generating main buttons
     :param message:
@@ -44,7 +46,7 @@ async def create_common_keyboards(message: types.Message) -> types.InlineKeyboar
         
     }
     user_id = message.chat.id
-    user_rooms = await room_db().get_all_users_of_room(user_id)
+    user_rooms = await RoomDB.get_all_users_of_room(user_id)
     
     if user_rooms:
         for room in user_rooms:
@@ -53,7 +55,9 @@ async def create_common_keyboards(message: types.Message) -> types.InlineKeyboar
             # add all users rooms' buttons
             keyboard_dict.update(
                 {
-                    personal_room_keyboard_formatter(room, is_owner): f"room_menu_{room.number}"
+                    personal_room_keyboard_formatter(
+                        room, is_owner
+                    ): f"room_menu_{room.number}"
                 }
             )
     # general buttons that mast be in end of buttons list

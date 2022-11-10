@@ -7,7 +7,8 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import game_result_db, room_db
+from app.store.database.queries.game_result import GameResultDB
+from app.store.database.queries.rooms import RoomDB
 from app.store.scheduler.operations import get_task
 
 logger = logging.getLogger(__name__)
@@ -17,10 +18,10 @@ logger = logging.getLogger(__name__)
 async def my_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     scheduler_task = get_task(room_number)
-    room = await room_db().get(room_number)
+    room = await RoomDB.get(room_number)
     user_id = callback.message.chat.id
-    is_room_owner = await room_db().is_owner(user_id=user_id,
-                                             room_number=room_number)
+    is_room_owner = await RoomDB.is_owner(user_id=user_id,
+                                          room_number=room_number)
     
     if room.is_closed:
         
@@ -29,8 +30,8 @@ async def my_room(callback: types.CallbackQuery):
             "Отправить сообщение получателю": f"1",  # TODO добавить коллбак
             "Вернуться в меню": "root_menu"
         }
-        recipient = await game_result_db().get_recipient(room_id=room_number,
-                                                         user_id=user_id)
+        recipient = await GameResultDB.get_recipient(room_id=room_number,
+                                                     user_id=user_id)
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
         user_information = profile_information_formatter(recipient)
         
@@ -78,12 +79,13 @@ async def my_room(callback: types.CallbackQuery):
             f'<b>Управление комнатой {room.name}'
             f' ({room.number})</b>'
         )
-        text_control_room_scheduler = (
-            "<b>🕓 Игра в текущей комнате запущена на "
-            f"{scheduler_task.next_run_time.strftime('%Y-%b-%d')}</b>\n\n"
-        )
         
         if scheduler_task:
+            text_control_room_scheduler = (
+                "<b>🕓 Игра в текущей комнате запущена на "
+                f"{scheduler_task.next_run_time.strftime('%Y-%b-%d')}</b>\n\n"
+            )
+            
             scheduler_text = text_control_room_scheduler
             message_text = scheduler_text + text_control_room
         else:
@@ -102,7 +104,7 @@ async def my_room(callback: types.CallbackQuery):
                 "Вернуться назад ◀️": f"room_menu_{room_number}"
             }
         )
-        room = await room_db().get(room_number)
+        room = await RoomDB.get(room_number)
         members = await room.members
         member_str = ''
         

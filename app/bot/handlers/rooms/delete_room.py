@@ -8,7 +8,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import room_db
+from app.store.database.queries.rooms import RoomDB
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ async def completed_process_delete_room(message: types.Message,
         }
     )
     
-    is_deleted = await room_db().delete(room_number=room_number)
+    is_deleted = await RoomDB.delete(room_number=room_number)
     if is_deleted:
         
         message_text = (

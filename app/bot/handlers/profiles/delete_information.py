@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import user_db
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ async def process_deleting_information(message: types.Message,
         'contact_number': None
     }
 
-    await user_db().update_user(user_id=user_id, **data)
+    await UserDB.update_user(user_id=user_id, **data)
 
     keyboard_inline = generate_inline_keyboard(
         {

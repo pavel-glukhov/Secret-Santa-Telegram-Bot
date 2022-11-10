@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import Text
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
-from app.store.database import user_db
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ async def create_user_or_enable(message: types.Message):
     first_name = message.chat.first_name
     last_name = message.chat.last_name
     
-    user, created = await user_db().get_or_create(
+    user, created = await UserDB.get_or_create(
         user_id=user_id,
         username=username,
         first_name=first_name,
@@ -48,7 +48,7 @@ async def create_user_or_enable(message: types.Message):
         logger.info(f'The new user "{user_id}" has been created')
     
     if not user.is_active:
-        await user_db().enable_user(message.chat.id)
+        await UserDB.enable_user(message.chat.id)
         logger.info(f'The new user "{user_id}" has been enabled')
     
     return user, created

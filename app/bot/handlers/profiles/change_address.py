@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import user_db
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     if len(address) < 150:
-        await user_db().update_user(user_id, address=address)
+        await UserDB.update_user(user_id, address=address)
         await message.answer(
             'Адрес изменен.',
             reply_markup=keyboard_inline,

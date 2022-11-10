@@ -2,21 +2,20 @@ from app.store.database.models import Wish
 
 
 class WishDB:
-    def __init__(self, _class: Wish = Wish):
-        self._class = _class
-
-    async def get(self, user_id: int, room_id: int) -> Wish:
-        result = await self._class.filter(
+    @staticmethod
+    async def get(user_id: int, room_id: int) -> Wish:
+        result = await Wish.filter(
             room__number=room_id,
             user__user_id=user_id
         ).first()
 
         return result
 
-    async def update_or_create(self, wish: str,
+    @staticmethod
+    async def update_or_create(wish: str,
                                user_id: int,
                                room_id: int) -> None:
-        await self._class.update_or_create(
+        await Wish.update_or_create(
             user__user_id=user_id,
             room__number=room_id,
             defaults={
@@ -24,8 +23,9 @@ class WishDB:
             }
         )
 
-    async def delete(self, room_id: int, user_id: int) -> None:
-        wishes = await self._class.filter(
+    @staticmethod
+    async def delete(room_id: int, user_id: int) -> None:
+        wishes = await Wish.filter(
             room__number=room_id,
             user__user_id=user_id
         ).first()

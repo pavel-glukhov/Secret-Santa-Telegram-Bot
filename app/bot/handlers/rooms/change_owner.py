@@ -8,8 +8,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database import room_db
 from app.store.database.models import User
+from app.store.database.queries.rooms import RoomDB
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         }
     )
     
-    owner: User = await room_db().change_owner(new_owner,
+    owner: User = await RoomDB.change_owner(new_owner,
                                                room_number)
     
     logger.info(f'The owner [{previous_owner}] of room '
