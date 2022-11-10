@@ -23,7 +23,7 @@ async def delete_room(callback: types.CallbackQuery):
     await DeleteRoom.waiting_conformation.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -52,7 +52,7 @@ async def process_delete_room_invalid(message: types.Message):
     )
     logger.info('Incorrect confirmation'
                 f' command from [{message.from_user.id}] ')
-    
+
     message_text = (
         'Вы ввели неверную команду для подтверждения,'
         ' попробуйте снова.\n'
@@ -74,15 +74,15 @@ async def completed_process_delete_room(message: types.Message,
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    
+
     is_deleted = await RoomDB.delete(room_number=room_number)
     if is_deleted:
-        
+
         message_text = (
             'Комната успешно удалена\n\n '
             'Вы можете создать новую комнату в основном меню.'
         )
-        
+
         await message.answer(
             text=message_text,
             reply_markup=keyboard_inline,
@@ -91,7 +91,7 @@ async def completed_process_delete_room(message: types.Message,
                     f' removed the room [{room_number}]')
     else:
         message_text = 'Что-то пошло не так, комната не была удалена'
-        
+
         await message.answer(
             text=message_text,
             reply_markup=keyboard_inline,

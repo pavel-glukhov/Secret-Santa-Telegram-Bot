@@ -26,7 +26,7 @@ async def create_room(callback: types.CallbackQuery, ):
             "Отмена": 'cancel',
         }
     )
-    
+
     await callback.message.edit_text(
         'Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
@@ -34,11 +34,10 @@ async def create_room(callback: types.CallbackQuery, ):
         'Имя комнаты не должно превышать 12 символов.\n',
         reply_markup=keyboard_inline
     )
-    
+
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_name)
 async def process_name(message: types.Message, state: FSMContext):
-
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -46,7 +45,7 @@ async def process_name(message: types.Message, state: FSMContext):
     )
     room_name = message.text
     await state.update_data(room_name=room_name)
-    
+
     if not len(room_name) < 13:
         keyboard_inline = generate_inline_keyboard(
             {
@@ -79,12 +78,12 @@ async def process_budget(message: types.Message, state: FSMContext):
             "Отмена": 'cancel',
         }
     )
-    
+
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
-    
+
     await CreateRoom.next()
-    
+
     await message.answer(
         f'Принято! Ваш бюджет будет составлять <b>{room_budget}</b>\n\n'
         'И последний вопрос.\n'
@@ -99,21 +98,21 @@ async def process_budget(message: types.Message, state: FSMContext):
 async def process_wishes(message: types.Message, state: FSMContext):
     user_wishes = message.text
     data = await state.get_data()
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Меню ◀️": 'root_menu',
         }
     )
-    
+
     room = await RoomDB.create(user_wish=user_wishes,
-                                  owner=message.chat.id,
-                                  name=data['room_name'],
-                                  budget=data['room_budget'])
-    
+                               owner=message.chat.id,
+                               name=data['room_name'],
+                               budget=data['room_budget'])
+
     logger.info(f'The new room "{room.number}" '
                 f'has been created by {message.chat.id}')
-    
+
     await message.answer(
         '"Хо-хо-хо! 🎅\n\n'
         f'Комната <b>"{room.name}"</b> создана.\n'
@@ -122,7 +121,7 @@ async def process_wishes(message: types.Message, state: FSMContext):
         f'что бы они присоединились '
         f'к твоей игре.\n\n',
     )
-    
+
     await message.answer(
         "А пока ты можешь вернуться назад и обновить свой профиль",
         reply_markup=keyboard_inline,

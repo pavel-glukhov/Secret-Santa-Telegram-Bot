@@ -20,10 +20,10 @@ async def my_profile(callback: types.CallbackQuery):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    
+
     user = await UserDB.get_user_or_none(message.chat.id)
     user_information = profile_information_formatter(user)
-    
+
     await message.edit_text(
         'Предоставленные вами данные необходимы для отправки'
         ' подарка вашим Тайным Сантой.\n\n'

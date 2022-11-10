@@ -26,9 +26,12 @@ async def delete_user_information(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+    message_text = (
         'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
-        ,
+    )
+
+    await message.answer(
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -67,7 +70,7 @@ async def process_deleting_information(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile",
+            "Вернуться назад ◀️": "menu_user_profile",
         }
     )
     await message.answer(

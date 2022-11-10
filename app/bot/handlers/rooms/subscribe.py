@@ -47,7 +47,7 @@ async def process_room_number(message: types.Message):
             "Отмена": 'cancel',
         }
     )
-    
+
     if not message.text.isdigit():
         message_text = (
             'Номер комнаты может содержать только цифры, '
@@ -57,9 +57,9 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-    
+
     is_room_exist = await RoomDB.is_exists(room_number=room_number)
-    
+
     if not is_room_exist:
         message_text = (
             'Введенной комнаты не существует, '
@@ -78,12 +78,12 @@ async def process_room_number(message: types.Message):
             user_id=message.chat.id,
             room_number=room_number
         )
-        
+
         if is_member_of_room:
             keyboard_inline = await create_common_keyboards(message)
-            
+
             message_text = 'Вы уже состоите в этой комнате.'
-            
+
             await message.answer(
                 text=message_text,
                 reply_markup=keyboard_inline,
@@ -93,10 +93,10 @@ async def process_room_number(message: types.Message):
                 f'already is member of the room [{room_number}]'
             )
             await state.finish()
-        
+
         else:
             await JoinRoom.next()
-            
+
             message_text = (
                 'А теперь напишите свои пожелания к подарку. '
                 'Возможно у тебя есть хобби и '
@@ -104,7 +104,7 @@ async def process_room_number(message: types.Message):
                 'Ваши комментарии помогут Тайному Санте '
                 'выбрать для вас подарок.\n'
             )
-            
+
             await message.answer(
                 text=message_text,
                 reply_markup=keyboard_inline,
@@ -117,7 +117,7 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     await state.update_data(wishes=wishes)
     data = await state.get_data()
-    
+
     await RoomDB.add_member(
         user_id=user_id,
         room_number=data['room_number']
@@ -128,14 +128,14 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         room_id=data['room_number']
     )
     keyboard_inline = await create_common_keyboards(message)
-    
+
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
         'Теперь ты можешь играть с своими друзьями.\n'
         'Следи за анонсами владельца комнаты.\n\n'
         'Желаю хорошей игры! 😋'
     )
-    
+
     await message.answer(
         text=message_text,
         reply_markup=keyboard_inline,

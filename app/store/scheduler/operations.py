@@ -21,7 +21,7 @@ def add_task(task_func: Callable,
     :param kwargs:
     :return:
     """
-    
+
     task = scheduler.add_job(
         task_func,
         'date',
@@ -29,7 +29,10 @@ def add_task(task_func: Callable,
         kwargs=kwargs,
         id=str(task_id)
     )
-    logger.info(f'New task {task_id} has been setup on {date_time.strftime("%Y-%b-%d, %H:%M:%S")}')
+    logger.info(
+        f'New task {task_id} has been setup on '
+        f'{date_time.strftime("%Y-%b-%d, %H:%M:%S")}'
+    )
     return task
 
 

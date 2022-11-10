@@ -42,11 +42,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile",
+            "Вернуться назад ◀️": "menu_user_profile",
         }
     )
 
-    if re.search('(\+7|7|8)\D*\d{3}\D*\d{3}\D*\d{2}\D*\d{2}', phone_number):
+    if re.search(r'(\+7|7|8)\D*\d{3}\D*\d{3}\D*\d{2}\D*\d{2}', phone_number):
         await UserDB.update_user(user_id, contact_number=phone_number)
         await message.answer(
             'Номер изменен.',

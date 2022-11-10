@@ -2,7 +2,7 @@ from app.store.database.models import GameResult, Room, User
 
 
 class GameResultDB:
-    
+
     @staticmethod
     async def insert(
             room_id: int,
@@ -13,14 +13,14 @@ class GameResultDB:
         room = await Room.filter(number=room_id).first()
         recipient = await User.filter(user_id=recipient_id).first()
         sender = await User.filter(user_id=sender_id).first()
-        
+
         result = await GameResult.create(
             room=room,
             recipient=recipient,
             sender=sender
         )
         return result
-    
+
     @staticmethod
     async def get_recipient(
             room_id,

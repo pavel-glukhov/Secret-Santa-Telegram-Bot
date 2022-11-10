@@ -26,13 +26,13 @@ async def show_wishes(callback: types.CallbackQuery):
         {
             "Изменить желание ✒️": f"room_change-wish_{room_number}",
             "Вернуться назад ◀️": f"room_menu_{room_number}",
-            
+
         }
     )
-    
+
     user_id = message.chat.id
     wishes = await WishDB.get(user_id, room_number)
-    
+
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
                             reply_markup=keyboard_inline)
@@ -45,13 +45,13 @@ async def update_wishes(callback: types.CallbackQuery):
     await ChangeWish.waiting_for_wishes.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-    
+
     message_text = '<b>Напиши новое желание:</b>\n'
     await message.edit_text(
         text=message_text,
@@ -65,7 +65,7 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
     room_number = state_data['room_number']
     wish = message.text
     user_id = message.chat.id
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}",
@@ -78,7 +78,7 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
     )
     room = await RoomDB.get(room_number)
     await state.finish()
-    
+
     message_text = (
         f'Ваши желания в комнате <b>{room.name}</b> изменены на:\n\n'
         f'{wish}\n\n'

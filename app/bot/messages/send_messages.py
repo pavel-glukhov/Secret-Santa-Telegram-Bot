@@ -21,7 +21,7 @@ async def send_message(user_id: int,
     try:
         await bot.send_message(user_id, text,
                                disable_notification=disable_notification)
-    
+
     except exceptions.BotBlocked:
         logger.error(f"Target [ID:{user_id}]: blocked by user")
     except exceptions.ChatNotFound:
@@ -52,8 +52,8 @@ async def broadcaster(list_users, text) -> int:
         for user_id in list_users:
             if await send_message(user_id, text):
                 count += 1
-            await asyncio.sleep(.05)  # 20 messages per second (Limit: 30 messages per second)
+            await asyncio.sleep(.05)  # 20 messages per second
     finally:
         logger.info(f"{count} messages successful sent.")
-    
+
     return count

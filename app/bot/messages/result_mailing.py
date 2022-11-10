@@ -17,11 +17,11 @@ class Person:
     """
     Circular list for sending a random list of addresses
     """
-    
+
     def __init__(self, player: dict):
         self.player = player
         self.to_send = None
-    
+
     def set_sender(self, player_to_send):
         self.to_send = player_to_send
 
@@ -31,13 +31,13 @@ async def creating_users_pool(room_number):
     room_members = await RoomDB.get_list_members(room_number)
     row_list_players = [member for member in room_members]
     verified_list_players = []
-    
+
     for player in row_list_players:
         is_active_player_char = await is_active_user_chat(player.user_id)
-        
+
         if is_active_player_char:
             wish = await WishDB.get(player.user_id, room_number)
-            
+
             player_information = {
                 'player_id': player.user_id,
                 'player_address': player.address,
@@ -46,10 +46,10 @@ async def creating_users_pool(room_number):
                 'player_contact_number': player.contact_number,
                 'player_wish': wish.wish
             }
-            
+
             verified_list_players.append(player_information)
         await asyncio.sleep(.05)  # 20 request per second
-    
+
     return verified_list_players
 
 
@@ -60,10 +60,10 @@ async def send_result_of_game(room_number) -> None:
     random.shuffle(list_players)
     persons = [Person(person) for person in list_players]
     persons[-1].set_sender(persons[0])
-    
+
     for ind in range(len(persons) - 1):
         persons[ind].set_sender(persons[ind + 1])
-    
+
     for p in persons:
         sender_id = p.player['player_id']
         sender_name = p.player["player_name"]
@@ -74,13 +74,13 @@ async def send_result_of_game(room_number) -> None:
         phone_to_send = p.to_send.player['player_contact_number']
         wish_to_send = (p.to_send.player['player_wish']
                         if p.to_send.player['player_wish'] else '')
-        
+
         await GameResultDB.insert(
             room_id=room_number,
             recipient_id=recipient_id,
             sender_id=sender_id,
         )
-        
+
         message_text = format_santa_message(
             sender_name=sender_name,
             receiver_first_name=receiver_first_name,
@@ -89,11 +89,14 @@ async def send_result_of_game(room_number) -> None:
             phone=phone_to_send,
             wish=wish_to_send
         )
-        
-        await send_message(user_id=p.player['player_id'], text=message_text)
-    
+
+        await send_message(
+            user_id=p.player['player_id'],
+            text=message_text
+        )
+
     await RoomDB.update(
         room_number=room_number,
-                        is_closed=True,
-                        closed_at=datetime.datetime.now()
-                        )
+        is_closed=True,
+        closed_at=datetime.datetime.now()
+    )

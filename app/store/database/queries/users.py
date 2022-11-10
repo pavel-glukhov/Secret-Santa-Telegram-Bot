@@ -13,13 +13,13 @@ class UserDB:
         :param kwargs:
         :return: [User Instance, Bool: Created - True, else False]
         """
-        
+
         user, created = await User.get_or_create(
             user_id=user_id,
             defaults=kwargs
         )
         return user, created
-    
+
     @staticmethod
     async def get_user_or_none(
             user: Union[int, str]
@@ -34,21 +34,21 @@ class UserDB:
         else:
             user = await User.filter(username=user).first()
         return user
-    
+
     @staticmethod
     async def update_user(user_id: int, **kwargs: str) -> None:
         """
         Update any field of user instance
         """
         await User.filter(user_id=user_id).update(**kwargs)
-    
+
     @staticmethod
     async def disable_user(user_id: int) -> None:
         """
         Disable user
         """
         await User.filter(user_id=user_id).update(is_active=False)
-    
+
     @staticmethod
     async def enable_user(user_id: int) -> None:
         """

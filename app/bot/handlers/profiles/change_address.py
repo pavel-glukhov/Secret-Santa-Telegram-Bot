@@ -26,7 +26,8 @@ async def change_user_address(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+
+    message_text = (
         'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
         'напишите ваш адрес куда необходимо отправить посылку'
         ' и не забудьте указать:\n\n'
@@ -40,8 +41,11 @@ async def change_user_address(callback: types.CallbackQuery):
         '<b>— номер на домофоне, если отличается от квартиры</b>\n'
         '<b>— индекс</b>\n\n'
         '<b>Например: Россия, Московская область, г. Фрязино, ул. Пупкина,'
-        ' д. 99, кв. 999, этаж 25, индекс 123987.</b>\n',
-        reply_markup=keyboard_inline
+        ' д. 99, кв. 999, этаж 25, индекс 123987.</b>\n'
+    )
+    await message.answer(
+        text=message_text,
+        reply_markup=keyboard_inline,
     )
 
 
@@ -51,7 +55,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile",
+            "Вернуться назад ◀️": "menu_user_profile",
         }
     )
 
@@ -63,7 +67,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         )
         await state.finish()
     else:
+        message_text = (
+            'Адресные данные не могут превышать 150 символов.'
+            ' Попробуйте снова.'
+        )
         await message.answer(
-            'Адресные данные не могут превышать 150 символов. Попробуйте снова.',
+            text=message_text,
             reply_markup=keyboard_inline,
-    )
+        )

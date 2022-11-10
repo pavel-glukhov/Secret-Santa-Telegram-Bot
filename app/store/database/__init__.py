@@ -5,7 +5,6 @@ from tortoise import Tortoise
 from tortoise.exceptions import ConfigurationError, DBConnectionError
 
 from app.config import config
-from app.store.database.queries.game_result import GameResultDB
 
 logger = logging.getLogger(__name__)
 

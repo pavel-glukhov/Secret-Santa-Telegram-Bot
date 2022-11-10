@@ -24,7 +24,7 @@ async def change_room_owner(callback: types.CallbackQuery):
     await ChangeOwner.waiting_for_owner_name.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -48,19 +48,19 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     room_number = state_data['room_number']
     previous_owner = message.chat.id
     new_owner = message.text
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    
+
     owner: User = await RoomDB.change_owner(new_owner,
                                                room_number)
-    
+
     logger.info(f'The owner [{previous_owner}] of room '
                 f'[{room_number}] has been changed to [{owner.user_id}]')
-    
+
     await state.finish()
     if owner:
         message_text = (

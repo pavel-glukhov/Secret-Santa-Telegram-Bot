@@ -30,8 +30,7 @@ async def change_username(callback: types.CallbackQuery):
     await message.answer(
         'Хохохо, пора указать твои данные для Санты 🎅\n'
         'Учти, что оно будет использоваться для отправки подарка Сантой.\n\n'
-        '<b>Сначала напиши свое имя</b>\n\n'
-        ,
+        '<b>Сначала напиши свое имя</b>\n\n',
         reply_markup=keyboard_inline
     )
 
@@ -64,12 +63,12 @@ async def process_changing_last_name(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"menu_user_profile",
+            "Вернуться назад ◀️": "menu_user_profile",
         }
     )
     await UserDB.update_user(user_id,
-                                first_name=first_name,
-                                last_name=last_name)
+                             first_name=first_name,
+                             last_name=last_name)
     await message.answer(
         'Имя и фамилия изменены.',
         reply_markup=keyboard_inline,

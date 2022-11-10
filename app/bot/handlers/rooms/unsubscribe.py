@@ -21,12 +21,12 @@ async def left_room(callback: types.CallbackQuery):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    
+
     message_text = f'Вы вышли из комнаты <b>{room_number}</b>.'
     await callback.message.edit_text(
         text=message_text,
     )
-    
+
     message_text = (
         'Вы можете вернуться в комнату в любое время,'
         ' для этого используйте старый номер комнаты.'
