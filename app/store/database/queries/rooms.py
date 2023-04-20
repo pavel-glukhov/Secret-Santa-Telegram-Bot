@@ -1,7 +1,7 @@
 import random
 from typing import Union
 
-from app.config import config
+from app.config import app_config
 from app.store.database.models import Room, User, Wish
 from app.store.database.queries.users import UserDB
 
@@ -197,7 +197,7 @@ class RoomDB:
 
         :return: int value
         """
-        length = config.room.room_number_length
+        length = app_config().room.room_number_length
         min_number = int("1" + "0" * (length - 1))
         max_number = int("9" + "9" * (length - 1))
 

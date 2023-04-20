@@ -1,13 +1,13 @@
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from app.config import config
+from app.config import app_config
 
 JOB_STORES = {
     'default': RedisJobStore(
-        host=config.redis.host,
-        port=config.redis.port,
-        password=config.redis.password
+        host=app_config().redis.host,
+        port=app_config().redis.port,
+        password=app_config().redis.password
     ),
 }
 

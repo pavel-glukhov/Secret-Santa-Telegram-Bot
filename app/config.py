@@ -52,29 +52,34 @@ class AppConfig:
     log: LoggingConfig
 
 
-config = AppConfig(
-    bot=BotConfig(
-        token=os.getenv("TELEGRAM_TOKEN"),
-    ),
-    db=DataBaseConfig(
-        name=os.getenv("DATABASE_NAME"),
-        user=os.getenv("DATABASE_USER"),
-        password=os.getenv("DATABASE_PASSWORD"),
-        port=os.getenv("DATABASE_PORT"),
-        host=os.getenv("DATABASE_HOST"),
-    ),
-    redis=RedisConfig(
-        db=os.getenv("REDIS_DB"),
-        host=os.getenv("REDIS_HOST"),
-        port=os.getenv("REDIS_PORT"),
-        password=os.getenv("REDIS_PASSWORD"),
-    ),
-    room=RoomConfig(
-        room_number_length=6
-    ),
-    log=LoggingConfig(
-        log_path=os.path.join(root_path, 'logs'),
-        log_file='logs.log',
-        config_file='logging.yaml'
-    ),
-)
+def app_config():
+    """
+    Main configuration of application
+    """
+    return AppConfig(
+        bot=BotConfig(
+            token=os.getenv("TELEGRAM_TOKEN"),
+        ),
+        db=DataBaseConfig(
+            name=os.getenv("DATABASE_NAME"),
+            user=os.getenv("DATABASE_USER"),
+            password=os.getenv("DATABASE_PASSWORD"),
+            port=os.getenv("DATABASE_PORT"),
+            host=os.getenv("DATABASE_HOST"),
+        ),
+        redis=RedisConfig(
+            db=os.getenv("REDIS_DB"),
+            host=os.getenv("REDIS_HOST"),
+            port=os.getenv("REDIS_PORT"),
+            password=os.getenv("REDIS_PASSWORD"),
+        ),
+        room=RoomConfig(
+            room_number_length=6
+        ),
+        log=LoggingConfig(
+            log_path=os.path.join(root_path, 'logs'),
+            log_file='logs.log',
+            config_file='logging.yaml'
+        ),
+    )
+
