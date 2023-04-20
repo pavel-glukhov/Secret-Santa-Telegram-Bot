@@ -21,6 +21,7 @@ def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
 def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
     """
     Formatter for user's room button.
+    Showing different message if user is owner of room.
 
     :param room:
     :param is_owner:
