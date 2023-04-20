@@ -24,30 +24,7 @@ async def my_room(callback: types.CallbackQuery):
                                           room_number=room_number)
 
     if room.is_closed:
-
-        keyboard_dict = {
-            "Связаться с Сантой": "1",  # TODO добавить коллбак
-            "Отправить сообщение получателю": "1",  # TODO добавить коллбак
-            "Вернуться в меню": "root_menu"
-        }
-        recipient = await GameResultDB.get_recipient(room_id=room_number,
-                                                     user_id=user_id)
-        keyboard_inline = generate_inline_keyboard(keyboard_dict)
-        user_information = profile_information_formatter(recipient)
-
-        message_text = (
-            "<b>Игра завершена!</b>\n\n"
-            "Вы стали Тайным Сантой для:\n"
-            f"{user_information}\n"
-            "Ты можешь написать сообщение своему Тайному Санте,"
-            "или отправить сообщение своему получателю.\n\n"
-            "<b>Учти, что в сутки можно отправлять не более 3х сообщений.</b>"
-        )
-
-        await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+        await room_is_closed(callback, room.number, user_id)
 
     else:
         keyboard_dict = {
@@ -96,27 +73,55 @@ async def my_room(callback: types.CallbackQuery):
             reply_markup=keyboard_inline
         )
 
-    @dp.callback_query_handler(Text(startswith='room_member-list'))
-    async def members_list(callback: types.CallbackQuery):
-        room_number = get_room_number(callback)
-        keyboard_inline = generate_inline_keyboard(
-            {
-                "Вернуться назад ◀️": f"room_menu_{room_number}"
-            }
-        )
-        room = await RoomDB.get(room_number)
-        members = await room.members
-        member_str = ''
 
-        for number, member in enumerate(members):
-            member_str += f'{number}) @{member.username}\n'
+async def room_is_closed(callback: types.CallbackQuery,
+                         room_number: int, user_id: int) -> None:
+    keyboard_dict = {
+        "Связаться с Сантой": f"room_closed-con-san_{room_number}",
+        "Отправить сообщение получателю": f"room_closed-con-rec_{room_number}",
+        "Вернуться в меню": "root_menu"
+    }
+    recipient = await GameResultDB.get_recipient(room_id=room_number,
+                                                 user_id=user_id)
+    keyboard_inline = generate_inline_keyboard(keyboard_dict)
+    user_information = profile_information_formatter(recipient)
+    
+    message_text = (
+        "<b>Игра завершена!</b>\n\n"
+        "Вы стали Тайным Сантой для:\n"
+        f"{user_information}\n"
+        "Ты можешь написать сообщение своему Тайному Санте,"
+        "или отправить сообщение своему получателю.\n\n"
+        "<b>Учти, что в сутки можно отправлять не более 3х "
+        "сообщений для каждого из них.</b>"
+    )
+    
+    await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
+    
+@dp.callback_query_handler(Text(startswith='room_member-list'))
+async def members_list(callback: types.CallbackQuery):
+    room_number = get_room_number(callback)
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "Вернуться назад ◀️": f"room_menu_{room_number}"
+        }
+    )
+    room = await RoomDB.get(room_number)
+    members = await room.members
+    member_str = ''
 
-        message_text = (
-            'Список участников комнаты: '
-            f'{room.name} ({room_number}):\n\n{member_str}'
-        )
+    for number, member in enumerate(members):
+        member_str += f'{number}) @{member.username}\n'
 
-        await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+    message_text = (
+        'Список участников комнаты: '
+        f'{room.name} ({room_number}):\n\n{member_str}'
+    )
+
+    await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
