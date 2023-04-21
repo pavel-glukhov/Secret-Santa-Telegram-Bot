@@ -12,7 +12,7 @@ handlers:
     formatter: default
     stream: ext://sys.stdout
 
-  timed_rot_handler:
+  timed_rotating_handler:
     class: logging.handlers.TimedRotatingFileHandler
     level: INFO
     formatter: default

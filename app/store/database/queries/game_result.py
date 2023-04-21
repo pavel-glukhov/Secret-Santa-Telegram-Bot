@@ -32,3 +32,15 @@ class GameResultDB:
             sender__user_id=user_id
         ).first()
         return await results.recipient
+
+    @staticmethod
+    async def get_sender(
+            room_id,
+            user_id
+    ) -> User:
+        """Get result for specific user"""
+        results = await GameResult.filter(
+            room__number=room_id,
+            recipient__user_id=user_id
+        ).first()
+        return await results.sender

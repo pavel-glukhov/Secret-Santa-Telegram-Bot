@@ -25,7 +25,8 @@ def setup_logging() -> None:
     with open(configuration_file, 'r') as stream:
         logging_cfg = yaml.load(stream, Loader=yaml.FullLoader)
     
-    logging_cfg['handlers']['timed_rot_handler']['filename'] = os.path.join(
+    logging_cfg['handlers'][
+        'timed_rotating_handler']['filename'] = os.path.join(
         config.log.log_path,
         config.log.log_file
     )
