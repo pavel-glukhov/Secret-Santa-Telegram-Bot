@@ -26,39 +26,35 @@ async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     room_members = await RoomDB.get_list_members(room_number)
     task = get_task(task_id=room_number)
-    keyboard = {}
+    keyboard = {
+        "Изменить время 🕘": f"room_change-game-dt_{room_number}",
+        "Вернуться назад ◀️": f"room_menu_{room_number}"
+    }
 
-    if len(list(room_members)) >= 3:
-        keyboard.update(
-            {
-                "Изменить время 👋": f"room_change-game-dt_{room_number}"
-            }
-        )
-    keyboard.update(
-        {
-            "Вернуться назад ◀️": f"room_menu_{room_number}"
-        }
-    )
-
-    keyboard_inline = generate_inline_keyboard(keyboard)
-    if task:
+    if not len(list(room_members)) >= 3:
         message_text = (
-            '<b>Рассылка будет выполнена:</b>'
-            f' {task.next_run_time.strftime("%b-%d-%Y %H:%M")}'
+            '<b>Для запуска игры требуется минимум '
+            '3 участника игры</b>'
         )
-        await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+        keyboard.pop("Изменить время 🕘")
+    
     else:
-        message_text = (
-            '<b>Время не назначено<b>\n\n'
-            '<b>Для запуска игры требуется минимум 3 участника игры</b>'
-        )
-        await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+        if not task:
+            message_text = (
+                '<b>Время не назначено</b>\n\n'
+                '<b>Для запуска игры требуется минимум 3 участника игры</b>'
+            )
+        else:
+            message_text = (
+                '<b>Рассылка будет выполнена:</b>'
+                f' {task.next_run_time.strftime("%b-%d-%Y %H:%M")}'
+            )
+            
+    keyboard_inline = generate_inline_keyboard(keyboard)
+    await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
 
 
 @dp.callback_query_handler(Text(startswith='room_change-game-dt'))
@@ -67,13 +63,13 @@ async def change_game_datetime(callback: types.CallbackQuery):
     await StartGame.waiting_for_datetime.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
-
+    
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
         'Для того, что-бы назначить время рассылки, '
@@ -81,7 +77,7 @@ async def change_game_datetime(callback: types.CallbackQuery):
         '*yyyy, mm, dd, h, m* - *год, месяц, день, час, минуты*\n\n'
         '*Пример: 2022,12,1,12,00*'
     )
-
+    
     await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
@@ -91,30 +87,26 @@ async def change_game_datetime(callback: types.CallbackQuery):
 async def pass_(message):
     await message.answer('test')
 
-
-# TODO loging
-# TODO Добавить календарь и рандомный выбор времени для рассылки
-# TODO если дата меньше, вывести ошибку
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     data = await state.get_data()
     room_number = data['room_number']
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-
+    # TODO если дата меньше, вывести ошибку
     match = re.fullmatch(r'\d{4},\d{1,2},\d{1,2},\d{1,2},\d{1,2}',
                          message.text)
-
+    
     if match:
         date = list(map(int, message.text.split(',')))
         task = get_task(task_id=room_number)
         if task:
             task.remove()
-
+        
         add_task(task_func=send_result_of_game,
                  date_time=datetime(*date),
                  task_id=room_number,
@@ -125,5 +117,5 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             f' {datetime(*date).strftime("%Y-%b-%d, %H:%M:%S")}',
             reply_markup=keyboard_inline
         )
-
+    
     await state.finish()
