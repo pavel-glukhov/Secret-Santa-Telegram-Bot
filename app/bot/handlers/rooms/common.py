@@ -28,26 +28,26 @@ async def my_room(callback: types.CallbackQuery):
 
     else:
         keyboard_dict = {
-            "Ваши желания 🎁": f"room_show-wish_{room_number}",
-            "Выйти из комнаты 🚪": f"room_exit_{room_number}"
+            'Ваши желания 🎁': f'room_show-wish_{room_number}',
+            'Выйти из комнаты 🚪': f'room_exit_{room_number}'
         }
 
         if is_room_owner:
             if not get_task(room_number):
-                start_game_button_name = "Начать игру 🎲"
+                start_game_button_name = 'Начать игру 🎲'
             else:
                 start_game_button_name = 'Игра запущена ✅'
 
             keyboard_dict.update(
                 {
-                    start_game_button_name: f"room_start-game_{room_number}",
-                    "Список участников 👥": f"room_member-list_{room_number}",
-                    "Настройки ⚒": f"room_config_{room_number}"
+                    start_game_button_name: f'room_start-game_{room_number}',
+                    'Список участников 👥': f'room_member-list_{room_number}',
+                    'Настройки ⚒': f'room_config_{room_number}'
                 }
             )
         keyboard_dict.update(
             {
-                "Вернуться назад ◀️": "root_menu",
+                'Вернуться назад ◀️': 'root_menu',
             }
         )
         keyboard_inline = generate_inline_keyboard(keyboard_dict)
@@ -59,8 +59,8 @@ async def my_room(callback: types.CallbackQuery):
 
         if scheduler_task:
             text_control_room_scheduler = (
-                "<b>🕓 Игра в текущей комнате запущена на "
-                f"{scheduler_task.next_run_time.strftime('%Y-%b-%d')}</b>\n\n"
+                '<b>🕓 Игра в текущей комнате запущена на '
+                f'{scheduler_task.next_run_time.strftime("%Y-%b-%d")}</b>\n\n'
             )
 
             scheduler_text = text_control_room_scheduler
@@ -77,9 +77,9 @@ async def my_room(callback: types.CallbackQuery):
 async def room_is_closed(callback: types.CallbackQuery,
                          room_number: int, user_id: int) -> None:
     keyboard_dict = {
-        "Связаться с Сантой": f"room_closed-con-san_{room_number}",
-        "Отправить сообщение получателю": f"room_closed-con-rec_{room_number}",
-        "Вернуться в меню": "root_menu"
+        'Связаться с Сантой': f'room_closed-con-san_{room_number}',
+        'Отправить сообщение получателю': f'room_closed-con-rec_{room_number}',
+        'Вернуться в меню': 'root_menu'
     }
     recipient = await GameResultDB.get_recipient(room_id=room_number,
                                                  user_id=user_id)
@@ -87,13 +87,13 @@ async def room_is_closed(callback: types.CallbackQuery,
     user_information = profile_information_formatter(recipient)
     
     message_text = (
-        "<b>Игра завершена!</b>\n\n"
-        "Вы стали Тайным Сантой для:\n"
-        f"{user_information}\n"
-        "Ты можешь написать сообщение своему Тайному Санте,"
-        "или отправить сообщение своему получателю.\n\n"
-        "<b>Учти, что в сутки можно отправлять не более 3х "
-        "сообщений для каждого из них.</b>"
+        '<b>Игра завершена!</b>\n\n'
+        'Вы стали Тайным Сантой для:\n'
+        f'{user_information}\n'
+        'Ты можешь написать сообщение своему Тайному Санте,'
+        'или отправить сообщение своему получателю.\n\n'
+        '<b>Учти, что в сутки можно отправлять не более 3х '
+        'сообщений для каждого из них.</b>'
     )
     
     await callback.message.edit_text(
@@ -106,7 +106,7 @@ async def members_list(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"room_menu_{room_number}"
+            'Вернуться назад ◀️': f'room_menu_{room_number}'
         }
     )
     room = await RoomDB.get(room_number)

@@ -28,8 +28,8 @@ async def left_room(callback: types.CallbackQuery):
     )
 
     message_text = (
-        'Вы можете вернуться в комнату в любое время,'
-        ' для этого используйте старый номер комнаты.'
+        'Вы можете вернуться в комнату в любое время, '
+        f'для этого используйте номер комнаты {room_number}.'
     )
     await callback.message.answer(
         text=message_text,
@@ -37,5 +37,5 @@ async def left_room(callback: types.CallbackQuery):
     )
     logger.info(
         f'The user[{callback.message.from_user.id}]'
-        f' left from the[{room_number}]'
+        f' left from the room[{room_number}]'
     )
