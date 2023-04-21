@@ -13,10 +13,10 @@ class User(Model):
     registered_at = fields.DatetimeField(auto_now_add=True)
     is_active = fields.BooleanField(default=True)
     is_superuser = fields.BooleanField(default=False)
-
+    
     class Meta:
         table = "users"
-
+    
     def __str__(self):
         return f"User {self.user_id} : {self.username}"
 
@@ -30,20 +30,16 @@ class Room(Model):
     is_closed = fields.BooleanField(default=False)
     started_at = fields.DatetimeField(null=True)
     closed_at = fields.DatetimeField(null=True)
-    owner = fields.ForeignKeyField(
-        'models.User',
-        related_name='room_owner'
-    )
-    members = fields.ManyToManyField(
-        'models.User',
-        related_name='members',
-        through='rooms_users',
-        on_delete='CASCADE'
-    )
-
+    owner = fields.ForeignKeyField('models.User',
+                                   related_name='room_owner')
+    members = fields.ManyToManyField('models.User',
+                                     related_name='members',
+                                     through='rooms_users',
+                                     on_delete='CASCADE')
+    
     class Meta:
         table = "rooms"
-
+    
     def __str__(self):
         return f"Room {self.number}: {self.name}"
 
@@ -57,33 +53,27 @@ class Wish(Model):
         'models.User',
         related_name='wishes_of_owner'
     )
-
+    
     class Meta:
         table = "wishes"
         unique_together = (("room", "user"),)
-
+    
     def __str__(self):
         return f"Room {self.room}: {self.user}"
 
 
 class GameResult(Model):
     id = fields.IntField(pk=True)
-    room = fields.ForeignKeyField(
-        'models.Room',
-        related_name='results_of_rooms'
-    )
-    recipient = fields.ForeignKeyField(
-        'models.User',
-        related_name='recipients'
-    )
-    sender = fields.ForeignKeyField(
-        'models.User',
-        related_name='senders'
-    )
+    room = fields.ForeignKeyField('models.Room',
+                                  related_name='results_of_rooms')
+    recipient = fields.ForeignKeyField('models.User',
+                                       related_name='recipients')
+    sender = fields.ForeignKeyField('models.User',
+                                    related_name='senders')
     assigned_at = fields.DatetimeField(auto_now_add=True)
-
+    
     class Meta:
         table = "game_results"
-
+    
     def __str__(self):
         return f"Room {self.room}: {self.recipient} {self.sender}"
