@@ -36,7 +36,7 @@ async def change_room_owner(callback: types.CallbackQuery):
         '<b>Учти, что ты потеряешь контроль за комнатой.</b>\n\n'
         '<b>Для смены владельца, напиши его ник.</b>\n'
     )
-    await callback.message.answer(
+    await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
