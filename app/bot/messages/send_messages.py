@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 async def send_message(user_id: int,
                        text: str,
-                       disable_notification: bool = False) -> bool:
+                       disable_notification: bool = False,
+                       **kwargs) -> bool:
     """
     Safe messages sender
     :param user_id:
@@ -20,7 +21,8 @@ async def send_message(user_id: int,
     """
     try:
         await bot.send_message(user_id, text,
-                               disable_notification=disable_notification)
+                               disable_notification=disable_notification,
+                               **kwargs)
 
     except exceptions.BotBlocked:
         logger.error(f"Target [ID:{user_id}]: blocked by user")
