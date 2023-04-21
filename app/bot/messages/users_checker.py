@@ -9,7 +9,7 @@ from app.store.database.queries.users import UserDB
 logger = logging.getLogger(__name__)
 
 
-async def is_active_user_chat(user_id):
+async def checking_user_is_active(user_id):
     """
     Checking if a bot was blocked by user
     or user's chat is not existing by other reason.

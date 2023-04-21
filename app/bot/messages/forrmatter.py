@@ -1,10 +1,19 @@
-def format_santa_message(sender_name, receiver_first_name, receiver_last_name,
-                         address, phone, wish):
-    f_n = receiver_first_name.first_name
-    l_n = receiver_last_name.last_name
+def message_formatter(
+        sender_name,
+        receiver_first_name,
+        receiver_last_name,
+        address,
+        phone, wish
+):
+    first_name = receiver_first_name.first_name
+    last_name = receiver_last_name.last_name
     address = address or 'адрес не указан'
     number = phone or 'номер не указан'
-    full_name = f'{f_n} {l_n}' if any([f_n, l_n]) else 'Имя не указано'
+    full_name = (
+        f'{first_name} {last_name}' if any([first_name, last_name])
+        else 'Имя не указано'
+    )
+    
     text = (
         '------------\n'
         f'<b>Привет {sender_name}!</b>\n'
