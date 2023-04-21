@@ -4,7 +4,7 @@ import logging
 import random
 
 from app.bot.messages.forrmatter import message_formatter
-from app.bot.messages.send_messages import send_message
+from app.bot.messages.send_messages import send_message, broadcaster
 from app.bot.messages.users_checker import checking_user_is_active
 from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
@@ -53,13 +53,14 @@ async def creating_active_users_pool(room_number):
 
 
 async def send_result_of_game(room_number) -> None:
-    list_players = await creating_active_users_pool(room_number)
-    random.shuffle(list_players)
-    persons = [Person(person) for person in list_players]
+    verified_users = await creating_active_users_pool(room_number)
+    random.shuffle(verified_users)
+    persons = [Person(user) for user in verified_users]
     persons[-1].set_sender(persons[0])
+    prepared_users_list = []
     
-    for ind in range(len(persons) - 1):
-        persons[ind].set_sender(persons[ind + 1])
+    for index in range(len(persons) - 1):
+        persons[index].set_sender(persons[index + 1])
     
     for person in persons:
         sender_id = person.player['player_id']
@@ -80,6 +81,12 @@ async def send_result_of_game(room_number) -> None:
             sender_id=sender_id,
         )
         
+        await RoomDB.update(
+            room_number=room_number,
+            is_closed=True,
+            closed_at=datetime.datetime.now()
+        )
+        
         message_text = message_formatter(
             sender_name=sender_name,
             receiver_first_name=receiver_first_name,
@@ -88,14 +95,13 @@ async def send_result_of_game(room_number) -> None:
             phone=phone_to_send,
             wish=wish_to_send
         )
-        # TODO внедрить бредкастер
-        await send_message(
-            user_id=person.player['player_id'],
-            text=message_text
+        
+        prepared_users_list.append(
+            {
+               'user_id': person.player['player_id'],
+                'text': message_text
+                
+            }
         )
-    
-    await RoomDB.update(
-        room_number=room_number,
-        is_closed=True,
-        closed_at=datetime.datetime.now()
-    )
+
+    await broadcaster(prepared_users_list)

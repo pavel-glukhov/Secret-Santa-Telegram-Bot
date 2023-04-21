@@ -42,15 +42,15 @@ async def send_message(user_id: int,
     return False
 
 
-async def broadcaster(list_users, text) -> int:
+async def broadcaster(list_users: list) -> int:
     """
     broadcaster
     :return: Count of messages
     """
     count = 0
     try:
-        for user_id in list_users:
-            if await send_message(user_id, text):
+        for user in list_users:
+            if await send_message(user['user_id'], user['text']):
                 count += 1
             await asyncio.sleep(.05)  # 20 messages per second
     finally:
