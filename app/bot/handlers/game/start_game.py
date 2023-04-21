@@ -30,7 +30,7 @@ async def start_game(callback: types.CallbackQuery):
         "Изменить время 🕘": f"room_change-game-dt_{room_number}",
         "Вернуться назад ◀️": f"room_menu_{room_number}"
     }
-
+    
     if not len(list(room_members)) >= 3:
         message_text = (
             '<b>Для запуска игры требуется минимум '
@@ -49,7 +49,7 @@ async def start_game(callback: types.CallbackQuery):
                 '<b>Рассылка будет выполнена:</b>'
                 f' {task.next_run_time.strftime("%b-%d-%Y %H:%M")}'
             )
-            
+    
     keyboard_inline = generate_inline_keyboard(keyboard)
     await callback.message.edit_text(
         text=message_text,
@@ -87,6 +87,7 @@ async def change_game_datetime(callback: types.CallbackQuery):
 async def pass_(message):
     await message.answer('test')
 
+
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -97,25 +98,33 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-    # TODO если дата меньше, вывести ошибку
     match = re.fullmatch(r'\d{4},\d{1,2},\d{1,2},\d{1,2},\d{1,2}',
                          message.text)
     
     if match:
-        date = list(map(int, message.text.split(',')))
-        task = get_task(task_id=room_number)
-        if task:
-            task.remove()
+        date = datetime(*list(map(int, message.text.split(','))))
         
-        add_task(task_func=send_result_of_game,
-                 date_time=datetime(*date),
-                 task_id=room_number,
-                 room_number=room_number
-                 )
-        await message.answer(
-            'Дата рассылки установлена на'
-            f' {datetime(*date).strftime("%Y-%b-%d, %H:%M:%S")}',
-            reply_markup=keyboard_inline
-        )
+        if date > datetime.now():
+            task = get_task(task_id=room_number)
+            if task:
+                task.remove()
+            
+            add_task(
+                task_func=send_result_of_game,
+                date_time=date,
+                task_id=room_number,
+                room_number=room_number
+            )
+            await message.answer(
+                'Дата рассылки установлена на'
+                f' {date.strftime("%Y-%b-%d, %H:%M:%S")}',
+                reply_markup=keyboard_inline
+            )
+        else:
+            await message.answer(
+                'Вы указали прошедшую дату. Попробуте снова и укажите '
+                'правильную дату для жеребьевки.',
+                reply_markup=keyboard_inline
+            )
     
     await state.finish()

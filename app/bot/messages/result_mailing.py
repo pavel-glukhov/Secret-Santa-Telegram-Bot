@@ -51,7 +51,8 @@ async def creating_active_users_pool(room_number):
     
     return verified_users_list
 
-
+#TODO Необходимо сделать, что бы при отправке проверялось,
+# что участников больше 3х человек
 async def send_result_of_game(room_number) -> None:
     verified_users = await creating_active_users_pool(room_number)
     random.shuffle(verified_users)
