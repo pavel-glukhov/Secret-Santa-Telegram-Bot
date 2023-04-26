@@ -2,13 +2,22 @@ import os
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
+from starlette.templating import Jinja2Templates
 
 root_path = os.path.dirname(os.path.dirname(__file__))
 dotenv_path = os.path.join(root_path, '.env')
-
+templates = Jinja2Templates(directory=os.path.join(root_path, "templates"))
 load_dotenv(dotenv_path)
 
+@dataclass()
+class JWTSettings:
+    authjwt_secret_key: str
 
+
+@dataclass()
+class WebSettings:
+    jwt_settings: JWTSettings
+    
 @dataclass
 class LoggingConfig:
     log_path: str
@@ -24,7 +33,8 @@ class RoomConfig:
 @dataclass
 class BotConfig:
     token: str
-
+    telegram_login: str
+    auth_url: str
 
 @dataclass
 class DataBaseConfig:
@@ -46,20 +56,28 @@ class RedisConfig:
 @dataclass
 class AppConfig:
     bot: BotConfig
+    web: WebSettings
     db: DataBaseConfig
     redis: RedisConfig
     room: RoomConfig
     log: LoggingConfig
 
 
-def app_config():
+def load_config():
     """
     Main configuration of application
     """
     return AppConfig(
         bot=BotConfig(
             token=os.getenv("TELEGRAM_TOKEN"),
+            telegram_login=os.getenv('TELEGRAM_LOGIN'),
+            auth_url=os.getenv('AUTH_URL'),
         ),
+    web=WebSettings(
+        jwt_settings=JWTSettings(
+            authjwt_secret_key=os.getenv('AUTH_JWT_SECRET_KEY')
+        )
+    ),
         db=DataBaseConfig(
             name=os.getenv("DATABASE_NAME"),
             user=os.getenv("DATABASE_USER"),

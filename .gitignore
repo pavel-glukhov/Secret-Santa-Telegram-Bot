@@ -151,3 +151,5 @@ test.py
 /migrations/db_init.bat
 /migrations/db_upgrade.bat
 /migrations/migrate.bat
+/ngrok/
+/ngrok.bat

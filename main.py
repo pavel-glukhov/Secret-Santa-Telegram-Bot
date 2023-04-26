@@ -4,7 +4,7 @@ import os
 
 import yaml
 
-from app.bot import bot, app_config, dispatcher
+from app.bot import bot, load_config, dispatcher
 from app.config import root_path
 from app.store.database import database_initialization
 from app.store.scheduler import scheduler
@@ -18,7 +18,7 @@ def create_directory(path: str) -> None:
 
 
 def setup_logging() -> None:
-    config = app_config()
+    config = load_config()
     create_directory(config.log.log_path)
     configuration_file = os.path.join(root_path, config.log.config_file)
     

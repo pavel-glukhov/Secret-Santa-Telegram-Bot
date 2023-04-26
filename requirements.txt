@@ -7,3 +7,7 @@ APScheduler==3.9.1
 redis==4.3.4
 PyYAML==6.0
 aiohttp-jinja2==1.5
+fastapi
+uvicorn
+Jinja2
+fastapi-jwt-auth

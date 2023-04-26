@@ -4,16 +4,16 @@ from asyncpg import InvalidPasswordError
 from tortoise import Tortoise
 from tortoise.exceptions import ConfigurationError, DBConnectionError
 
-from app.config import app_config
+from app.config import load_config
 
 logger = logging.getLogger(__name__)
 
 DATABASE_URL = (
-    f'postgres://{app_config().db.user}:'
-    f'{app_config().db.password}@'
-    f'{app_config().db.host}:'
-    f'{app_config().db.port}/'
-    f'{app_config().db.name}'
+    f'postgres://{load_config().db.user}:'
+    f'{load_config().db.password}@'
+    f'{load_config().db.host}:'
+    f'{load_config().db.port}/'
+    f'{load_config().db.name}'
 )
 
 TORTOISE_ORM = {
