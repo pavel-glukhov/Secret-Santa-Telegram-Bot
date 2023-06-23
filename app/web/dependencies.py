@@ -9,11 +9,21 @@ def get_config():
 
 
 def get_current_user(Authorize: AuthJWT = Depends()):
-    try:
-        
-        Authorize.jwt_required()
-        current_user = Authorize.get_jwt_subject()
-    
-    except Exception as e:
-        current_user = None
-    return current_user
+    # TODO убрать заглушку при переводе на вебхуки
+    # "---------------------------------------------------------------"
+    # Заглушка#
+    user = 245942576
+    return user
+    # "---------------------------------------------------------------"
+    # Процесс нормальной проверки
+    # "---------------------------------------------------------------"
+
+    # try:
+    #
+    #     Authorize.jwt_required()
+    #     current_user = Authorize.get_jwt_subject()
+    # except Exception as e:
+    #     current_user = None
+    #
+    #
+    # return current_user
