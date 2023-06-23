@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Главная страница</title>
-</head>
-<body>
-<div>
-    Какой-то текст
-</div>
+{% extends 'base.html' %}
 
+{% block title %}Главная страница{% endblock %}
 
-</body>
-</html>
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h2>Статистика</h2>
+            <p>Всего комнат: {}.</p>
+            <p>Всего пользователей: {}.</p>
+            <p>Всего активных игр: {}.</p>
+        </div>
+    </div>
+{% endblock %}

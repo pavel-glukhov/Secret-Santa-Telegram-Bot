@@ -1,13 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Профиль</title>
-</head>
-<body>
-<h1>Username: {{ username }}</h1>
-<h1>First Name: {{ first_name }}</h1>
-<h1>Last Name: {{ last_name }}</h1>
-<h1>ID: {{ id }}</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Игровые комнаты{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h2>Ваш профиль</h2>
+            <p>Username: {{ username }}</p>
+            <p>First Name: {{ first_name }}</p>
+            <p>Last Name: {{ last_name }}</p>
+            <p>ID: {{ id }}</p>
+
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,22 +1,38 @@
-body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      /* Стили для контейнера формы */
-      .form-container {
-        border: 1px solid #ddd;
-        padding: 20px;
-        border-radius: 5px;
-      }
-      /* Стили для кнопки */
-      button {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-      }
+#mainmenu {
+    background: #444;
+    position: relative;
+    overflow: hidden;
+    height: 40px;
+    margin: 30px 0
+}
+
+#mainmenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 50%;
+    float: left;
+    font: 14px Arial, Helvetica, sans-serif;
+    height: 40px
+}
+
+#mainmenu ul li {
+    position: relative;
+    left: -50%;
+    float: left;
+    margin: 0 10px;
+    height: 40px
+}
+
+#mainmenu ul li a {
+    color: #fff;
+    display: block;
+    text-decoration: none;
+    padding: 0 15px;
+    line-height: 40px;
+}
+
+#mainmenu ul li a:hover {
+    background-color: #666;
+}
