@@ -22,7 +22,7 @@ def get_config():
 
 
 @router.get("/login", name='login')
-def login(request: Request,
+async def login(request: Request,
           params: TelegramAuth = Depends(TelegramAuth),
           current_user=Depends(get_current_user),
           Authorize: AuthJWT = Depends()):
@@ -37,7 +37,10 @@ def login(request: Request,
     app_config = load_config()
     redirect_response = RedirectResponse(url='/',
                                          status_code=307)
+    
+
     if current_user:
+        get_jwt_token({'id': current_user}, redirect_response, Authorize)
         return redirect_response
     
     if not params.dict().get('hash'):
@@ -55,6 +58,7 @@ def login(request: Request,
             app_config.bot.token, params.dict()
         )
         if result:
+
             get_jwt_token(result, redirect_response, Authorize)
             # TODO Проверка на существование пользователя в БД
             return redirect_response

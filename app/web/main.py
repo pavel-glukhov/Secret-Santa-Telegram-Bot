@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI
-from app.web.routers import auth, users, general
+from app.web.routers import auth, users, general, rooms
 from fastapi.staticfiles import StaticFiles
 
 from app.web.exceptions.app_exceptions import (
@@ -23,6 +23,7 @@ app.mount("/static", StaticFiles(directory=os.path.join(root_path, "static")),
 app.include_router(general.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(rooms.router)
 
 app.add_exception_handler(NotAuthenticatedException, not_authenticated)
 app.add_exception_handler(NotAccessException, access_denied)

@@ -57,7 +57,7 @@ def remove_task(task_id: int) -> bool:
     task = get_task(task_id)
     if task:
         task.remove()
-        logger.info(f'The task {task_id} has been removed.')
+        logger.info(f'The task [{task_id}] has been removed.')
         return True
-    logger.info(f'Request of is not existed {task_id} task.')
+    logger.info(f'The requested [{task_id}] task is not existed.')
     return False

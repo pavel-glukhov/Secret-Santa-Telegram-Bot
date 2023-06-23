@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("/", name='index')
-def index(request: Request, current_user=Depends(get_current_user)):
+async def index(request: Request, current_user=Depends(get_current_user)):
     if current_user:
         return templates.TemplateResponse(
             'index.html', {'request': request, })
