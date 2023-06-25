@@ -5,11 +5,13 @@
 {% block content %}
     <div class="container">
         <div id="content">
-            <h2>Ваш профиль</h2>
-            <p>Username: {{ username }}</p>
-            <p>First Name: {{ first_name }}</p>
-            <p>Last Name: {{ last_name }}</p>
-            <p>ID: {{ id }}</p>
+            <h2>Профиль пользователя {{ username }}</h2><hr>
+            <p><b>Telegram ID</b>: {{ telegram_id }}</p>
+            <p><b>First Name</b>: {{ first_name }}</p>
+            <p><b>Last Name</b>: {{ last_name }}</p>
+            <p><b>status</b>: {{ status }}</p>
+            <p><b>Is Superuser</b>: {{ is_superuser }}</p>
+
 
         </div>
     </div>
