@@ -7,7 +7,7 @@ from app.store.database.queries.users import UserDB
 
 
 class RoomDB:
-
+    
     @staticmethod
     async def create(name: str,
                      owner: int,
@@ -23,7 +23,7 @@ class RoomDB:
         :return: Room instance
         """
         user = await UserDB().get_user_or_none(owner)
-
+        
         unique_number = await RoomDB._get_room_unique_number()
         room = await Room.create(
             name=name,
@@ -31,15 +31,15 @@ class RoomDB:
             owner=user,
             number=unique_number
         )
-
+        
         await room.members.add(user)
         await Wish.create(
             wish=user_wish,
             user=user, room=room
         )
-
+        
         return room
-
+    
     @staticmethod
     async def update(room_number: int, **kwargs) -> None:
         """
@@ -50,7 +50,7 @@ class RoomDB:
         :return: None
         """
         await Room.filter(number=room_number).update(**kwargs)
-
+    
     @staticmethod
     async def add_member(user_id: int,
                          room_number: int) -> bool:
@@ -61,16 +61,16 @@ class RoomDB:
         :param room_number: Number of game room
         :return: Bool
         """
-
+        
         user = await UserDB().get_user_or_none(user_id)
         room = await Room.filter(number=room_number).first()
-
+        
         if not room:
             return False
-
+        
         await room.members.add(user)
         return True
-
+    
     @staticmethod
     async def get_list_members(room_number: int) -> Room:
         """
@@ -81,7 +81,7 @@ class RoomDB:
         """
         room = await Room.filter(number=room_number).first()
         return await room.members
-
+    
     @staticmethod
     async def remove_member(user_id: int,
                             room_number: int) -> None:
@@ -95,12 +95,12 @@ class RoomDB:
         user = await UserDB().get_user_or_none(user_id)
         room = await Room.filter(number=room_number).first()
         await room.members.remove(user)
-
+    
     @staticmethod
     async def is_exists(room_number: int) -> bool:
         result = await Room.filter(number=room_number).exists()
         return result
-
+    
     @staticmethod
     async def is_member(user_id, room_number: int) -> bool:
         """
@@ -115,7 +115,7 @@ class RoomDB:
             members__user_id=user_id
         ).exists()
         return result
-
+    
     @staticmethod
     async def get(room_number: int) -> Room:
         """
@@ -126,7 +126,7 @@ class RoomDB:
         """
         room = await Room.filter(number=room_number).first()
         return room
-
+    
     @staticmethod
     async def change_owner(username: str,
                            room_number: int) -> Union[User, bool]:
@@ -140,12 +140,12 @@ class RoomDB:
         user = await UserDB().get_user_or_none(username)
         room = await Room.filter(number=room_number).first()
         room_members = await room.members
-
+        
         if user in room_members:
             await Room.filter(number=room_number).update(owner=user)
             return user
         return False
-
+    
     @staticmethod
     async def get_all_users_of_room(user_id: int) -> list[Room]:
         """
@@ -156,7 +156,7 @@ class RoomDB:
         """
         rooms = await Room.filter(members__user_id=user_id)
         return rooms
-
+    
     @staticmethod
     async def delete(room_number: int) -> bool:
         """
@@ -168,15 +168,15 @@ class RoomDB:
         room = await Room.filter(number=room_number).first()
         if not room:
             return False
-
+        
         await Wish.filter(room=room).delete()
         await room.delete()
         return True
-
+    
     @staticmethod
     async def is_owner(user_id, room_number: int) -> bool:
         """
-        Checking if user is owner of room
+        Checking if user is owner of specified room
 
         :param user_id: Telegram user ID of user
         :param room_number: Room number for checking on the owner
@@ -186,12 +186,24 @@ class RoomDB:
             number=room_number,
             owner__user_id=user_id
         ).exists()
-
+        
         return result
-
+    
+    @staticmethod
+    async def get_all_rooms():
+        """return list of all rooms"""
+        result = await Room.all().prefetch_related('owner')
+        return result
+    
+    @staticmethod
+    async def count_rooms():
+        """return count of all rooms"""
+        result = await Room.all().count()
+        return result
+    
     @staticmethod
     async def _get_room_unique_number() -> int:
-
+        
         """
         Non-public method for generate of individual room number.
 
@@ -200,9 +212,9 @@ class RoomDB:
         length = load_config().room.room_number_length
         min_number = int("1" + "0" * (length - 1))
         max_number = int("9" + "9" * (length - 1))
-
+        
         rooms: list[Room] = await Room.all()
-
+        
         while True:
             number = random.randint(min_number, max_number)
             if number in [x.number for x in rooms]:
