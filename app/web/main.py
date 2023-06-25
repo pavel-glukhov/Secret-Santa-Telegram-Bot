@@ -1,8 +1,11 @@
+import asyncio
 import os
 
 from fastapi import FastAPI
+from app.store.database import TORTOISE_ORM
 from app.web.routers import auth, users, general, rooms
 from fastapi.staticfiles import StaticFiles
+from tortoise.contrib.fastapi import register_tortoise
 
 from app.web.exceptions.app_exceptions import (
     NotAuthenticatedException,
@@ -29,3 +32,9 @@ app.add_exception_handler(NotAuthenticatedException, not_authenticated)
 app.add_exception_handler(NotAccessException, access_denied)
 app.add_exception_handler(PageNotFoundException, not_found_error)
 app.add_exception_handler(InternalErrorException, internal_error)
+
+# TODO Временный регистратор
+register_tortoise(
+    app,
+    config=TORTOISE_ORM,
+)
