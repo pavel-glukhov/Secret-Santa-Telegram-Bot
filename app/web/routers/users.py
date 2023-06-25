@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import HTMLResponse
 
+from app.store.database.queries.users import UserDB
 from app.web.dependencies import get_current_user
 from app.web.exceptions.app_exceptions import (
     NotAccessException,
@@ -11,17 +12,22 @@ from app.config import templates
 router = APIRouter()
 
 
-@router.get("/profile", name='profile')
-async def profile(request: Request, current_user=Depends(get_current_user)):
+@router.get("/profile/{number}", name='profile')
+async def profile(request: Request, number: int,
+                  current_user=Depends(get_current_user)):
     if not current_user:
         raise NotAccessException(status_code=403)
     
+    user = await UserDB.get_user_or_none(number)
     context = {
         'request': request,
-        'id': current_user,
-        'username': request.cookies.get('username'),
-        'first_name': request.cookies.get('first_name'),
-        'last_name': request.cookies.get('last_name'),
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'telegram_id': user.user_id,
+        'status': user.is_active,
+        'is_superuser': user.is_superuser
+        
     }
     
     return templates.TemplateResponse(
