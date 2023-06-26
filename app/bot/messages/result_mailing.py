@@ -66,20 +66,22 @@ async def send_result_of_game(room_number) -> None:
                 "Вернуться назад ◀️": "root_menu",
             }
         )
-        
+        await RoomDB.update(room_number,
+                            is_closed=True,
+                            closed_at=datetime.datetime.now())
         await send_message(
             user_id=owner.user_id,
             text=(
                 f'Вы получили данное сообщение, т.к. '
-                f'ваша  игра в комнате '
-                f'[<b>{room.name}</b>] [<b>{room.name}</b>] '
+                f'рассылка в вашей комнате '
+                f'[<b>{room.name}</b>] [<b>{room.number}</b>] '
                 f'была указана на данную дату. И сожалению, '
                 f'в вашей комнате недостаточно '
                 'активных игроков для жеребьевки.'
                 'Активных игроков должно быть 3 или более.\n'
                 f'В данный момент у вас {len(verified_users)}.\n'
-                'Вам необходимо задать новую дату после'
-                'набора нужного количества игроков'),
+                '<b>Пригласите больше игроков и задайте '
+                'новую дату жеребьевки</b>'),
             reply_markup=keyboard_inline
         )
         

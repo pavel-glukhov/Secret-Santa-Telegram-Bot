@@ -115,6 +115,11 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                 task_id=room_number,
                 room_number=room_number
             )
+            await RoomDB.update(
+                room_number,
+                started_at=datetime.now(),
+                closed_at=None, is_closed=False
+            )
             await message.answer(
                 'Дата рассылки установлена на'
                 f' {date.strftime("%Y-%b-%d, %H:%M:%S")}',

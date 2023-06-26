@@ -1,5 +1,5 @@
 from app.store.database.models import GameResult, Room, User
-
+from typing import Optional
 
 class GameResultDB:
 
@@ -25,12 +25,14 @@ class GameResultDB:
     async def get_recipient(
             room_id,
             user_id
-    ) -> User:
+    ) -> User | None:
         """Get result for specific user"""
         results = await GameResult.filter(
             room__number=room_id,
             sender__user_id=user_id
         ).first()
+        if not results:
+            return None
         return await results.recipient
 
     @staticmethod

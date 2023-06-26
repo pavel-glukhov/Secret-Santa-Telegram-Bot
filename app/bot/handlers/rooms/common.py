@@ -37,7 +37,7 @@ async def my_room(callback: types.CallbackQuery):
                 start_game_button_name = 'Начать игру 🎲'
             else:
                 start_game_button_name = 'Игра запущена ✅'
-            
+            del keyboard_dict['Выйти из комнаты 🚪']
             keyboard_dict.update(
                 {
                     start_game_button_name: f'room_start-game_{room_number}',
@@ -54,7 +54,8 @@ async def my_room(callback: types.CallbackQuery):
         
         text_control_room = (
             f'<b>Управление комнатой {room.name}'
-            f' ({room.number})</b>'
+            f' ({room.number})</b>\n\n'
+            'Владелец комнаты ещё не назначил время жеребьевки.'
         )
         
         if scheduler_task:
@@ -76,23 +77,46 @@ async def my_room(callback: types.CallbackQuery):
 
 async def room_is_closed(callback: types.CallbackQuery,
                          room_number: int, user_id: int) -> None:
-    keyboard_dict = {
-        'Связаться с Сантой': f'room_closed-con-san_{room_number}',
-        'Отправить сообщение получателю': f'room_closed-con-rec_{room_number}',
-        'Вернуться в меню': 'root_menu'
-    }
     recipient = await GameResultDB.get_recipient(room_id=room_number,
                                                  user_id=user_id)
-    keyboard_inline = generate_inline_keyboard(keyboard_dict)
-    user_information = profile_information_formatter(recipient)
     
-    message_text = (
-        '<b>Игра завершена!</b>\n\n'
-        'Вы стали Тайным Сантой для:\n'
-        f'{user_information}\n'
-        'Ты можешь написать сообщение своему Тайному Санте,'
-        'или отправить сообщение своему получателю.\n'
-    )
+    if recipient:
+        keyboard_dict = {
+            'Связаться с Сантой': f'room_closed-con-san_{room_number}',
+            'Отправить сообщение получателю': f'room_closed-con-rec_{room_number}',
+            'Вернуться в меню': 'root_menu'
+        }
+        user_information = profile_information_formatter(recipient)
+        message_text = (
+            '<b>Игра в вашей комнате завершена!</b>\n\n'
+            'Вы стали Тайным Сантой для:\n'
+            f'{user_information}\n'
+            'Ты можешь написать сообщение своему Тайному Санте,'
+            'или отправить сообщение своему получателю.\n'
+        )
+    else:
+        room_owner = await RoomDB.is_owner(user_id=user_id,
+                                           room_number=room_number)
+
+        keyboard_dict = {
+            'Активировать комнату': f'room_activate_{room_number}',# TODO реализовать активацию комнаты
+            'Настройки ⚒': f'room_config_{room_number}',
+            'Вернуться в меню': 'root_menu',
+        }
+        
+        if not room_owner:
+            del keyboard_dict['Настройки ⚒']
+        
+        message_text = (
+            f'<b>Игра в комнате {room_number} завершена!</b>\n\n'
+            'К сожалению, количество игроков оказалось недостаточным '
+            'для полноценной жеребьевки.\n'
+            'Для активации комнаты повторно, нажмите на '
+            '<b>Активировать комнату</b>, пригласите больше людей '
+            'и назначьте новое время жеребьевки.'
+        )
+    
+    keyboard_inline = generate_inline_keyboard(keyboard_dict)
     
     await callback.message.edit_text(
         text=message_text,

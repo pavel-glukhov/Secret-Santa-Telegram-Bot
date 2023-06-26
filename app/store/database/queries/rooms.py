@@ -154,7 +154,7 @@ class RoomDB:
         :param user_id: The telegram user_id of a user
         :return: List of Room instances
         """
-        rooms = await Room.filter(members__user_id=user_id)
+        rooms = await Room.filter(members__user_id=user_id).prefetch_related('owner')
         return rooms
     
     @staticmethod

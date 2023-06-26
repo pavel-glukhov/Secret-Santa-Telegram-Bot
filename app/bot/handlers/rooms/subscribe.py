@@ -58,12 +58,12 @@ async def process_room_number(message: types.Message):
             reply_markup=keyboard_inline,
         )
 
-    is_room_exist = await RoomDB.is_exists(room_number=room_number)
+    room = await RoomDB.get(room_number=room_number)
 
-    if not is_room_exist:
+    if not room or room.is_closed is True:
         message_text = (
-            'Введенной комнаты не существует, '
-            'введите корректный номер.'
+            'Введенной комнаты не существует, или она завершена.\n'
+            'Введите корректный номер.'
         )
         await message.answer(
             text=message_text,
