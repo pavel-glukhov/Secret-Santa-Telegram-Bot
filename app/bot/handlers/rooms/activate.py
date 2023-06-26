@@ -4,12 +4,9 @@ from aiogram import types
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
-from app.store.scheduler.operations import get_task
 
 logger = logging.getLogger(__name__)
 
