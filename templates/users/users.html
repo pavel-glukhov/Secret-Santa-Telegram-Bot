@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h4>Список пользователей:</h4>
+    {% include 'users/users_list.html' %}
+    </div>
+{% endblock %}

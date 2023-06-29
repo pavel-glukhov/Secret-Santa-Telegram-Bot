@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-   <title>Not Found</title>
-   <body>
-      <h1>Not Found</h1>
-      <p>The requested resource was not found on this server.</p>
-   </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Error 404{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h3>Ошибка 404</h3>
+            <p>Запрашиваемая страница не найдена.</p>
+        </div>
+    </div>
+{% endblock %}
+

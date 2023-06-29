@@ -5,10 +5,8 @@
 {% block content %}
     <div class="container">
         <div id="content">
-            <h2>Статистика</h2>
-            <p>Всего комнат: {{ count_rooms }}.</p>
-            <p>Всего пользователей: {{ count_users }}.</p>
-            <p>Всего активных игр: {}.</p>
+            <h4>Ваши комнаты</h4>
+            {% include 'rooms/users_rooms_list.html' %}
         </div>
     </div>
 {% endblock %}

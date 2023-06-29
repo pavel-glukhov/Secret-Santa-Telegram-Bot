@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-   <title>Access denied</title>
-   <body>
-      <h1>Access denied</h1>
-      <p>You do not have access to the url.</p>
-   </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Error 403{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h3>Ошибка 403</h3>
+            <p>Недостаточно прав для получения информации.</p>
+        </div>
+    </div>
+{% endblock %}
+

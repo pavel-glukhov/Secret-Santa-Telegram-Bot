@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Игровые комнаты{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h4>Список всех игровых комнат</h4>
+            {% include 'rooms/all_rooms_list.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+

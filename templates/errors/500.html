@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html>
-   <title>Internal Server Error</title>
-   <body>
-      <h1>Internal Server Error</h1>
-      <p>The server encountered an internal error or
-         misconfiguration and was unable to complete your request.
-      </p>
-   </body>
-</html>
+{% block title %}Error 500{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div id="content">
+            <h1>Упс, что-то сломалось, мы уже работаем над этим.</h1>
+        </div>
+    </div>
+{% endblock %}
+

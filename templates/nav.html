@@ -1,8 +1,22 @@
-<div id="mainmenu">
-    <ul>
-        <li><a href="{{ url_for('index') }}">Главная</a></li>
-        <li><a href="{{ url_for('rooms') }}">Игровые комнаты</a></li>
-        <li><a href="{{ url_for('users') }}">Пользователи</a></li>
-        <li><a href="{{ url_for('active_games') }}">Активные игры</a></li>
-    </ul>
+<div class="container col-9">
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link" id="nav-home-tab" data-toggle="tab" href="{{ url_for('index') }}" role="tab" aria-controls="nav-home" aria-selected="true">Главная</a>
+      {% if current_user.is_superuser %}
+    <a class="nav-item nav-link" id="nav-rooms-tab" data-toggle="tab" href="{{ url_for('rooms') }}" role="tab" aria-controls="nav-rooms" aria-selected="false">Комнаты</a>
+    <a class="nav-item nav-link" id="nav-users-tab" data-toggle="tab" href="{{ url_for('users') }}" role="tab" aria-controls="nav-users" aria-selected="false">Пользователи</a>
+      <a class="nav-item nav-link" id="nav-active_games-tab" data-toggle="tab" href="{{ url_for('active_games') }}" role="tab" aria-controls="nav-active_games" aria-selected="false">Активные игры</a>
+        {% endif %}
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab"></div>
+          {% if current_user.is_superuser %}
+  <div class="tab-pane fade" id="nav-rooms" role="tabpanel" aria-labelledby="nav-rooms-tab"></div>
+  <div class="tab-pane fade" id="nav-users" role="tabpanel" aria-labelledby="nav-users-tab"></div>
+    <div class="tab-pane fade" id="nav-active_games" role="tabpanel" aria-labelledby="nav-active_games-tab"></div>
+            {% endif %}
 </div>
+
+</div>
+
