@@ -47,6 +47,13 @@ def get_task(task_id: int) -> Job:
     task = scheduler.get_job(task_id)
     return task
 
+def get_all_task() -> list[Job]:
+    """
+    Get all task from job store.
+    :return: list of jobs
+    """
+    tasks = scheduler.get_jobs()
+    return tasks
 
 def remove_task(task_id: int) -> bool:
     """
