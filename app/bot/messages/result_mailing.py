@@ -5,7 +5,7 @@ import random
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.forrmatter import message_formatter
-from app.bot.messages.send_messages import send_message, broadcaster
+from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
 from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
