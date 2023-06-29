@@ -1,14 +1,13 @@
 import logging
 
 from fastapi import Depends
-from starlette.exceptions import HTTPException
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from starlette.exceptions import HTTPException
 
 from app.store.database.models import User
-from app.web.schemes import AuthJWTSettings
 from app.store.database.queries.users import UserDB
-from app.store.database.queries.rooms import RoomDB
+from app.web.schemes import AuthJWTSettings
 
 
 @AuthJWT.load_config

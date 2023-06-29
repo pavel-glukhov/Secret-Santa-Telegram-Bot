@@ -1,6 +1,5 @@
-from fastapi import Request, APIRouter, Depends
-from starlette.responses import RedirectResponse
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi import Depends, Request
+
 from app.config import templates
 from app.store.database.models import User
 from app.web.dependencies import get_current_user

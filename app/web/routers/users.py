@@ -1,15 +1,15 @@
 import logging
+from urllib.parse import quote, unquote
 
-from fastapi import APIRouter, Depends, Request, Form
-from starlette.responses import RedirectResponse
+from fastapi import APIRouter, Depends, Form, Request
 from starlette.exceptions import HTTPException
-from urllib.parse import unquote, quote
+from starlette.responses import RedirectResponse
 
+from app.config import templates
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB
 from app.web.dependencies import get_current_user
-from app.config import templates
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 @router.get("/profile/{user_id}", name='profile')
 async def profile(request: Request, user_id: int,
                   current_user: User = Depends(get_current_user)):
+    
+    # TODO add permissions [superuser | owner_profile]
+    
     user = await UserDB.get_user_or_none(user_id)
     
     if not user:
@@ -28,11 +31,7 @@ async def profile(request: Request, user_id: int,
     context = {
         'request': request,
         'current_user': current_user,
-        'username': user.username,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'telegram_id': user.user_id,
-        'status': user.is_active,
+        'user': user,
         'rooms': rooms,
     }
     
@@ -44,7 +43,7 @@ async def profile(request: Request, user_id: int,
 @router.get("/users", name='users')
 async def users(request: Request,
                 current_user: User = Depends(get_current_user)):
-    # TODO add permissions
+    # TODO add permissions [superuser]
     users = await UserDB.get_list_all_users()
     context = {
         'request': request,
@@ -59,7 +58,7 @@ async def users(request: Request,
 @router.post("/user/activate/{user_id}", name='activate_user')
 async def activate(request: Request, user_id: int,
                    current_user: User = Depends(get_current_user)):
-    # TODO add permissions
+    # TODO add permissions [superuser]
     
     user = await UserDB.get_user_or_none(user=user_id)
     if not user:
@@ -77,7 +76,7 @@ async def activate(request: Request, user_id: int,
 @router.get("/user/{user_id}/delete_confirmation/", name='usr_del_confirmation')
 async def index(request: Request, user_id: int,
                 current_user: User = Depends(get_current_user)):
-    # TODO add permissions
+    # TODO add permissions [superuser]
     user = await UserDB.get_user_or_none(user_id)
     context = {
         'request': request,
@@ -94,7 +93,7 @@ async def index(request: Request, user_id: int,
 async def delete(request: Request, user_id: int = Form(...),
                  referer: str = Form(...), confirm: bool = Form(...),
                  current_user: User = Depends(get_current_user)):
-    # TODO add permissions
+    # TODO add permissions [superuser]
     if confirm:
         await UserDB.delete_user(user_id)
     

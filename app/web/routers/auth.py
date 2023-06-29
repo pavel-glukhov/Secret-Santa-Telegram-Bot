@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi_jwt_auth import AuthJWT
-from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.exceptions import HTTPException
+from starlette.responses import HTMLResponse, RedirectResponse
+
+from app.config import load_config, templates
 from app.store.database.queries.users import UserDB
 from app.web.dependencies import get_current_user
 from app.web.exceptions.telegram_exceptions import (TelegramDataError,
-                                                TelegramDataIsOutdated)
-from app.web.schemes import TelegramAuth, AuthJWTSettings
-from app.config import load_config
-from app.config import templates
+                                                    TelegramDataIsOutdated)
+from app.web.schemes import AuthJWTSettings, TelegramAuth
 from app.web.validators import verify_telegram_authentication
 
 router = APIRouter()

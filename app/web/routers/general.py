@@ -1,11 +1,10 @@
 import logging
 
-from fastapi import Depends, Request, APIRouter
-from app.store.database.models import User
-from app.store.database.queries.users import UserDB
-from app.web.dependencies import get_current_user
+from fastapi import APIRouter, Depends, Request
+
 from app.config import templates
-from app.store.database.queries.rooms import RoomDB
+from app.store.database.models import User
+from app.web.dependencies import get_current_user
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 @router.get("/", name='index')
 async def index(request: Request,
                 current_user: User = Depends(get_current_user)):
-    
+    # TODO add permissions [is_authorized]
     rooms = await current_user.members
     contex = {
         'request': request,

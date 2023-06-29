@@ -3,7 +3,7 @@ import hmac
 import time
 
 from app.web.exceptions.telegram_exceptions import (TelegramDataError,
-                                                TelegramDataIsOutdated)
+                                                    TelegramDataIsOutdated)
 
 
 def verify_telegram_authentication(telegram_bot_token, request_data):

@@ -1,12 +1,11 @@
 import logging
+
 from fastapi import APIRouter, Depends, Request
 
-from app.store.scheduler import operations as scheduler_operations
-from app.store.database.models import User
-from app.store.database.queries.rooms import RoomDB
-from app.web.dependencies import get_current_user
-
 from app.config import templates
+from app.store.database.models import User
+from app.store.scheduler import operations as scheduler_operations
+from app.web.dependencies import get_current_user
 
 router = APIRouter()
 logger = logging.getLogger(__name__)

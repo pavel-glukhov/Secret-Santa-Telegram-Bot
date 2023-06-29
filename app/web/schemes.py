@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel
+
 from app.config import load_config
 
 

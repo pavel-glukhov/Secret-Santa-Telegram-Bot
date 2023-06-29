@@ -1,16 +1,17 @@
 import asyncio
-import os
-import yaml
 import logging.config
+import os
 
+import yaml
 from fastapi import FastAPI
-from app.store.database import TORTOISE_ORM
-from app.web.routers import auth, users, general, rooms
 from fastapi.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 
+from app.config import load_config, root_path
+from app.store.database import TORTOISE_ORM
+from app.store.scheduler import scheduler
 from app.web.exceptions import app_exceptions
-from app.config import root_path, load_config
+from app.web.routers import active_games, auth, general, rooms, users
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ app.include_router(general.router)
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(rooms.router)
+app.include_router(active_games.router)
 
 # TODO Временный логгер
 def setup_logging() -> None:
@@ -44,7 +46,7 @@ def setup_logging() -> None:
     )
     logging.config.dictConfig(logging_cfg)
 
-
+scheduler.start()
 setup_logging()
 # TODO Временный регистратор
 register_tortoise(
