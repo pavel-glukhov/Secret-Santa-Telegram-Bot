@@ -39,23 +39,26 @@
                 <td>
                 {% if current_user.is_superuser %}
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                        <script>
-                          function redirectToLeaveConfirmation(user_id) {
-                            var url = "{{ request.url_for('user_leave_confirm', room_number=room.number) }}" + "?user_id=" + encodeURIComponent(user_id);
-                            window.location.href = url;
-                          }
-                        </script>
-                        <div class="me-1">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ user.user_id }}, )">Выгнать</button>
-                        </div>
-
+                        {#-----------Leave from room button---------------#}
+                        {% if room_owner != user %}
+                            <script>
+                              function redirectToLeaveConfirmation(user_id) {
+                                var url = "{{ request.url_for('user_leave_confirm', room_number=room.number) }}" + "?user_id=" + encodeURIComponent(user_id);
+                                window.location.href = url;
+                              }
+                            </script>
+                            <div class="me-1">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ user.user_id }}, )">Выгнать</button>
+                            </div>
+                        {% endif %}
+                        {#----------Leave from room button-----------------#}
+                    {#----------Activate button-----------------#}
                     <div class="me-1">
                         {% if user.is_active %}
                         <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
                               method="post">
                             <button class="btn btn-outline-secondary btn-sm"
                                     title="Деактивировать пользователя">Деактивировать
-
                             </button>
                         </form>
                         {% else %}
@@ -68,7 +71,8 @@
                             </form>
                         {% endif %}
                     </div>
-
+                    {#----------Activate button-----------------#}
+                    {#----------Delete button-----------------#}
                     <div class="me-2">
                         <form action="{{ url_for('usr_del_confirmation', user_id=user.user_id) }}"
                         method="get">
@@ -78,6 +82,8 @@
                         </button>
                         </form>
                     </div>
+                    {#----------Delete button-----------------#}
+
 {#                    <img src="{{ url_for('static', path='icons//no.png') }}"#}
 {#                                     alt="buttonpng"/>#}
 
