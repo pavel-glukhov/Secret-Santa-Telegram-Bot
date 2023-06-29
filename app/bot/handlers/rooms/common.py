@@ -99,7 +99,7 @@ async def room_is_closed(callback: types.CallbackQuery,
                                            room_number=room_number)
 
         keyboard_dict = {
-            'Активировать комнату': f'room_activate_{room_number}',# TODO реализовать активацию комнаты
+            'Активировать комнату': f'room_activate_{room_number}',
             'Настройки ⚒': f'room_config_{room_number}',
             'Вернуться в меню': 'root_menu',
         }

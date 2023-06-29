@@ -1,7 +1,6 @@
 from typing import Tuple, Union
 
-from app.store.database.models import User
-
+from app.store.database.models import User, Room
 
 class UserDB:
     @staticmethod
@@ -41,6 +40,23 @@ class UserDB:
         Update any field of user instance
         """
         await User.filter(user_id=user_id).update(**kwargs)
+
+    @staticmethod
+    async def list_rooms_where_owner(user: User) -> list[Room]:
+        """
+        Get list of rooms where user is owner
+        """
+        user_rooms = await user.room_owner
+        return user_rooms
+
+    @staticmethod
+    async def is_room_owner(user: User, room_number) -> bool:
+        """
+        Check if user is owner or room
+        """
+        user_rooms = await UserDB.list_rooms_where_owner(user)
+        room = await Room.filter(number=room_number).first()
+        return room in user_rooms
     
     @staticmethod
     async def disable_user(user_id: int) -> None:
@@ -57,11 +73,19 @@ class UserDB:
         await User.filter(user_id=user_id).update(is_active=True)
     
     @staticmethod
+    async def delete_user(user_id: int) -> None:
+        """
+        delete user
+        """
+        user = await User.filter(user_id=user_id).first()
+        await user.delete()
+    
+    @staticmethod
     async def get_list_all_users():
         """get list all users"""
-        result = await User.all()
+        result = await User.all().order_by('user_id')
         return result
-
+    
     @staticmethod
     async def count_users():
         """get count all users"""

@@ -80,7 +80,7 @@ class RoomDB:
         :return: Room instance
         """
         room = await Room.filter(number=room_number).first()
-        return await room.members
+        return await room.members.order_by('user_id')
     
     @staticmethod
     async def remove_member(user_id: int,
@@ -154,7 +154,8 @@ class RoomDB:
         :param user_id: The telegram user_id of a user
         :return: List of Room instances
         """
-        rooms = await Room.filter(members__user_id=user_id).prefetch_related('owner')
+        rooms = await Room.filter(
+            members__user_id=user_id).prefetch_related('owner')
         return rooms
     
     @staticmethod

@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi_jwt_auth import AuthJWT
 from starlette.responses import HTMLResponse, RedirectResponse
-
+from starlette.exceptions import HTTPException
 from app.web.dependencies import get_current_user
-from app.web.exceptions.app_exceptions import (NotAccessException,
-                                           InternalErrorException,
-                                           NotAuthenticatedException)
 from app.web.exceptions.telegram_exceptions import (TelegramDataError,
                                                 TelegramDataIsOutdated)
 from app.web.schemes import TelegramAuth, AuthJWTSettings
@@ -63,12 +60,12 @@ async def login(request: Request,
             # TODO Проверка на существование пользователя в БД
             return redirect_response
         
-        raise NotAccessException(status_code=403)
+        raise HTTPException(status_code=403)
     
     except TelegramDataIsOutdated:
-        raise InternalErrorException(status_code=500)
+        raise HTTPException(status_code=500)
     except TelegramDataError:
-        raise InternalErrorException(status_code=500)
+        raise HTTPException(status_code=500)
 
 
 def get_jwt_token(params, response, Authorize):
@@ -94,4 +91,4 @@ def logout(request: Request, Authorize: AuthJWT = Depends()):
     Authorize.unset_jwt_cookies()
     Authorize.unset_access_cookies()
     Authorize.unset_refresh_cookies()
-    raise NotAuthenticatedException(status_code=401)
+    raise HTTPException(status_code=401)

@@ -20,3 +20,6 @@ class AuthJWTSettings(BaseModel):
     authjwt_cookie_secure: bool = False
     authjwt_cookie_csrf_protect: bool = True
     authjwt_cookie_samesite: str = 'none'
+
+class RemoveMemberConfirmation(BaseModel):
+    user_id: int
