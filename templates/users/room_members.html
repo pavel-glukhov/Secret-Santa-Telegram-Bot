@@ -50,44 +50,46 @@
                             <div class="me-1">
                                 <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ user.user_id }}, )">Выгнать</button>
                             </div>
-                        {% endif %}
-                        {#----------Leave from room button-----------------#}
-                    {#----------Activate button-----------------#}
-                    <div class="me-1">
-                        {% if user.is_active %}
-                        <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
-                              method="post">
-                            <button class="btn btn-outline-secondary btn-sm"
-                                    title="Деактивировать пользователя">Деактивировать
-                            </button>
-                        </form>
-                        {% else %}
-                            <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
-                                  method="post">
+
+                            {#----------Leave from room button-----------------#}
+                            {#----------Activate button-----------------#}
+                            <div class="me-1">
+                                {% if user.is_active %}
+                                <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
+                                      method="post">
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                            title="Деактивировать пользователя">Деактивировать
+                                    </button>
+                                </form>
+                                {% else %}
+                                    <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
+                                          method="post">
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                                title="Активировать пользователя">Активировать
+
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                            </div>
+                            {#----------Activate button-----------------#}
+                            {#----------Delete button-----------------#}
+                            <div class="me-2">
+                                <form action="{{ url_for('usr_del_confirmation', user_id=user.user_id) }}"
+                                method="get">
                                 <button class="btn btn-outline-secondary btn-sm"
-                                        title="Активировать пользователя">Активировать
+                                    title="удалить пользователя">Удалить
 
                                 </button>
-                            </form>
+                                </form>
+                            </div>
+                            {#----------Delete button-----------------#}
+
+        {#                    <img src="{{ url_for('static', path='icons//no.png') }}"#}
+        {#                                     alt="buttonpng"/>#}
+
+                            </div>
                         {% endif %}
-                    </div>
-                    {#----------Activate button-----------------#}
-                    {#----------Delete button-----------------#}
-                    <div class="me-2">
-                        <form action="{{ url_for('usr_del_confirmation', user_id=user.user_id) }}"
-                        method="get">
-                        <button class="btn btn-outline-secondary btn-sm"
-                            title="удалить пользователя">Удалить
-
-                        </button>
-                        </form>
-                    </div>
-                    {#----------Delete button-----------------#}
-
-{#                    <img src="{{ url_for('static', path='icons//no.png') }}"#}
-{#                                     alt="buttonpng"/>#}
-
-                    </div>
                 {% endif %}
             </td>
             </tr>

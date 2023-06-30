@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Авторизация</title>
-    <meta charset="UTF-8">
-<link href="{{ url_for('static', path='/css/styles.css') }}" rel="stylesheet">
-  </head>
-  <body>
+{% extends 'base.html' %}
+
+{% block title %}Error 404{% endblock %}
+
+{% block content %}
     <div class="form-container">
       <form>
 
@@ -18,5 +15,4 @@
         </div>
       </form>
     </div>
-  </body>
-</html>
+{% endblock %}
