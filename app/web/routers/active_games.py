@@ -24,4 +24,4 @@ async def active_games(request: Request,
     }
     
     return templates.TemplateResponse(
-        'active_games.html', context=context, status_code=200)
+        'games/active_games.html', context=context, status_code=200)
