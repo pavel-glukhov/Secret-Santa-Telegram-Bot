@@ -18,18 +18,14 @@ def get_config():
 logger = logging.getLogger(__name__)
 
 
-async def get_current_user(Authorize: AuthJWT = Depends()):
-    # TODO убрать заглушку при переводе на вебхуки
-    # "---------------------------------------------------------------"
+async def get_current_user(Authorize: AuthJWT = Depends()) -> User | None:
     try:
-        # Заглушка#
-        user_id = 245942576
-        # current_user = Authorize.get_jwt_subject()
-        # Authorize.jwt_required()
-        user = await UserDB.get_user_or_none(user_id)
-        if not user:
-            raise HTTPException(status_code=401)
-        return user
+        Authorize.jwt_required()
+        current_user = Authorize.get_jwt_subject()
+        user = await UserDB.get_user_or_none(current_user)
+        if user:
+            return user
+        return None
     except AuthJWTException:
         raise HTTPException(status_code=401)
 
@@ -47,6 +43,7 @@ async def is_admin_or_owner(user_id: int,
     if user.is_superuser or user.user_id == user_id:
         return True
     raise HTTPException(status_code=403)
+
 
 async def is_admin(user: User = Depends(get_current_user)):
     if user.is_superuser:

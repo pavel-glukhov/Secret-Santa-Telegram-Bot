@@ -45,7 +45,9 @@ async def index(request: Request, room_number: int,
     if not room:
         raise HTTPException(status_code=404)
     members = await RoomDB.get_list_members(room_number=room_number)
-    room_toss_time = scheduler_operations.get_task(room.number).next_run_time
+    room_toss_time = scheduler_operations.get_task(room.number)
+    if room_toss_time:
+        room_toss_time = room_toss_time.next_run_time
     context = {
         'request': request,
         'current_user': current_user,

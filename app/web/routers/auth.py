@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, Request
 from fastapi_jwt_auth import AuthJWT
 from starlette.exceptions import HTTPException
@@ -5,13 +7,14 @@ from starlette.responses import HTMLResponse, RedirectResponse
 
 from app.config import load_config, templates
 from app.store.database.queries.users import UserDB
-from app.web.dependencies import get_current_user
 from app.web.exceptions.telegram_exceptions import (TelegramDataError,
                                                     TelegramDataIsOutdated)
 from app.web.schemes import AuthJWTSettings, TelegramAuth
 from app.web.validators import verify_telegram_authentication
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 
 @AuthJWT.load_config
@@ -21,9 +24,8 @@ def get_config():
 
 @router.get("/login", name='login')
 async def login(request: Request,
-          params: TelegramAuth = Depends(TelegramAuth),
-          current_user=Depends(get_current_user),
-          Authorize: AuthJWT = Depends()):
+                params: TelegramAuth = Depends(TelegramAuth),
+                Authorize: AuthJWT = Depends()):
     """
     Endpoint for authorization via Telegram.
     If the user is already logged in, returns it to the main page.
@@ -32,11 +34,12 @@ async def login(request: Request,
     When receiving the 'hash', redirects to an attempt to validate
     the received data. In case of success a token is issued.
     """
-    app_config = load_config()
+    
     redirect_response = RedirectResponse(url='/',
                                          status_code=307)
+    Authorize.jwt_optional()
+    current_user = Authorize.get_jwt_subject()
     
-
     if current_user:
         get_jwt_token({'id': current_user}, redirect_response, Authorize)
         return redirect_response
@@ -46,17 +49,17 @@ async def login(request: Request,
             'login.html',
             {
                 'request': request,
-                'telegram_login': app_config.bot.telegram_login,
-                'auth_url': app_config.bot.auth_url
-            }
+                'telegram_login': load_config().bot.telegram_login,
+                'current_user':current_user,
+                'auth_url': request.url_for('login')}
         )
     
     try:
         result = verify_telegram_authentication(
-            app_config.bot.token, params.dict()
+            load_config().bot.token, params.dict()
         )
         if result:
-            await UserDB.get_or_create(user_id=id,
+            await UserDB.get_or_create(user_id=params.id,
                                        first_name=params.first_name,
                                        last_name=params.last_name,
                                        username=params.username,
@@ -72,13 +75,10 @@ async def login(request: Request,
         raise HTTPException(status_code=500)
 
 
-def get_jwt_token(params, response, Authorize):
-    access_token = Authorize.create_access_token(
-        subject=params['id'])
-    
-    refresh_token = Authorize.create_refresh_token(
-        subject=params['id'])
-    
+def get_jwt_token(params: dict, response: RedirectResponse,
+                  Authorize: AuthJWT) -> None:
+    access_token = Authorize.create_access_token(params['id'])
+    refresh_token = Authorize.create_refresh_token(params['id'])
     Authorize.set_access_cookies(access_token, response=response)
     Authorize.set_refresh_cookies(refresh_token, response=response)
 
@@ -91,7 +91,6 @@ def logout(request: Request, Authorize: AuthJWT = Depends()):
     We need the backend to send us a response to delete the cookies.
     """
     Authorize.jwt_required()
-    
     Authorize.unset_jwt_cookies()
     Authorize.unset_access_cookies()
     Authorize.unset_refresh_cookies()
