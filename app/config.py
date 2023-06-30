@@ -9,6 +9,7 @@ dotenv_path = os.path.join(root_path, '.env')
 templates = Jinja2Templates(directory=os.path.join(root_path, "templates"))
 load_dotenv(dotenv_path)
 
+
 @dataclass()
 class JWTSettings:
     authjwt_secret_key: str
@@ -17,7 +18,9 @@ class JWTSettings:
 @dataclass()
 class WebSettings:
     jwt_settings: JWTSettings
-    
+    site_url: str
+
+
 @dataclass
 class LoggingConfig:
     log_path: str
@@ -34,7 +37,8 @@ class RoomConfig:
 class BotConfig:
     token: str
     telegram_login: str
-    auth_url: str
+    auth_path: str
+
 
 @dataclass
 class DataBaseConfig:
@@ -69,26 +73,27 @@ def load_config():
     """
     return AppConfig(
         bot=BotConfig(
-            token=os.getenv("TELEGRAM_TOKEN"),
+            token=os.getenv('TELEGRAM_TOKEN'),
             telegram_login=os.getenv('TELEGRAM_LOGIN'),
-            auth_url=os.getenv('AUTH_URL'),
+            auth_path=os.getenv('AUTH_PATH'),
         ),
-    web=WebSettings(
-        jwt_settings=JWTSettings(
-            authjwt_secret_key=os.getenv('AUTH_JWT_SECRET_KEY')
-        )
-    ),
+        web=WebSettings(
+            jwt_settings=JWTSettings(
+                authjwt_secret_key=os.getenv('AUTH_JWT_SECRET_KEY')
+            ),
+            site_url=os.getenv('SITE_URL'),
+        ),
         db=DataBaseConfig(
-            name=os.getenv("DATABASE_NAME"),
-            user=os.getenv("DATABASE_USER"),
-            password=os.getenv("DATABASE_PASSWORD"),
-            port=os.getenv("DATABASE_PORT"),
-            host=os.getenv("DATABASE_HOST"),
+            name=os.getenv('DATABASE_NAME'),
+            user=os.getenv('DATABASE_USER'),
+            password=os.getenv('DATABASE_PASSWORD'),
+            port=os.getenv('DATABASE_PORT'),
+            host=os.getenv('DATABASE_HOST'),
         ),
         redis=RedisConfig(
-            db=os.getenv("REDIS_DB"),
-            host=os.getenv("REDIS_HOST"),
-            port=os.getenv("REDIS_PORT"),
+            db=os.getenv('REDIS_DB'),
+            host=os.getenv('REDIS_HOST'),
+            port=os.getenv('REDIS_PORT'),
             password=os.getenv("REDIS_PASSWORD"),
         ),
         room=RoomConfig(
@@ -99,5 +104,14 @@ def load_config():
             log_file='logs.log',
             config_file='logging.yaml'
         ),
+    
     )
 
+
+def webhook_settings(config) -> dict:
+    webhook_path = f"/bot/{config().bot.token}"
+    webhook_url = config().web.site_url + webhook_path
+    return {
+        'webhook_path': webhook_path,
+        'webhook_url': webhook_url
+    }
