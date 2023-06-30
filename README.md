@@ -45,9 +45,7 @@
 7. ### Не реализовано
    1. Требуется ревью информационных сообщений бота.
    2. Перенос всех ответов бота в БД.
-   3. Покрытие тестами
-   4. перевести на вебхуки бота для нормальной интеграции проекта. Сейчас бот и веб админка, это 2 разных приложения, требующие значительных правок.
-      
+   3. Покрытие тестами     
 
 8. ### В планах
    3. Расширить функционал веб панели. 
@@ -73,7 +71,15 @@
  - pip install -r requirements
  - aerich migrate
  - aerich upgrade
- - run main.py
+ - python app.py
 
-### Запуск веб панели
-  - uvicorn app\web\main.py:app --reload
+
+- ### Регистрация вебхука
+    Используем линк в браузере
+    https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
+
+    Пример:
+    https://api.telegram.org/bot5473814321:AAEFDZ1A5SoRsd6RFDONysEbYkl3D_VAfss/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/
+
+
+- Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя команду **/setdomain**
