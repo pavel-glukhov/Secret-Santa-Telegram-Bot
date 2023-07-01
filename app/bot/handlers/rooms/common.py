@@ -80,7 +80,34 @@ async def room_is_closed(callback: types.CallbackQuery,
     recipient = await GameResultDB.get_recipient(room_id=room_number,
                                                  user_id=user_id)
     
-    if recipient:
+    if not recipient:
+        room_owner = await RoomDB.is_owner(user_id=user_id,
+                                           room_number=room_number)
+        
+        keyboard_dict = {
+            'Активировать комнату ✅': f'room_activate_{room_number}',
+            'Настройки ⚒': f'room_config_{room_number}',
+            'Вернуться в меню ◀️': 'root_menu',
+        }
+        
+        if not room_owner:
+            del keyboard_dict['Настройки ⚒']
+            del keyboard_dict['Активировать комнату ✅']
+        
+        message_text = (
+            f'<b>Игра в комнате {room_number} завершена!</b>\n\n'
+            'К сожалению, количество игроков оказалось недостаточным '
+            'для полноценной жеребьевки.\n'
+        
+        )
+        if room_owner:
+            additional_text = (
+                '\nДля активации комнаты повторно, нажмите на '
+                '<b>Активировать комнату</b>, пригласите больше людей '
+                'и назначьте новое время жеребьевки.'
+            )
+            message_text = message_text + additional_text
+    else:
         keyboard_dict = {
             'Связаться с Сантой': f'room_closed-con-san_{room_number}',
             'Отправить сообщение получателю': f'room_closed-con-rec_{room_number}',
@@ -93,27 +120,6 @@ async def room_is_closed(callback: types.CallbackQuery,
             f'{user_information}\n'
             'Ты можешь написать сообщение своему Тайному Санте,'
             'или отправить сообщение своему получателю.\n'
-        )
-    else:
-        room_owner = await RoomDB.is_owner(user_id=user_id,
-                                           room_number=room_number)
-
-        keyboard_dict = {
-            'Активировать комнату': f'room_activate_{room_number}',
-            'Настройки ⚒': f'room_config_{room_number}',
-            'Вернуться в меню': 'root_menu',
-        }
-        
-        if not room_owner:
-            del keyboard_dict['Настройки ⚒']
-        
-        message_text = (
-            f'<b>Игра в комнате {room_number} завершена!</b>\n\n'
-            'К сожалению, количество игроков оказалось недостаточным '
-            'для полноценной жеребьевки.\n'
-            'Для активации комнаты повторно, нажмите на '
-            '<b>Активировать комнату</b>, пригласите больше людей '
-            'и назначьте новое время жеребьевки.'
         )
     
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
