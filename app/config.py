@@ -37,7 +37,6 @@ class RoomConfig:
 class BotConfig:
     token: str
     telegram_login: str
-    auth_path: str
 
 
 @dataclass
@@ -75,7 +74,6 @@ def load_config():
         bot=BotConfig(
             token=os.getenv('TELEGRAM_TOKEN'),
             telegram_login=os.getenv('TELEGRAM_LOGIN'),
-            auth_path=os.getenv('AUTH_PATH'),
         ),
         web=WebSettings(
             jwt_settings=JWTSettings(
