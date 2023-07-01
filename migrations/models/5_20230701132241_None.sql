@@ -17,14 +17,14 @@ CREATE TABLE IF NOT EXISTS "rooms" (
     "number" INT NOT NULL UNIQUE,
     "budget" VARCHAR(12) NOT NULL,
     "created_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
-    "is_started" BOOL NOT NULL  DEFAULT False,
+    "is_closed" BOOL NOT NULL  DEFAULT False,
     "started_at" TIMESTAMPTZ,
-    "finished_at" TIMESTAMPTZ,
+    "closed_at" TIMESTAMPTZ,
     "owner_id" INT NOT NULL REFERENCES "users" ("user_id") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "game_results" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "assigned_at" TIMESTAMPTZ,
+    "assigned_at" TIMESTAMPTZ NOT NULL  DEFAULT CURRENT_TIMESTAMP,
     "recipient_id" INT NOT NULL REFERENCES "users" ("user_id") ON DELETE CASCADE,
     "room_id" INT NOT NULL REFERENCES "rooms" ("id") ON DELETE CASCADE,
     "sender_id" INT NOT NULL REFERENCES "users" ("user_id") ON DELETE CASCADE
