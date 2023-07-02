@@ -1,11 +1,10 @@
 aiogram==2.21
 python-dotenv==0.20.0
 asyncpg==0.26.0
-tortoise_orm==0.19.2
+tortoise_orm
 aerich==0.6.3
 APScheduler==3.9.1
-redis==4.3.4
-PyYAML==6.0
+PyYAML
 fastapi
 uvicorn
 Jinja2

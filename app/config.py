@@ -1,6 +1,8 @@
+import logging.config
 import os
 from dataclasses import dataclass
 
+import yaml
 from dotenv import load_dotenv
 from starlette.templating import Jinja2Templates
 
@@ -113,3 +115,18 @@ def webhook_settings(config) -> dict:
         'webhook_path': webhook_path,
         'webhook_url': webhook_url
     }
+
+
+def setup_logging() -> None:
+    config = load_config()
+    configuration_file = os.path.join(root_path, config.log.config_file)
+    
+    with open(configuration_file, 'r') as stream:
+        logging_cfg = yaml.load(stream, Loader=yaml.FullLoader)
+    
+    logging_cfg['handlers'][
+        'timed_rotating_handler']['filename'] = os.path.join(
+        config.log.log_path,
+        config.log.log_file
+    )
+    logging.config.dictConfig(logging_cfg)

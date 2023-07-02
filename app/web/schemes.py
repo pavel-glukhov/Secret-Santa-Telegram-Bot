@@ -18,8 +18,8 @@ class TelegramAuth(BaseModel):
 class AuthJWTSettings(BaseModel):
     authjwt_secret_key: str = load_config().web.jwt_settings.authjwt_secret_key
     authjwt_token_location: set = {"cookies"}
-    authjwt_cookie_secure: bool = False
-    authjwt_cookie_csrf_protect: bool = True
+    authjwt_cookie_secure: bool = True
+    authjwt_cookie_csrf_protect: bool = False
     authjwt_cookie_samesite: str = 'none'
 
 class RemoveMemberConfirmation(BaseModel):

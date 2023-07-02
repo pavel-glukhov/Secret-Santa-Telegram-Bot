@@ -6,7 +6,6 @@ from app.store.database.models import User
 from app.web.dependencies import get_current_user
 
 
-# TODO переделать перенаправление на страницу login
 async def not_authenticated(request: Request, exc):
     return RedirectResponse(url='/login', status_code=301)
 

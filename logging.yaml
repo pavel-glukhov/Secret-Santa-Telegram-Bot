@@ -38,3 +38,7 @@ loggers:
   tortoise:
     level: INFO
     handlers: [console_handler, timed_rotating_handler]
+
+  apscheduler:
+    level: INFO
+    handlers: [console_handler, timed_rotating_handler]
