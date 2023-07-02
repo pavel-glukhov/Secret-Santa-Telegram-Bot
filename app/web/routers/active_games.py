@@ -6,6 +6,7 @@ from app.config import templates
 from app.store.database.models import User
 from app.store.scheduler import operations as scheduler_operations
 from app.web.dependencies import get_current_user
+from app.web.permissions import is_admin
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -13,14 +14,12 @@ logger = logging.getLogger(__name__)
 
 @router.get("/active_games", name='active_games')
 async def active_games(request: Request,
-                       current_user: User = Depends(get_current_user)):
-    # TODO add permissions [superuser]
-    
-    tasks = scheduler_operations.get_all_task()
+                       current_user: User = Depends(get_current_user),
+                       permissions=Depends(is_admin)):
     context = {
         'request': request,
         'current_user': current_user,
-        'tasks': tasks,
+        'tasks': scheduler_operations.get_all_task(),
     }
     
     return templates.TemplateResponse(

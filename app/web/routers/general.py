@@ -13,13 +13,11 @@ logger = logging.getLogger(__name__)
 @router.get("/", name='index')
 async def index(request: Request,
                 current_user: User = Depends(get_current_user)):
-    # TODO add permissions [is_authorized]
-    rooms = await current_user.members
     contex = {
         'request': request,
         'current_user': current_user,
-        'rooms': rooms
-
+        'rooms': await current_user.members
     }
+    my_header = request.headers.get('x-csrf-token')
     return templates.TemplateResponse(
         'index.html', context=contex)
