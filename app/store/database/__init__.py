@@ -1,8 +1,6 @@
 import logging
 
-from asyncpg import InvalidPasswordError
 from tortoise import Tortoise
-from tortoise.exceptions import ConfigurationError, DBConnectionError
 
 from app.config import load_config
 
@@ -26,13 +24,10 @@ TORTOISE_ORM = {
     },
 }
 
+async def init_db() -> None:
+    await Tortoise.init(
+        config=TORTOISE_ORM
+    )
 
-async def database_initialization():
-    try:
-        await Tortoise.init(
-            config=TORTOISE_ORM,
-        )
-    except (
-            ConfigurationError, DBConnectionError, InvalidPasswordError
-    ) as error:
-        logger.error(error)
+async def close_db() -> None:
+    await Tortoise.close_connections()
