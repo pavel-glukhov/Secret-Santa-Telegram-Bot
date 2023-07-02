@@ -1,25 +1,49 @@
 {% extends 'base.html' %}
 
+
+
 {% block title %}Профиль комнаты {{ room.name }}{% endblock %}
 
+
 {% block content %}
-    <div class="container">
-        <div id="content">
-            <h4>Информация о комнате {{ room.name }}</h4><hr>
-            <p><b>Номер комнаты</b>: {{ room.number }}</p>
-            <p><b>Владелец</b>: <a href="{{ url_for('profile', user_id=room_owner.user_id) }}">{{ room_owner.username }}</a></p>
-            <p><b>Количество участников</b>: {{ users| length }}</p>
-            <p><b>Статус</b>: {% if not room.is_closed %}Активна{% else %}Закрыта{% endif %}</p>
-            <p><b>Дата жеребьевки</b>: {% if toss_time %}
-                                       {{ toss_time.strftime('%Y-%b-%d (%A) %H:%M:%S') }}
-                                       {% else %}
-                                       Не назначена
-                                       {% endif %}
-            </p>
-        </div>
+<div class="container">
+    <script>
+        function redirectToLeaveConfirmation(user_id) {
+        var url = "{{ request.url_for('user_leave_confirm', room_number=room.number) }}" + "?user_id=" + encodeURIComponent(user_id);
+        window.location.href = url;}
+    </script>
 
-        <h4>Участники комнаты:</h4>
-        {% include 'users/room_members.html' %}
+    <div id="content">
+        <h4>Информация о комнате {{ room.name }}</h4>
+        <hr>
+        <p><b>Номер комнаты</b>: {{ room.number }}</p>
+        <p><b>Владелец</b>: <a
+                href="{{ url_for('profile', user_id=room_owner.user_id) }}">{{ room_owner.username }}</a>
+        </p>
+        <p><b>Количество участников</b>: {{ users| length }}</p>
+        <p><b>Статус</b>: {% if not room.is_closed %}Активна{% else %}
+            Закрыта{% endif %}</p>
+        <p><b>Дата жеребьевки</b>: {% if toss_time %}
+            {{ toss_time.strftime('%Y-%b-%d (%A) %H:%M:%S') }}
+        {% else %}
+            Не назначена
+        {% endif %}
+        </p>
 
-    </div>
+        {% if current_user in users and current_user != room_owner%}
+            <hr>
+            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+
+                <div class="me-1">
+                <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ current_user.user_id }}, )">Выйти</button>
+                </div>
+            </div>
+            <hr>
+        {% endif %}
+
+ </div>
+    <h4>Участники комнаты:</h4>
+    {% include 'users/room_members.html' %}
+
+</div>
 {% endblock %}

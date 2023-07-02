@@ -13,8 +13,7 @@ from app.store.database.queries.users import UserDB
 from app.store.scheduler import operations as scheduler_operations
 from app.web.dependencies import get_current_user
 from app.web.permissions import (is_admin_is_room_own_or_member,
-                                 is_admin,
-                                 is_admin_is_room_own)
+                                 is_admin)
 from app.web.schemes import RemoveMemberConfirmation
 
 router = APIRouter()
@@ -25,10 +24,11 @@ logger = logging.getLogger(__name__)
 async def index(request: Request,
                 current_user: User = Depends(get_current_user),
                 permissions=Depends(is_admin), ):
+    rooms = await RoomDB.get_all_rooms()
     context = {
         'request': request,
         'current_user': current_user,
-        'rooms': await RoomDB.get_all_rooms()
+        'rooms': rooms
     }
     
     return templates.TemplateResponse(
@@ -42,18 +42,18 @@ async def index(request: Request, room_number: int,
     room = await RoomDB.get(room_number)
     if not room:
         raise HTTPException(status_code=404)
-   
-
     
     members = await RoomDB.get_list_members(room_number=room_number)
     room_toss_time = scheduler_operations.get_task(room.number)
+    current_room_owner = await room.owner
+    
     if room_toss_time:
         room_toss_time = room_toss_time.next_run_time
     context = {
         'request': request,
         'current_user': current_user,
         'room': room,
-        'room_owner': await room.owner,
+        'room_owner': current_room_owner,
         'toss_time': room_toss_time,
         'users': members,
     }
@@ -67,17 +67,17 @@ async def remove_member_conf(request: Request, room_number: int,
                              current_user: User = Depends(get_current_user),
                              params=Depends(RemoveMemberConfirmation),
                              permissions=Depends(
-                                 is_admin_is_room_own)):
+                                 is_admin_is_room_own_or_member)):
     """
     The confirmation Endpoint to remove members from the room.
     Permissions: Only the superuser and the owner of the room,
                  but the owners cannot remove themselves from the room
     """
     is_room_owner = await RoomDB.is_owner(room_number=room_number,
-                                    user_id=params.dict().get('user_id'))
+                                          user_id=params.dict().get('user_id'))
     if is_room_owner:
         raise HTTPException(status_code=403)
-        
+    
     user_id = params.dict().get('user_id')
     context = {
         'request': request,
@@ -96,20 +96,33 @@ async def remove_member(request: Request, user_id: int = Form(...),
                         room_number: int = Form(...),
                         referer: str = Form(...), confirm: bool = Form(...),
                         current_user: User = Depends(get_current_user),
+                        permissions=Depends(
+                            is_admin_is_room_own_or_member)
                         ):
     """
     The endpoint to remove members from the room.
-    Permissions: Only the superuser and the owner of the room,
-                 but the owners cannot remove themselves from the room
+    Permissions: The superuser and the owner of the room can remove users
+                 but the owners cannot remove themselves from the room.
+                 If users are members they are able to leave themselves.
+                 
+                 members forward to index page, others to room page.
     """
     
     is_room_owner = await RoomDB.is_owner(room_number=room_number,
                                           user_id=user_id)
-    logger.info(f'-----------{is_room_owner}')
+    
+    index_page_redirect_response = RedirectResponse(url='/',
+                                                    status_code=301)
+    room_page_redirect_response = RedirectResponse(url=unquote(referer),
+                                                   status_code=301)
+    
     if is_room_owner:
         raise HTTPException(status_code=403)
-    logger.info(f'-----------{confirm}')
+    
     if confirm:
         await RoomDB.remove_member(user_id, room_number)
     
-    return RedirectResponse(url=unquote(referer), status_code=301)
+    if current_user.user_id == user_id:
+        return index_page_redirect_response
+    
+    return room_page_redirect_response

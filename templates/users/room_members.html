@@ -37,17 +37,15 @@
                 {% endif %}
                 </td>
                 <td>
-                {% if current_user == room_owner and user != room_owner or current_user.is_superuser and user != room_owner %}
+                {% if current_user == room_owner and
+                    user != room_owner or
+                    current_user.is_superuser and
+                    user != room_owner %}
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         {#-----------Leave from room button---------------#}
-                        <script>
-                          function redirectToLeaveConfirmation(user_id) {
-                            var url = "{{ request.url_for('user_leave_confirm', room_number=room.number) }}" + "?user_id=" + encodeURIComponent(user_id);
-                            window.location.href = url;
-                          }
-                        </script>
+
                         <div class="me-1">
-                            <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ user.user_id }}, )">Выгнать</button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="redirectToLeaveConfirmation({{ user.user_id }}, )">{% if current_user == user %}Выйти{% else %}Выгнать{% endif %}</button>
                         </div>
 
                         {#----------Leave from room button-----------------#}
@@ -90,7 +88,7 @@
     {#                    <img src="{{ url_for('static', path='icons//no.png') }}"#}
     {#                                     alt="buttonpng"/>#}
 
-                        </div>
+                    </div>
                 {% endif %}
             </td>
             </tr>
