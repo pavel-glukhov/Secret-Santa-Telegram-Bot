@@ -20,16 +20,18 @@ logger = logging.getLogger(__name__)
 async def profile(request: Request, user_id: int,
                   current_user: User = Depends(get_current_user),
                   permissions=Depends(is_admin_or_owner)):
+    """The endpoint provided information about selected user."""
+
     user = await UserDB.get_user_or_none(user_id)
+    rooms = await RoomDB.get_all_users_of_room(user_id)
     
     if not user:
         raise HTTPException(status_code=404)
-    
     context = {
         'request': request,
         'current_user': current_user,
         'user': user,
-        'rooms': await RoomDB.get_all_users_of_room(user_id),
+        'rooms': rooms,
     }
     
     return templates.TemplateResponse(
@@ -41,10 +43,12 @@ async def profile(request: Request, user_id: int,
 async def users(request: Request,
                 current_user: User = Depends(get_current_user),
                 permissions=Depends(is_admin)):
+    """The endpoint provided list all users."""
+    users = await UserDB.get_list_all_users()
     context = {
         'request': request,
         'current_user': current_user,
-        'users': await UserDB.get_list_all_users(),
+        'users': users,
     }
     return templates.TemplateResponse(
         'users/users.html', context=context
@@ -55,8 +59,11 @@ async def users(request: Request,
 async def activate(request: Request, user_id: int,
                    current_user: User = Depends(get_current_user),
                    permissions=Depends(is_admin)):
+    """The endpoint to activate\deactivate user's account."""
+    
     user = await UserDB.get_user_or_none(user=user_id)
     referer = request.headers.get('referer')
+    
     if not user:
         raise HTTPException(status_code=404)
     
@@ -72,11 +79,16 @@ async def activate(request: Request, user_id: int,
 async def index(request: Request, user_id: int,
                 current_user: User = Depends(get_current_user),
                 permissions=Depends(is_admin)):
+    """The endpoint conformation that user can be deleted from DB."""
+    
+    referer = quote(request.headers.get('referer'), safe='')
+    user = await UserDB.get_user_or_none(user_id),
+    
     context = {
         'request': request,
         'current_user': current_user,
-        "user": await UserDB.get_user_or_none(user_id),
-        'referer': quote(request.headers.get('referer'), safe='')
+        "user": user,
+        'referer': referer,
     }
     
     return templates.TemplateResponse(
@@ -88,6 +100,8 @@ async def delete(request: Request, user_id: int = Form(...),
                  referer: str = Form(...), confirm: bool = Form(...),
                  current_user: User = Depends(get_current_user),
                  permissions=Depends(is_admin)):
+    """The endpoint for deleting user from DB."""
+    
     if confirm:
         await UserDB.delete_user(user_id)
     

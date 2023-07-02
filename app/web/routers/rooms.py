@@ -24,6 +24,8 @@ logger = logging.getLogger(__name__)
 async def index(request: Request,
                 current_user: User = Depends(get_current_user),
                 permissions=Depends(is_admin), ):
+    """The endpoint provided list all rooms."""
+
     rooms = await RoomDB.get_all_rooms()
     context = {
         'request': request,
@@ -39,6 +41,8 @@ async def index(request: Request,
 async def index(request: Request, room_number: int,
                 current_user: User = Depends(get_current_user),
                 permissions=Depends(is_admin_is_room_own_or_member)):
+    """The endpoint provided information about selected room."""
+
     room = await RoomDB.get(room_number)
     if not room:
         raise HTTPException(status_code=404)

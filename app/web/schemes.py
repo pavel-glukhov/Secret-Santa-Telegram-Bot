@@ -21,6 +21,7 @@ class AuthJWTSettings(BaseModel):
     authjwt_cookie_secure: bool = True
     authjwt_cookie_csrf_protect: bool = False
     authjwt_cookie_samesite: str = 'none'
+    authjwt_access_token_expires: bool = False
     authjwt_refresh_token_expires: bool = False
 
 class RemoveMemberConfirmation(BaseModel):

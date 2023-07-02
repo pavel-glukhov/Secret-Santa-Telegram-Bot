@@ -18,6 +18,5 @@ async def index(request: Request,
         'current_user': current_user,
         'rooms': await current_user.members
     }
-    my_header = request.headers.get('x-csrf-token')
     return templates.TemplateResponse(
         'index.html', context=contex)

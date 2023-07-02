@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 async def active_games(request: Request,
                        current_user: User = Depends(get_current_user),
                        permissions=Depends(is_admin)):
+    """The endpoint provided list all active scheduler tasks from Redis."""
+    
     context = {
         'request': request,
         'current_user': current_user,
