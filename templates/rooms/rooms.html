@@ -6,7 +6,12 @@
     <div class="container">
         <div id="content">
             <h4>Список всех игровых комнат</h4>
+            {% if not rooms %}<hr> Комнаты отсутствуют.
+            {% else %}
             {% include 'rooms/all_rooms_list.html' %}
+            {% endif %}
+
+
         </div>
     </div>
 {% endblock %}

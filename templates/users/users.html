@@ -5,6 +5,10 @@
 {% block content %}
     <div class="container">
         <h4>Список пользователей:</h4>
-    {% include 'users/users_list.html' %}
+        {% if not users %}<hr> Пользователи отсутствуют.
+        {% else %}
+        {% include 'users/users_list.html' %}
+        {% endif %}
+
     </div>
 {% endblock %}
