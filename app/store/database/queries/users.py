@@ -81,9 +81,9 @@ class UserDB:
         await user.delete()
     
     @staticmethod
-    async def get_list_all_users():
+    async def get_list_all_users(order_by: str = 'user_id'):
         """get list all users"""
-        result = await User.all().order_by('user_id')
+        result = await User.all().order_by(order_by)
         return result
     
     @staticmethod

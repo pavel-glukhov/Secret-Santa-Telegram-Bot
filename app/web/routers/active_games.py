@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, Request
 
-from app.config import templates
+from app.web.templates import templates
 from app.store.database.models import User
 from app.store.scheduler import operations as scheduler_operations
 from app.web.dependencies import get_current_user

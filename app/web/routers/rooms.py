@@ -2,11 +2,10 @@ import logging
 from urllib.parse import quote, unquote
 
 from fastapi import APIRouter, Depends, Form, Request
-from starlette.datastructures import MutableHeaders
 from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
 
-from app.config import templates
+from app.web.templates import templates
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB

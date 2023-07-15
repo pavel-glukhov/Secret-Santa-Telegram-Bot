@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.config import load_config, root_path, webhook_settings
+from app.config import load_config, webhook_settings
 from app.bot import dispatcher as dp
 from app.bot import bot
 from aiogram import types, Bot, Dispatcher

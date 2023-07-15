@@ -7,12 +7,11 @@
       <form>
 
         <div>
-        <script async src="https://telegram.org/js/telegram-widget.js?22"
-        data-telegram-login={{telegram_login}} data-size="large"
-        data-userpic="false"
-        data-auth-url={{auth_url}}
-        data-request-access="write"></script>
-        </div>
+        <!-- {{ redirect_widget|safe }} -->
+        {% autoescape off %}
+        {{ telegram_login_widget }}
+        {% endautoescape %}
+    </div>
       </form>
     </div>
 {% endblock %}
