@@ -15,10 +15,11 @@ logger = logging.getLogger(__name__)
 async def index(request: Request,
                 current_user: User = Depends(get_current_user),
                 templates: Jinja2Templates = Depends(template)):
+    rooms = await current_user.members
     contex = {
         'request': request,
         'current_user': current_user,
-        'rooms': await current_user.members
+        'rooms': rooms
     }
     return templates.TemplateResponse(
         'index.html', context=contex)

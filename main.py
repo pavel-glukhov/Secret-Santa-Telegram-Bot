@@ -8,11 +8,11 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
 
-from app.config import load_config, root_path, webhook_settings, setup_logging
+from app.config import load_config, ROOT_PATH, webhook_settings, setup_logging
 from app.store.database import init_db, close_db
 from app.store.scheduler import scheduler
 from app.web.exceptions import app_exceptions
-from app.web.routers import active_games, auth, general, rooms, users, webhooks
+from app.web.routers import active_games, auth, main, rooms, users, webhooks
 from app.web.schemes import AuthJWTSettings
 
 logger = logging.getLogger(__name__)
@@ -37,11 +37,11 @@ app = FastAPI(
 
 app.mount(
     "/static",
-    StaticFiles(directory=os.path.join(root_path, "static")),
+    StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
     name="static"
 )
 
-app.include_router(general.router)
+app.include_router(main.router)
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(rooms.router)
