@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import yaml
 from dotenv import load_dotenv
-from starlette.templating import Jinja2Templates
 
 ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
 dotenv_path = os.path.join(ROOT_PATH, '.env')
@@ -99,7 +98,7 @@ def load_config():
             room_number_length=6
         ),
         log=LoggingConfig(
-            log_path=os.path.join(root_path, 'logs'),
+            log_path=os.path.join(ROOT_PATH, 'logs'),
             log_file='logs.log',
             config_file='logging.yaml'
         ),
@@ -118,7 +117,7 @@ def webhook_settings(config) -> dict:
 
 def setup_logging() -> None:
     config = load_config()
-    configuration_file = os.path.join(root_path, config.log.config_file)
+    configuration_file = os.path.join(ROOT_PATH, config.log.config_file)
     
     with open(configuration_file, 'r') as stream:
         logging_cfg = yaml.load(stream, Loader=yaml.FullLoader)
