@@ -4,8 +4,9 @@ from urllib.parse import quote, unquote
 from fastapi import APIRouter, Depends, Form, Request
 from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
+from starlette.templating import Jinja2Templates
 
-from app.web.templates import templates
+from app.web.templates import template
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB
@@ -22,9 +23,10 @@ logger = logging.getLogger(__name__)
 @router.get("/rooms", name='rooms')
 async def index(request: Request,
                 current_user: User = Depends(get_current_user),
-                permissions=Depends(is_admin), ):
+                templates: Jinja2Templates = Depends(template),
+                permissions=Depends(is_admin)):
     """The endpoint provided list all rooms."""
-
+    
     rooms = await RoomDB.get_all_rooms()
     context = {
         'request': request,
@@ -39,9 +41,10 @@ async def index(request: Request,
 @router.get("/room/{room_number}", name='room')
 async def index(request: Request, room_number: int,
                 current_user: User = Depends(get_current_user),
-                permissions=Depends(is_admin_is_room_own_or_member)):
+                permissions=Depends(is_admin_is_room_own_or_member),
+                templates: Jinja2Templates = Depends(template)):
     """The endpoint provided information about selected room."""
-
+    
     room = await RoomDB.get(room_number)
     if not room:
         raise HTTPException(status_code=404)
@@ -69,6 +72,7 @@ async def index(request: Request, room_number: int,
 async def remove_member_conf(request: Request, room_number: int,
                              current_user: User = Depends(get_current_user),
                              params=Depends(RemoveMemberConfirmation),
+                             templates: Jinja2Templates = Depends(template),
                              permissions=Depends(
                                  is_admin_is_room_own_or_member)):
     """
@@ -99,6 +103,7 @@ async def remove_member(request: Request, user_id: int = Form(...),
                         room_number: int = Form(...),
                         referer: str = Form(...), confirm: bool = Form(...),
                         current_user: User = Depends(get_current_user),
+                        templates: Jinja2Templates = Depends(template),
                         permissions=Depends(
                             is_admin_is_room_own_or_member)
                         ):

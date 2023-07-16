@@ -4,8 +4,9 @@ from urllib.parse import quote, unquote
 from fastapi import APIRouter, Depends, Form, Request
 from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
+from starlette.templating import Jinja2Templates
 
-from app.web.templates import templates
+from app.web.templates import template
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB
@@ -19,9 +20,10 @@ logger = logging.getLogger(__name__)
 @router.get("/profile/{user_id}", name='profile')
 async def profile(request: Request, user_id: int,
                   current_user: User = Depends(get_current_user),
+                  templates: Jinja2Templates = Depends(template),
                   permissions=Depends(is_admin_or_owner)):
     """The endpoint provided information about selected user."""
-
+    
     user = await UserDB.get_user_or_none(user_id)
     rooms = await RoomDB.get_all_users_of_room(user_id)
     
@@ -42,6 +44,7 @@ async def profile(request: Request, user_id: int,
 @router.get("/users", name='users')
 async def users(request: Request,
                 current_user: User = Depends(get_current_user),
+                templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint provided list all users."""
     users = await UserDB.get_list_all_users()
@@ -58,6 +61,7 @@ async def users(request: Request,
 @router.post("/user/activate/{user_id}", name='activate_user')
 async def activate(request: Request, user_id: int,
                    current_user: User = Depends(get_current_user),
+                   templates: Jinja2Templates = Depends(template),
                    permissions=Depends(is_admin)):
     """The endpoint to activate\deactivate user's account."""
     
@@ -78,6 +82,7 @@ async def activate(request: Request, user_id: int,
 @router.get("/user/{user_id}/delete_confirmation/", name='usr_del_confirmation')
 async def index(request: Request, user_id: int,
                 current_user: User = Depends(get_current_user),
+                templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint conformation that user can be deleted from DB."""
     
@@ -99,6 +104,7 @@ async def index(request: Request, user_id: int,
 async def delete(request: Request, user_id: int = Form(...),
                  referer: str = Form(...), confirm: bool = Form(...),
                  current_user: User = Depends(get_current_user),
+                 templates: Jinja2Templates = Depends(template),
                  permissions=Depends(is_admin)):
     """The endpoint for deleting user from DB."""
     

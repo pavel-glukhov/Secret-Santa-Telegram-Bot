@@ -4,16 +4,17 @@ from fastapi import APIRouter, Depends, Request
 from fastapi_jwt_auth import AuthJWT
 from starlette.exceptions import HTTPException
 from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.templating import Jinja2Templates
 
 from app.config import load_config, AppConfig
-from app.web.templates import templates
+from app.web.templates import template
 from app.store.database.queries.users import UserDB
-from app.web.auth.exceptions import (TelegramDataError,
-                                     TelegramDataIsOutdated)
+from app.web.auth_widget.exceptions import (TelegramDataError,
+                                            TelegramDataIsOutdated)
 from app.web.schemes import AuthJWTSettings
-from app.web.auth.schemes import TelegramAuth
-from app.web.auth.validators import validate_telegram_data
-from app.web.auth.widget import TelegramLoginWidget, Size
+from app.web.auth_widget.schemes import TelegramAuth
+from app.web.auth_widget.validators import validate_telegram_data
+from app.web.auth_widget.widget import TelegramLoginWidget, Size
 
 router = APIRouter()
 
@@ -29,7 +30,8 @@ def get_config():
 async def login(request: Request,
                 params: TelegramAuth = Depends(TelegramAuth),
                 Authorize: AuthJWT = Depends(),
-                config: AppConfig = Depends(load_config)):
+                config: AppConfig = Depends(load_config),
+                       templates: Jinja2Templates = Depends(template)):
     """
     Endpoint for authorization via Telegram.
     If the user is already logged in, returns it to the main page.
