@@ -8,7 +8,7 @@ def user_information_formatter(user: User) -> list:
     last_name = user.last_name
     address = None
     number = None
-    crypt = CryptData(key=load_config().encryption.key)
+    crypt = CryptData(password=load_config().encryption.password)
     
     if user.encrypted_address:
         crypt_address_data = {

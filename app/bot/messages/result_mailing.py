@@ -40,7 +40,7 @@ async def creating_active_users_pool(room_number):
         
         if is_active_user:
             wish = await WishDB.get(player.user_id, room_number)
-            crypt = CryptData(key=load_config().encryption.key)
+            crypt = CryptData(password=load_config().encryption.password)
             
             if player.encrypted_address:
                 crypt_address_data = {

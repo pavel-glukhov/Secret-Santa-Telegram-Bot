@@ -7,14 +7,14 @@ from Cryptodome.Random import get_random_bytes
 
 
 class CryptData:
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, password):
+        self.password = password
     
     def encrypt(self, data: Union[str, int]) -> dict:
         salt = get_random_bytes(AES.block_size)
         
         private_key = hashlib.scrypt(
-            self.key.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
+            self.password.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
         cipher_config = AES.new(private_key, AES.MODE_GCM)
         
         cipher_text, tag = cipher_config.encrypt_and_digest(
@@ -33,7 +33,7 @@ class CryptData:
         tag = b64decode(enc_dict['tag'])
         
         private_key = hashlib.scrypt(
-            self.key.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
+            self.password.encode(), salt=salt, n=2 ** 14, r=8, p=1, dklen=32)
         cipher = AES.new(private_key, AES.MODE_GCM, nonce=nonce)
         decrypted = cipher.decrypt_and_verify(cipher_text, tag)
         

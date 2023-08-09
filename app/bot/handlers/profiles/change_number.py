@@ -49,7 +49,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     if re.search(r'(\+7|7|8)\D*\d{3}\D*\d{3}\D*\d{2}\D*\d{2}', phone_number):
-        crypt = CryptData(key=load_config().encryption.key)
+        crypt = CryptData(password=load_config().encryption.password)
         encrypted_data = crypt.encrypt(data=phone_number)
 
         await UserDB.update_user(user_id, encrypted_number=encrypted_data.get(
