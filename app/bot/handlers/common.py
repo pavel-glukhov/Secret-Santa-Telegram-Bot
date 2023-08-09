@@ -66,7 +66,7 @@ async def root_menu(
     user, created = await create_user_or_enable(message)
     keyboard = await create_common_keyboards(message)
 
-    is_profile_filled_out = all([user.address, user.contact_number])
+    is_profile_filled_out = all([user.encrypted_address, user.encrypted_number])
 
     text_reminder_notification_for_user = (
         '❗ <b>Не забудь обновить свои конт актные данные '
@@ -112,7 +112,7 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
         'должен приготовить для своего одариваемого подарок, оставаясь '
         'при этом анонимным. Подарки необходимо будет отправить на '
         'указанный адрес. А в конце игры, когда все участники получит '
-        'свой подарок, игроки могут расскрыть своё тайное имя и '
+        'свой подарок, игроки могут раскрыть своё тайное имя и '
         'поделиться впечатлениями о подарках.'
 
     )

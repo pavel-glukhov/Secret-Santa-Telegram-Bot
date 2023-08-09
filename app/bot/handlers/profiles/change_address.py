@@ -4,10 +4,11 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
-
+from app.store.encryption import CryptData
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.users import UserDB
+from app.config import load_config
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,15 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     if len(address) < 150:
-        await UserDB.update_user(user_id, address=address)
+        crypt = CryptData(key=load_config().encryption.key)
+        encrypted_data = crypt.encrypt(data=address)
+        await UserDB.update_user(user_id,
+                                 encrypted_address=encrypted_data.get(
+                                     'cipher_text'),
+                                 address_salt=encrypted_data.get('salt'),
+                                 address_nonce=encrypted_data.get('nonce'),
+                                 address_tag=encrypted_data.get('tag'),
+                                 )
         await message.answer(
             'Адрес изменен.',
             reply_markup=keyboard_inline,

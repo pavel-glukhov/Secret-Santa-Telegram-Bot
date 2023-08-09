@@ -62,8 +62,14 @@ async def process_deleting_information(message: types.Message,
         'first_name': None,
         'last_name': None,
         'email': None,
-        'address': None,
-        'contact_number': None
+        'encrypted_address': None,
+        'address_salt': None,
+        'address_nonce': None,
+        'address_tag': None,
+        'encrypted_number': None,
+        'number_salt': None,
+        'number_nonce': None,
+        'number_tag': None,
     }
 
     await UserDB.update_user(user_id=user_id, **data)
