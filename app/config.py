@@ -1,7 +1,7 @@
 import logging.config
 import os
 from dataclasses import dataclass
-
+from functools import lru_cache
 import yaml
 from dotenv import load_dotenv
 
@@ -57,6 +57,11 @@ class RedisConfig:
 
 
 @dataclass
+class Encryption:
+    key: str
+
+
+@dataclass
 class AppConfig:
     bot: BotConfig
     web: WebSettings
@@ -64,8 +69,10 @@ class AppConfig:
     redis: RedisConfig
     room: RoomConfig
     log: LoggingConfig
+    encryption: Encryption
 
 
+@lru_cache
 def load_config():
     """
     Main configuration of application
@@ -102,7 +109,9 @@ def load_config():
             log_file='logs.log',
             config_file='logging.yaml'
         ),
-    
+        encryption=Encryption(
+            key=os.getenv('AES_SECRET_KEY')
+        )
     )
 
 
