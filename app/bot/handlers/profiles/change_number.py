@@ -8,7 +8,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.config import load_config
 from app.store.database.queries.users import UserDB
+from app.store.encryption import CryptData
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,16 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     if re.search(r'(\+7|7|8)\D*\d{3}\D*\d{3}\D*\d{2}\D*\d{2}', phone_number):
-        await UserDB.update_user(user_id, contact_number=phone_number)
+        crypt = CryptData(key=load_config().encryption.key)
+        encrypted_data = crypt.encrypt(data=phone_number)
+
+        await UserDB.update_user(user_id, encrypted_number=encrypted_data.get(
+                                     'cipher_text'),
+                                 number_salt=encrypted_data.get('salt'),
+                                 number_nonce=encrypted_data.get('nonce'),
+                                 number_tag=encrypted_data.get('tag'),
+                                 )
+        
         await message.answer(
             'Номер изменен.',
             reply_markup=keyboard_inline,

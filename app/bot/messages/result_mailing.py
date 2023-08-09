@@ -7,9 +7,11 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
+from app.config import load_config
 from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.wishes import WishDB
+from app.store.encryption import CryptData
 from app.store.scheduler.operations import remove_task
 
 logger = logging.getLogger(__name__)
@@ -38,13 +40,39 @@ async def creating_active_users_pool(room_number):
         
         if is_active_user:
             wish = await WishDB.get(player.user_id, room_number)
+            crypt = CryptData(key=load_config().encryption.key)
+            
+            if player.encrypted_address:
+                crypt_address_data = {
+                    'cipher_text': player.encrypted_address,
+                    'salt': player.address_salt,
+                    'nonce': player.address_nonce,
+                    'tag': player.address_tag
+                }
+                address = crypt.decrypt(crypt_address_data).decode('UTF8')
+            else:
+                address = ('Адрес указан, свяжитесь с участником через чат '
+                           'для уточнения информации')
+            
+            if player.encrypted_number:
+                crypt_number_data = {
+                    'cipher_text': player.encrypted_number,
+                    'salt': player.number_salt,
+                    'nonce': player.number_nonce,
+                    'tag': player.number_tag
+                }
+                number = crypt.decrypt(crypt_number_data).decode('UTF8')
+            else:
+                number = ('Контактный номер не указан, '
+                          'свяжитесь с участником через чат '
+                          'для уточнения информации')
             
             player_information = {
                 'player_id': player.user_id,
-                'player_address': player.address,
+                'player_address': address,
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
-                'player_contact_number': player.contact_number,
+                'player_contact_number': number,
                 'player_wish': wish.wish
             }
             
