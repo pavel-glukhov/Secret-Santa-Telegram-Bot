@@ -33,7 +33,7 @@ async def change_phone_number(callback: types.CallbackQuery):
         'Укажите ваш номер телефона, что бы почтовые служащие '
         'смогли оповестить вас о прибывшем подарке\n'
         '<b>Укажи свой номер используя формат: +7|8(___)___-__-__ </b> \n'
-        '<b>Например:</b> 8 999 700 000 00 00',
+        '<b>Например:</b> 8 700 111 11 11',
         reply_markup=keyboard_inline
     )
 
@@ -47,17 +47,12 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": "menu_user_profile",
         }
     )
-
+    
     if re.search(r'(\+7|7|8)\D*\d{3}\D*\d{3}\D*\d{2}\D*\d{2}', phone_number):
-        crypt = CryptData(password=load_config().encryption.password)
+        crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=phone_number)
-
-        await UserDB.update_user(user_id, encrypted_number=encrypted_data.get(
-                                     'cipher_text'),
-                                 number_salt=encrypted_data.get('salt'),
-                                 number_nonce=encrypted_data.get('nonce'),
-                                 number_tag=encrypted_data.get('tag'),
-                                 )
+        
+        await UserDB.update_user(user_id, encrypted_number=encrypted_data)
         
         await message.answer(
             'Номер изменен.',

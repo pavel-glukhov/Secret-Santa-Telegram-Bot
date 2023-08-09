@@ -58,7 +58,7 @@ class RedisConfig:
 
 @dataclass
 class Encryption:
-    password: str
+    key: str
 
 
 @dataclass
@@ -110,7 +110,7 @@ def load_config():
             config_file='logging.yaml'
         ),
         encryption=Encryption(
-            password=os.getenv('AES_SECRET_PASSWORD')
+            key=os.getenv('AES_SECRET_KEY')
         )
     )
 

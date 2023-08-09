@@ -29,7 +29,7 @@ def get_config():
     return AuthJWTSettings()
 
 app = FastAPI(
-    debug=True,
+    debug=False,
     exception_handlers=exception_handlers,
     docs_url=None,
     redoc_url=None

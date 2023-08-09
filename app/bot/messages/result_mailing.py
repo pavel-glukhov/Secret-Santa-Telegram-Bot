@@ -40,28 +40,16 @@ async def creating_active_users_pool(room_number):
         
         if is_active_user:
             wish = await WishDB.get(player.user_id, room_number)
-            crypt = CryptData(password=load_config().encryption.password)
+            crypt = CryptData(key=load_config().encryption.key)
             
             if player.encrypted_address:
-                crypt_address_data = {
-                    'cipher_text': player.encrypted_address,
-                    'salt': player.address_salt,
-                    'nonce': player.address_nonce,
-                    'tag': player.address_tag
-                }
-                address = crypt.decrypt(crypt_address_data).decode('UTF8')
+                address = crypt.decrypt(player.encrypted_address).decode('UTF8')
             else:
                 address = ('Адрес указан, свяжитесь с участником через чат '
                            'для уточнения информации')
             
             if player.encrypted_number:
-                crypt_number_data = {
-                    'cipher_text': player.encrypted_number,
-                    'salt': player.number_salt,
-                    'nonce': player.number_nonce,
-                    'tag': player.number_tag
-                }
-                number = crypt.decrypt(crypt_number_data).decode('UTF8')
+                number = crypt.decrypt(player.encrypted_number).decode('UTF8')
             else:
                 number = ('Контактный номер не указан, '
                           'свяжитесь с участником через чат '

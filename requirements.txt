@@ -10,4 +10,4 @@ uvicorn
 Jinja2
 fastapi-jwt-auth
 python-multipart
-pycryptodomex
+cryptography

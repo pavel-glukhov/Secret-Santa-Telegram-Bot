@@ -61,15 +61,9 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     if len(address) < 150:
-        crypt = CryptData(password=load_config().encryption.password)
+        crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=address)
-        await UserDB.update_user(user_id,
-                                 encrypted_address=encrypted_data.get(
-                                     'cipher_text'),
-                                 address_salt=encrypted_data.get('salt'),
-                                 address_nonce=encrypted_data.get('nonce'),
-                                 address_tag=encrypted_data.get('tag'),
-                                 )
+        await UserDB.update_user(user_id, encrypted_address=encrypted_data)
         await message.answer(
             'Адрес изменен.',
             reply_markup=keyboard_inline,

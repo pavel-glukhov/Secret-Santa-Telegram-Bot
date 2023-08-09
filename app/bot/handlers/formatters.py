@@ -8,25 +8,13 @@ def user_information_formatter(user: User) -> list:
     last_name = user.last_name
     address = None
     number = None
-    crypt = CryptData(password=load_config().encryption.password)
+    crypt = CryptData(key=load_config().encryption.key)
     
     if user.encrypted_address:
-        crypt_address_data = {
-            'cipher_text': user.encrypted_address,
-            'salt': user.address_salt,
-            'nonce': user.address_nonce,
-            'tag': user.address_tag
-        }
-        address = crypt.decrypt(crypt_address_data).decode('UTF8')
-    
+        address = crypt.decrypt(user.encrypted_address).decode('UTF8')
+        
     if user.encrypted_number:
-        crypt_number_data = {
-            'cipher_text': user.encrypted_number,
-            'salt': user.number_salt,
-            'nonce': user.number_nonce,
-            'tag': user.number_tag
-        }
-        number = crypt.decrypt(crypt_number_data).decode('UTF8')
+        number = crypt.decrypt(user.encrypted_number).decode('UTF8')
     
     address_value = address or 'адрес не указан'
     number_value = number or 'номер не указан'
