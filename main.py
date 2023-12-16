@@ -53,21 +53,24 @@ def create_app() -> FastAPI:
     return app
 
 async def on_startup():
-    setup_logging()
-    await init_db()
-    scheduler.start()
-    webhook_url = webhook_settings(load_config).get('webhook_url')
-    webhook_info = await bot.get_webhook_info()
+    try:
+        setup_logging()
+        await init_db()
+        scheduler.start()
+        webhook_url = webhook_settings(load_config).get('webhook_url')
+        webhook_info = await bot.get_webhook_info()
     
-    if webhook_info.url != webhook_url:
-        await bot.set_webhook(url=webhook_url)
-    logger.info("App started")
+        if webhook_info.url != webhook_url:
+            await bot.set_webhook(url=webhook_url)
+            
+    except Exception as ex:
+        logger.error(ex)
+    logger.info("App has been started")
 
 async def on_shutdown():
     await bot.session.close()
     await close_db()
-    logger.info("App stopped")
-
+    logger.info("App has been stopped")
 
 
 if __name__ == "__main__":
