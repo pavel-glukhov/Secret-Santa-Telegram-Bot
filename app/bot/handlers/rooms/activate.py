@@ -14,13 +14,11 @@ logger = logging.getLogger(__name__)
 @dp.callback_query_handler(Text(startswith='room_activate'))
 async def members_list(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
-    await RoomDB.update(room_number,closed_at=None, is_closed=False)
+    keyboard_dict = {'Вернуться в меню комнаты': f"room_menu_{room_number}"}
+    keyboard_inline = generate_inline_keyboard(keyboard_dict)
     message_text = 'Комната повторно активирована.'
     
-    keyboard_dict = {
-        'Вернуться в меню комнаты': f"room_menu_{room_number}"
-    }
-    keyboard_inline = generate_inline_keyboard(keyboard_dict)
+    await RoomDB.update(room_number,closed_at=None, is_closed=False)
 
     await callback.message.edit_text(
         text=message_text,

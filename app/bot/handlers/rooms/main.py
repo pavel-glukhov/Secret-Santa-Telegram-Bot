@@ -55,6 +55,7 @@ async def my_room(callback: types.CallbackQuery):
         text_control_room = (
             f'<b>Управление комнатой {room.name}'
             f' ({room.number})</b>\n\n'
+            f'Бюджет: {room.budget}\n\n'
             'Владелец комнаты ещё не назначил время жеребьевки.'
         )
         

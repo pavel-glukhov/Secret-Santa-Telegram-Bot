@@ -6,18 +6,8 @@ from app.store.encryption import CryptData
 def user_information_formatter(user: User) -> list:
     first_name = user.first_name
     last_name = user.last_name
-    address = None
-    number = None
-    crypt = CryptData(key=load_config().encryption.key)
-    
-    if user.encrypted_address:
-        address = crypt.decrypt(user.encrypted_address).decode('UTF8')
-        
-    if user.encrypted_number:
-        number = crypt.decrypt(user.encrypted_number).decode('UTF8')
-    
-    address_value = address or 'адрес не указан'
-    number_value = number or 'номер не указан'
+    address_value = user.get_address() or 'адрес не указан'
+    number_value = user.get_number() or 'номер не указан'
     
     full_name = (
         f'{first_name} {last_name}'

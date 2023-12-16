@@ -37,14 +37,22 @@ async def creating_active_users_pool(room_number):
     for player in row_list_players:
         is_active_user = await checking_user_is_active(player.user_id)
         
+        address = player.adress if player.adress \
+            else ('Адрес указан, свяжитесь с участником через чат '
+                'для уточнения информации')
+        number = player.get_number if player.get_number \
+            else ('Контактный номер не указан, '
+                    'свяжитесь с участником через чат '
+                    'для уточнения информации')
+                
         if is_active_user:
             wish = await WishDB.get(player.user_id, room_number)
             player_information = {
                 'player_id': player.user_id,
-                'player_address': player.player_address,
+                'player_address': address,
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
-                'player_contact_number': player.player_number,
+                'player_contact_number': number,
                 'player_wish': wish.wish
             }
             

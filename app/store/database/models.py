@@ -20,21 +20,17 @@ class User(Model):
     class Meta:
         table = "users"
 
-    def player_address(self) -> str:
+    def get_address(self) -> str | None:
         if self.encrypted_address:
             crypt = CryptData(key=load_config().encryption.key)
             return crypt.decrypt(self.encrypted_address).decode('UTF8')
-        return ('Адрес указан, свяжитесь с участником через чат '
-                'для уточнения информации')
+        return None
 
-    def player_number(self) -> str:
+    def get_number(self) -> str | None:
         if self.encrypted_number:
             crypt = CryptData(key=load_config().encryption.key)
             return crypt.decrypt(self.encrypted_number).decode('UTF8')
-        else:
-            return ('Контактный номер не указан, '
-                    'свяжитесь с участником через чат '
-                    'для уточнения информации')
+        return None
     
     def __str__(self):
         return f"User {self.user_id} : {self.username}"
