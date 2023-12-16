@@ -1,1 +1,1 @@
-from app.bot.handlers.wishes import common
+from app.bot.handlers.wishes import main

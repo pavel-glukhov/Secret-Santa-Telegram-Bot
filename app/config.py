@@ -73,7 +73,7 @@ class AppConfig:
 
 
 @lru_cache
-def load_config():
+def load_config() -> AppConfig:
     """
     Main configuration of application
     """
@@ -110,7 +110,7 @@ def load_config():
             config_file='logging.yaml'
         ),
         encryption=Encryption(
-            key=os.getenv('AES_SECRET_KEY')
+            key=os.getenv('ENCRYPT_SECRET_KEY')
         )
     )
 

@@ -28,27 +28,30 @@ exception_handlers = {
 def get_config():
     return AuthJWTSettings()
 
-app = FastAPI(
-    debug=False,
-    exception_handlers=exception_handlers,
-    docs_url=None,
-    redoc_url=None
-)
 
-app.mount(
-    "/static",
-    StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
-    name="static"
-)
+def create_app() -> FastAPI:
+    app = FastAPI(
+        debug=False,
+        exception_handlers=exception_handlers,
+        docs_url=None,
+        redoc_url=None
+    )
+    app.add_event_handler("startup", on_startup)
+    app.add_event_handler("shutdown", on_shutdown)
+    app.mount(
+        "/static",
+        StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
+        name="static"
+    )
 
-app.include_router(main.router)
-app.include_router(users.router)
-app.include_router(auth.router)
-app.include_router(rooms.router)
-app.include_router(active_games.router)
-app.include_router(webhooks.router)
+    app.include_router(main.router)
+    app.include_router(users.router)
+    app.include_router(auth.router)
+    app.include_router(rooms.router)
+    app.include_router(active_games.router)
+    app.include_router(webhooks.router)
+    return app
 
-@app.on_event("startup")
 async def on_startup():
     setup_logging()
     await init_db()
@@ -60,13 +63,13 @@ async def on_startup():
         await bot.set_webhook(url=webhook_url)
     logger.info("App started")
 
-
-@app.on_event("shutdown")
 async def on_shutdown():
     await bot.session.close()
     await close_db()
     logger.info("App stopped")
 
 
+
 if __name__ == "__main__":
+    app = create_app()
     uvicorn.run(app, port=8000)

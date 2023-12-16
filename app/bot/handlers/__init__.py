@@ -1,2 +1,2 @@
-from app.bot.handlers import (common, communication, game, profiles, rooms,
+from app.bot.handlers import (main, communication, game, profiles, rooms,
                               wishes)

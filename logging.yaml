@@ -32,7 +32,7 @@ loggers:
     handlers: [console_handler, timed_rotating_handler]
 
   aiogram.event:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler, timed_rotating_handler]
 
   tortoise:
