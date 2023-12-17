@@ -5,7 +5,7 @@
 {% block content %}
     <div class="container">
         <div id="content">
-            <h4>Список всех игровых комнат</h4>
+            <h4>Список всех игровых комнат</h4><hr>
             {% if not rooms %}<hr> Комнаты отсутствуют.
             {% else %}
             {% include 'rooms/all_rooms_list.html' %}

@@ -4,11 +4,27 @@
 
 {% block content %}
     <div class="container">
-        <h4>Список пользователей:</h4>
+        <h4>Список пользователей:</h4><hr>
         {% if not users %}<hr> Пользователи отсутствуют.
         {% else %}
         {% include 'users/users_list.html' %}
         {% endif %}
 
     </div>
+    <div>
+        <p>Показано {{ (page - 1) * limit + 1 }}
+            из {{ (page - 1) * limit + users|length }} пользователей. Всего {{ total_users }}
+            записей.</p>
+        <p>
+            {% if page > 1 %}
+                <a href="{{ url_for('users').include_query_params(page=page-1, limit=limit) }}">Назад</a>
+            {% endif %}
+
+            {% if users|length == limit %}
+                <a href="{{ url_for('users').include_query_params(page=page+ 1, limit=limit) }}">Вперед</a>
+
+            {% endif %}
+        </p>
+    </div>
+
 {% endblock %}

@@ -39,40 +39,44 @@
                 {% endif %}
                 </td>
                 <td>
-                {% if current_user.is_superuser %}
-                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                        {% if user.username != current_user.username %}
-                            <div class="me-1">
-                                {% if user.is_active %}
-                                    <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
-                                    method="post">
-                                    <button class="btn btn-outline-secondary btn-sm"
-                                            title="Деактивировать пользователя">Деактивировать
-                                    </button>
-                                    </form>
-                                {% else %}
-                                    <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
-                                          method="post">
-                                          <button class="btn btn-outline-secondary btn-sm"
-                                                  title="Активировать пользователя">Активировать
-                                          </button>
-                                    </form>
-                                {% endif %}
-                            </div>
+                    {% if current_user.is_superuser %}
+                        <div class="btn-toolbar" role="toolbar"
+                             aria-label="Toolbar with button groups">
+                            {% if user.username != current_user.username %}
+                                <div class="me-1">
+                                    {% if user.is_active %}
+                                        <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
+                                              method="post">
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Деактивировать пользователя">
+                                                Деактивировать
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{{ url_for('activate_user', user_id=user.user_id) }}"
+                                              method="post">
+                                            <button class="btn btn-outline-secondary btn-sm"
+                                                    title="Активировать пользователя">
+                                                Активировать
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
 
-                            <div class="me-2">
-                                <form action="{{ url_for('usr_del_confirmation', user_id=user.user_id) }}"
-                                      method="get">
-                                      <button class="btn btn-outline-secondary btn-sm"
-                                              title="удалить пользователя">Удалить
+                                <div class="me-2">
+                                    <form action="{{ url_for('usr_del_confirmation', user_id=user.user_id) }}"
+                                          method="get">
+                                        <button class="btn btn-outline-secondary btn-sm"
+                                                title="удалить пользователя">
+                                            Удалить
 
-                                      </button>
-                                </form>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            </td>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
