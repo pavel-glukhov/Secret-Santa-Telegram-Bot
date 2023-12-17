@@ -22,6 +22,7 @@ async def change_room_owner(callback: types.CallbackQuery):
     await state.update_data(room_number=room_number)
 
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    
     message_text = (
         'Хочешь поменять владельца комнаты?\n'
         'Новый владелец комнаты должен являться ее участником. '
@@ -42,6 +43,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     previous_owner = message.chat.id
     new_owner = message.text
     last_message = state_data['last_message']
+    await delete_user_message(message.from_user.id, message.message_id)
     
     keyboard_inline = generate_inline_keyboard(
         {
@@ -50,24 +52,26 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     )
 
     owner: User = await RoomDB.change_owner(new_owner, room_number)
-    logger.info(f'The owner [{previous_owner}] of room '
-                f'[{room_number}] has been changed to [{owner.user_id}]')
     
-    await delete_user_message(message.from_user.id, message.message_id)
-
     if owner:
         message_text = (
             '"Хо-хо-хо! 🎅\n\n'
             f'Я сменил владельца, теперь это <b>{new_owner}</b>'
         )
-        return await last_message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
-    else:
-        message_text = 'Такой участник не найден.'
+        
         await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
-    await state.finish()
+        await state.finish()
+        logger.info(f'The owner [{previous_owner}] of room '
+                    f'[{room_number}] has been changed to [{owner.user_id}]')
+    else:
+        
+        message_text = 'Такой участник не найден.'
+        
+        await last_message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
+        await state.finish()

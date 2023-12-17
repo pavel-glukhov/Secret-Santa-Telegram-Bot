@@ -16,6 +16,7 @@ async def left_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
     await RoomDB.remove_member(user_id, room_number)
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
@@ -23,13 +24,14 @@ async def left_room(callback: types.CallbackQuery):
     )
 
     message_text = f'Вы вышли из комнаты <b>{room_number}</b>.'
+    
     await callback.message.edit_text(
         text=message_text,
     )
 
     message_text = (
         'Вы можете вернуться в комнату в любое время, '
-        f'для этого используйте номер комнаты {room_number}.'
+        f'для этого используйте номер комнаты <b>{room_number}</b>.'
     )
     await callback.message.answer(
         text=message_text,

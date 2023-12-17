@@ -21,12 +21,14 @@ async def delete_room(callback: types.CallbackQuery):
     await state.update_data(room_number=room_number)
     await state.update_data(question_message_id=callback.message.message_id)
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    
     message_text = (
         '❌<b>Комната будет удалена без'
         ' возможности восстановления</b>.\n\n'
         f'Для подтверждения удаления комнаты <b>{room_number}</b>, '
         'введите в чат <b>подтверждаю</b>.\n\n '
     )
+    
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
             text=message_text,
@@ -64,18 +66,19 @@ async def process_delete_room_invalid(message: types.Message):
 async def completed_process_delete_room(message: types.Message,
                                         state: FSMContext):
     state_data = await state.get_data()
+    last_message = state_data['last_message']
     room_number = state_data['room_number']
+    await delete_user_message(message.from_user.id, message.message_id)
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
         }
     )
 
-    is_deleted = await RoomDB.delete(room_number=room_number)
-    await delete_user_message(message.from_user.id, message.message_id)
-    last_message = state_data['last_message']
+    is_room_deleted = await RoomDB.delete(room_number=room_number)
     
-    if is_deleted:
+    if is_room_deleted:
         message_text = (
             'Комната успешно удалена\n\n '
             'Вы можете создать новую комнату в основном меню.'
@@ -85,16 +88,21 @@ async def completed_process_delete_room(message: types.Message,
             reply_markup=keyboard_inline,
         )
 
-        logger.info(f'The user [{message.from_user.id}]'
-                    f' removed the room [{room_number}]')
+        logger.info(
+            f'The user [{message.from_user.id}]'
+            f' removed the room [{room_number}]'
+        )
     else:
         message_text = 'Что-то пошло не так, комната не была удалена'
+        
         await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
-        logger.info(f'The room [{room_number}]'
+        logger.info(
+            f'The room [{room_number}]'
                     'was not removed removed'
-                    f' by[{message.from_user.id}] ')
+                    f' by[{message.from_user.id}] '
+        )
     
     await state.finish()

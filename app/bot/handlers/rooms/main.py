@@ -55,7 +55,7 @@ async def my_room(callback: types.CallbackQuery):
         text_control_room = (
             f'<b>Управление комнатой {room.name}'
             f' ({room.number})</b>\n\n'
-            f'Бюджет: {room.budget}\n\n'
+            f'<b>Бюджет</b>: {room.budget}\n\n'
             'Владелец комнаты ещё не назначил время жеребьевки.'
         )
         
@@ -111,10 +111,11 @@ async def room_is_closed(callback: types.CallbackQuery,
     else:
         keyboard_dict = {
             'Связаться с Сантой': f'room_closed-con-san_{room_number}',
-            'Отправить сообщение получателю': f'room_closed-con-rec_{room_number}',
+            'Связаться с получателем': f'room_closed-con-rec_{room_number}',
             'Вернуться в меню': 'root_menu'
         }
         user_information = profile_information_formatter(recipient)
+        
         message_text = (
             '<b>Игра в вашей комнате завершена!</b>\n\n'
             'Вы стали Тайным Сантой для:\n'

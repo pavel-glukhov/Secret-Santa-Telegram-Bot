@@ -63,78 +63,82 @@ async def process_room_number(message: types.Message):
     room = await RoomDB.get(room_number=room_number)
 
     if not room or room.is_closed is True:
-        message_text = (
-            'Введенной комнаты не существует, или она завершена.\n'
-            'Введите корректный номер.'
+        return await _is_not_exists_room(last_message,
+                                         room_number, keyboard_inline)
+    
+    is_member_of_room = await RoomDB.is_member(
+            user_id=message.chat.id,
+            room_number=room_number
         )
+    
+    if is_member_of_room:
+        keyboard_inline = await create_common_keyboards(message)
+    
+        message_text = 'Вы уже состоите в этой комнате.'
+    
         await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
         logger.info(
-            f'Incorrect room number [{room_number}] '
-            f'from [{message.from_user.id}]'
+            f'The user[{message.from_user.id}] '
+            f'already is member of the room [{room_number}]'
         )
+        await state.finish()
+
     else:
-        is_member_of_room = await RoomDB.is_member(
-            user_id=message.chat.id,
-            room_number=room_number
+        await JoinRoom.next()
+        
+        message_text = (
+            'А теперь напишите свои пожелания к подарку. '
+            'Возможно у тебя есть хобби и '
+            'ты хочешь получить что-то особое?\n'
+            'Ваши комментарии помогут Тайному Санте '
+            'выбрать для вас подарок.\n'
+        )
+    
+        await last_message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline,
         )
 
-        if is_member_of_room:
-            keyboard_inline = await create_common_keyboards(message)
-
-            message_text = 'Вы уже состоите в этой комнате.'
-
-            await last_message.edit_text(
-                text=message_text,
-                reply_markup=keyboard_inline,
-            )
-            logger.info(
-                f'The user[{message.from_user.id}] '
-                f'already is member of the room [{room_number}]'
-            )
-            await state.finish()
-
-        else:
-            await JoinRoom.next()
-
-            message_text = (
-                'А теперь напишите свои пожелания к подарку. '
-                'Возможно у тебя есть хобби и '
-                'ты хочешь получить что-то особое?\n'
-                'Ваши комментарии помогут Тайному Санте '
-                'выбрать для вас подарок.\n'
-            )
-
-            await last_message.edit_text(
-                text=message_text,
-                reply_markup=keyboard_inline,
-            )
-
-
+async def _is_not_exists_room(message, room_number, keyboard_inline):
+    message_text = (
+        'Введенной комнаты не существует, или игра завершена.\n'
+        'Введите корректный номер комнаты.'
+    )
+    await message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
+    logger.info(
+        f'Incorrect room number [{room_number}] '
+        f'from [{message.from_user.id}]'
+    )
+    
 @dp.message_handler(state=JoinRoom.waiting_for_wishes)
 async def process_room_wishes(message: types.Message, state: FSMContext):
+    state_data = await state.get_data()
     wishes = message.text
     user_id = message.chat.id
-    await state.update_data(wishes=wishes)
-    state_data = await state.get_data()
+    room_number = state_data['room_number']
     last_message = state_data['last_message']
     await delete_user_message(message.from_user.id, message.message_id)
 
     await RoomDB.add_member(
         user_id=user_id,
-        room_number=state_data['room_number']
+        room_number=room_number
     )
     await WishDB.update_or_create(
-        wish=state_data['wishes'],
+        wish=wishes,
         user_id=user_id,
-        room_id=state_data['room_number']
+        room_id=room_number
     )
     keyboard_inline = await create_common_keyboards(message)
 
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
+        f'Вы вошли в комнату <b>{room_number}</b>.\n'
         'Теперь ты можешь играть с своими друзьями.\n'
         'Следи за анонсами владельца комнаты.\n\n'
         'Желаю хорошей игры! 😋'
