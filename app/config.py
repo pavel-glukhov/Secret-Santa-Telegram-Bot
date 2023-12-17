@@ -31,6 +31,7 @@ class LoggingConfig:
 @dataclass
 class RoomConfig:
     room_number_length: int
+    user_rooms_count: int
 
 
 @dataclass
@@ -102,7 +103,8 @@ def load_config() -> AppConfig:
             password=os.getenv("REDIS_PASSWORD"),
         ),
         room=RoomConfig(
-            room_number_length=6
+            room_number_length=int(os.getenv('ROOM_NUBER_LENGTH')),
+            user_rooms_count=int(os.getenv('USER_ROOMS_LIMIT'))
         ),
         log=LoggingConfig(
             log_path=os.path.join(ROOT_PATH, 'logs'),

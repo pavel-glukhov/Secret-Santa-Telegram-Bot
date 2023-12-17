@@ -195,11 +195,20 @@ class RoomDB:
         """return list of all rooms"""
         result = await Room.all().prefetch_related('owner')
         return result
-    
+
     @staticmethod
     async def count_rooms():
         """return count of all rooms"""
         result = await Room.all().count()
+        return result
+
+    @staticmethod
+    async def get_count_user_rooms(user_id) -> int:
+        """
+        Get count user's rooms
+        """
+        result = await Room.filter(owner__user_id=user_id).count()
+    
         return result
     
     @staticmethod

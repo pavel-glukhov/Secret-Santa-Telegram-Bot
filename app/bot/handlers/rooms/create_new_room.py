@@ -8,6 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.rooms.states import CreateRoom
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.config import load_config
 from app.store.database.queries.rooms import RoomDB
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,26 @@ logger = logging.getLogger(__name__)
 
 @dp.callback_query_handler(Text(equals='menu_create_new_room'))
 async def create_room(callback: types.CallbackQuery, ):
+    
+    count_user_rooms = await RoomDB.get_count_user_rooms(
+        callback.message.chat.id)
+    logger.info(count_user_rooms)
+    if count_user_rooms >=load_config().room.user_rooms_count:
+        keyboard_inline = generate_inline_keyboard(
+            {
+              "Вернуться назад ◀️": "root_menu",
+            }
+        )
+        message_text = (
+            '<b>Новая комната не может быть создана, '
+            'т.к. вы достигли лимита.</b>\n\n '
+            'Вы можете являться владельцем только 10 комнат.'
+        )
+        return await callback.message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
+    
     await CreateRoom.waiting_for_room_name.set()
     state = dp.get_current().current_state()
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})

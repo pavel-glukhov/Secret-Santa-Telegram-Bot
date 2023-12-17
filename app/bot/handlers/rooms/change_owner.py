@@ -8,8 +8,10 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import ChangeOwner
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.config import load_config
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
+from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
 
@@ -50,24 +52,35 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-
-    owner: User = await RoomDB.change_owner(new_owner, room_number)
+    user = await UserDB.get_user_or_none(new_owner)
     
-    if owner:
-        message_text = (
-            '"Хо-хо-хо! 🎅\n\n'
-            f'Я сменил владельца, теперь это <b>{new_owner}</b>'
-        )
-        
-        await last_message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
-        await state.finish()
-        logger.info(f'The owner [{previous_owner}] of room '
-                    f'[{room_number}] has been changed to [{owner.user_id}]')
+    if user:
+        count_rooms = await RoomDB.get_count_user_rooms(user.user_id)
+        if count_rooms < load_config().room.user_rooms_count:
+            await RoomDB.change_owner(new_owner, room_number)
+
+            message_text = (
+                '"Хо-хо-хо! 🎅\n\n'
+                f'Я сменил владельца, теперь это <b>{new_owner}</b>'
+            )
+            
+            await last_message.edit_text(
+                text=message_text,
+                reply_markup=keyboard_inline,
+            )
+            await state.finish()
+            logger.info(f'The owner [{previous_owner}] of room '
+                        f'[{room_number}] has been changed to [{user.user_id}]')
+        else:
+            message_text = ('Данный участник не может '
+                            'быть назначен владельцем комнаты.')
+    
+            await last_message.edit_text(
+                text=message_text,
+                reply_markup=keyboard_inline,
+            )
+            await state.finish()
     else:
-        
         message_text = 'Такой участник не найден.'
         
         await last_message.edit_text(
