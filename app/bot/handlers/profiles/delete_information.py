@@ -79,7 +79,8 @@ async def process_deleting_information(message: types.Message,
     }
 
     await UserDB.update_user(user_id=user_id, **data)
-
+    logger.info(f'The user [{user_id}] deleted personal information.'
+    )
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "menu_user_profile",

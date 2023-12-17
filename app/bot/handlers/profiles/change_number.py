@@ -60,7 +60,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         encrypted_data = crypt.encrypt(data=phone_number)
         
         await UserDB.update_user(user_id, encrypted_number=encrypted_data)
-        
+        logger.info(f'The user [{user_id}] updated call number.')
         message_text = 'Номер изменен.'
         
         await last_message.edit_text(

@@ -68,6 +68,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         encrypted_data = crypt.encrypt(data=address)
         
         await UserDB.update_user(user_id, encrypted_address=encrypted_data)
+        logger.info(f'The user [{user_id}] updated an address.')
         
         message_text = 'Адрес изменен.'
         

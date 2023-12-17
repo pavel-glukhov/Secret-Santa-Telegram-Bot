@@ -79,7 +79,7 @@ async def process_changing_last_name(message: types.Message,
     await UserDB.update_user(user_id,
                              first_name=first_name,
                              last_name=last_name)
-    
+    logger.info(f'The user [{user_id}] updated fist and last name.')
     message_text = 'Имя и фамилия изменены.'
     
     await last_message.edit_text(
