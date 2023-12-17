@@ -19,14 +19,14 @@
                 </td>
                 <td>{{ user.user_id }}
                 <td>{{ user.registered_at.strftime('%Y-%m-%d') }}
-                <td>{% if user.address %}
+                <td>{% if user.encrypted_address %}
                     <span class="text-success">Указан</span>
                 {% else %}
                     <span class="text-danger">Не указан</span>
                 {% endif %}
                 </td>
 
-                <td>{% if user.contact_number %}
+                <td>{% if user.encrypted_number %}
                     <span class="text-success">Указан</span>
                 {% else %}
                     <span class="text-danger">Не указан</span>
