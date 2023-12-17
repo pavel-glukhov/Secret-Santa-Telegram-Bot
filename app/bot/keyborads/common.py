@@ -31,7 +31,7 @@ def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
     owner_tag = ' 🤴' if is_owner else ''
     scheduler_tag = '⏱' if get_task(room.number) else ''
     closed_tag = '✅' if room.is_closed else ''
-    text = 'Управление комнатой' if is_owner else 'Ваша комната'
+    text = 'Ваша комната'
     return (f'{text}: {room.name} ({room.number})'
             f'{owner_tag} {scheduler_tag}{closed_tag}')
 
