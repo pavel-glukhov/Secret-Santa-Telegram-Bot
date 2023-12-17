@@ -7,11 +7,9 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
-from app.config import load_config
 from app.store.database.queries.game_result import GameResultDB
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.wishes import WishDB
-from app.store.encryption import CryptData
 from app.store.scheduler.operations import remove_task
 
 logger = logging.getLogger(__name__)
@@ -61,21 +59,6 @@ async def creating_active_users_pool(room_number):
     
     return verified_users_list
 
-# def _player_address(player) -> str:
-#     if player.encrypted_address:
-#         crypt = CryptData(key=load_config().encryption.key)
-#         return crypt.decrypt(player.encrypted_address).decode('UTF8')
-#     return ('Адрес указан, свяжитесь с участником через чат '
-#             'для уточнения информации')
-#
-# def _player_number(player) -> str:
-#     if player.encrypted_number:
-#         crypt = CryptData(key=load_config().encryption.key)
-#         return crypt.decrypt(player.encrypted_number).decode('UTF8')
-#     else:
-#         return ('Контактный номер не указан, '
-#                 'свяжитесь с участником через чат '
-#                 'для уточнения информации')
 
 async def send_result_of_game(room_number) -> None:
     verified_users = await creating_active_users_pool(room_number)

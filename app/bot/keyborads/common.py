@@ -3,6 +3,7 @@ from aiogram import types
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
 from app.store.database.models import Room
 from app.store.database.queries.rooms import RoomDB
+from app.store.scheduler.operations import get_task
 
 
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
@@ -28,8 +29,11 @@ def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
     :return:
     """
     owner_tag = ' 🤴' if is_owner else ''
+    scheduler_tag = '⏱' if get_task(room.number) else ''
+    closed_tag = '✅' if room.is_closed else ''
     text = 'Управление комнатой' if is_owner else 'Ваша комната'
-    return f'{text}: {room.name} ({room.number}){owner_tag}'
+    return (f'{text}: {room.name} ({room.number})'
+            f'{owner_tag} {scheduler_tag}{closed_tag}')
 
 
 async def create_common_keyboards(

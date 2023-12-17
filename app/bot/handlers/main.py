@@ -116,7 +116,6 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
         'А в конце игры, когда все участники получит '
         'свой подарок, игроки могут раскрыть своё тайное имя и '
         'поделиться впечатлениями о подарках.'
-
     )
 
     await message.edit_text(
