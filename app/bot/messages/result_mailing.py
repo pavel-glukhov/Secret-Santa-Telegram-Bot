@@ -37,10 +37,10 @@ async def creating_active_users_pool(room_number):
     for player in row_list_players:
         is_active_user = await checking_user_is_active(player.user_id)
         
-        address = player.adress if player.adress \
+        address = player.get_address() if player.get_address() \
             else ('Адрес указан, свяжитесь с участником через чат '
                 'для уточнения информации')
-        number = player.get_number if player.get_number \
+        number = player.get_number() if player.get_number() \
             else ('Контактный номер не указан, '
                     'свяжитесь с участником через чат '
                     'для уточнения информации')
@@ -142,19 +142,22 @@ async def _insufficient_number_players(room_number: int,
     await RoomDB.update(room_number,
                         is_closed=True,
                         closed_at=datetime.datetime.now())
-    await send_message(
-        user_id=owner.user_id,
-        text=(
+    
+    message_text = (
             f'Вы получили данное сообщение, т.к. '
             f'рассылка в вашей комнате '
-            f'[<b>{room.name}</b>] [<b>{room.number}</b>] '
-            f'была указана на данную дату. И сожалению, '
+            f'[<b>{room.name}</b>] '
+            f'была указана на данную дату.\n\n К сожалению, '
             f'в вашей комнате недостаточно '
-            'активных игроков для жеребьевки.'
+            'активных игроков.\n\n'
             'Активных игроков должно быть 3 или более.\n'
-            f'В данный момент у вас {count_verified_users}.\n'
+            f'В данный момент у вас {count_verified_users}.\n\n'
             '<b>Пригласите больше игроков и задайте '
-            'новую дату жеребьевки</b>'),
+            'новую дату жеребьевки</b>')
+    
+    await send_message(
+        user_id=owner.user_id,
+        text=message_text,
         reply_markup=keyboard_inline
     )
     
