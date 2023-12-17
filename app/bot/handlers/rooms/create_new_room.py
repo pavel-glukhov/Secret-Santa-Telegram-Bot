@@ -52,7 +52,7 @@ async def process_name(message: types.Message, state: FSMContext):
             'Имя комнаты не должно превышать 12 символов.\n'
         )
         
-        return await state_data['last_message'].edit_text(
+        return await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline
         )
