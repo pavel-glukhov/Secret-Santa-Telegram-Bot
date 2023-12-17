@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
+from app.store.database.queries.pagination import Paginator
 from app.web.templates import template
 from app.store.database.models import User
 from app.store.database.queries.rooms import RoomDB
@@ -47,7 +48,7 @@ async def users(request: Request, page: int = 1, limit: int = 10,
                 templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint provided list all users."""
-    users, total_users = await UserDB.paginate(page, limit)
+    users, total_users = await Paginator.paginate(User, page, limit)
     context = {
         'request': request,
         'current_user': current_user,

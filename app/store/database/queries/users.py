@@ -91,10 +91,3 @@ class UserDB:
         """get count all users"""
         result = await User.all().count()
         return result
-
-    @staticmethod
-    async def paginate(page: int, page_size: int) -> tuple:
-        """Paginate user model"""
-        items = await User.all().limit(page_size).offset((page - 1) * page_size)
-        total_items = await User.all().count()
-        return  items, total_items

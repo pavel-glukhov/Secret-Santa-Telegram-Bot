@@ -6,8 +6,9 @@ from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
+from app.store.database.queries.pagination import Paginator
 from app.web.templates import template
-from app.store.database.models import User
+from app.store.database.models import User, Room
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.users import UserDB
 from app.store.scheduler import operations as scheduler_operations
@@ -21,17 +22,21 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/rooms", name='rooms')
-async def index(request: Request,
+async def index(request: Request, page: int = 1, limit: int = 10,
                 current_user: User = Depends(get_current_user),
                 templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint provided list all rooms."""
+    rooms, total_rooms = await Paginator.paginate(Room,
+                                                  page, limit, related='owner')
     
-    rooms = await RoomDB.get_all_rooms()
     context = {
         'request': request,
         'current_user': current_user,
-        'rooms': rooms
+        'rooms': rooms,
+        'total_rooms': total_rooms,
+        "page": page,
+        "limit": limit
     }
     
     return templates.TemplateResponse(
