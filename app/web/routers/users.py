@@ -42,16 +42,19 @@ async def profile(request: Request, user_id: int,
 
 
 @router.get("/users", name='users')
-async def users(request: Request,
+async def users(request: Request, page: int = 1, limit: int = 10,
                 current_user: User = Depends(get_current_user),
                 templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint provided list all users."""
-    users = await UserDB.get_list_all_users()
+    users, total_users = await UserDB.paginate(page, limit)
     context = {
         'request': request,
         'current_user': current_user,
         'users': users,
+        'total_users': total_users,
+        "page": page,
+        "limit": limit
     }
     return templates.TemplateResponse(
         'users/users.html', context=context
