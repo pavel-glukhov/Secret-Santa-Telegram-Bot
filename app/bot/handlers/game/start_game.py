@@ -8,7 +8,7 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.game.states import StartGame
-from app.bot.handlers.operations import get_room_number
+from app.bot.handlers.operations import get_room_number, delete_user_message
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
 from app.store.database.queries.rooms import RoomDB
@@ -60,81 +60,99 @@ async def change_game_datetime(callback: types.CallbackQuery):
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
     
-    keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        }
-    )
+    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
         'Для того, что-бы назначить время рассылки, '
         'отправь сообщение в формате\n'
-        '<b>yyyy, mm, dd, h, m</b> - <b>год, месяц, день, час, минуты</b>\n\n'
-        '<b>Пример: 2022,12,1,12,00</b>'
+        '<b>yyyy.mm.dd h:m</b> - <b>год.месяц.день час:минуты</b>\n\n'
+        '<b>Пример: 2023.12.01 12:00</b>'
     )
-    
-    await callback.message.edit_text(
+
+    async with state.proxy() as data:
+        data['last_message'] = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
 
 
-async def pass_(message):
-    await message.answer('test')
-
-
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
-    data = await state.get_data()
-    room_number = data['room_number']
-    
+    state_data = await state.get_data()
+    room_number = state_data['room_number']
+    text = message.text
+    last_message = state_data['last_message']
+    await delete_user_message(message.from_user.id, message.message_id)
+    cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-    match = re.fullmatch(r'\d{4},\d{1,2},\d{1,2},\d{1,2},\d{1,2}',
-                         message.text)
-    
-    if match:
-        date = datetime(*list(map(int, message.text.split(','))))
-        
-        if date > datetime.now():
-            task = get_task(task_id=room_number)
-            if task:
+
+    date_time = _parse_date(text)
+    if date_time:
+        if date_time > datetime.now():
+            if task:=get_task(task_id=room_number):
                 task.remove()
             
-            add_task(
-                task_func=send_result_of_game,
-                date_time=date,
-                task_id=room_number,
-                room_number=room_number
-            )
-            await RoomDB.update(
-                room_number,
-                started_at=datetime.now(),
-                closed_at=None, is_closed=False
-            )
+            add_task(task_func=send_result_of_game, date_time=date_time,
+                    task_id=room_number, room_number=room_number)
+            
+            await RoomDB.update(room_number, started_at=datetime.now(),
+                                closed_at=None, is_closed=False)
             
             message_text = (
                 'Дата рассылки установлена на'
-                f' {date.strftime("%Y-%b-%d, %H:%M:%S")}'
+                f' {date_time.strftime("%Y-%b-%d, %H:%M:%S")}'
             )
-            await message.answer(
+            await last_message.edit_text(
                 text=message_text,
                 reply_markup=keyboard_inline
             )
+            await state.finish()
         else:
-    
             message_text = (
                 'Вы указали прошедшую дату. Попробуте снова и укажите '
                 'правильную дату для жеребьевки.'
             )
-            
-            await message.answer(
-                text=message_text,
-                reply_markup=keyboard_inline
-            )
+
+            await _incorrect_data_format(last_message, message_text,
+                                         cancel_keyboard_inline)
+    else:
+        message_text = (
+            'Вы указали неверную дату.\n\n Попробуте снова и укажите '
+            'правильную дату для жеребьевки.'
+        )
+        await _incorrect_data_format(last_message, message_text,
+                                     cancel_keyboard_inline)
+
+def _parse_date(text) -> datetime | bool:
+    time_format_variants = ['%Y,%m,%d,%H,%M', '%Y %m %d %H:%M',
+                            '%Y.%m.%d %H:%M', '%Y\\%m\\%d %H:%M',
+                            '%Y/%m/%d %H:%M', '%Y %m %d %H %M']
     
-    await state.finish()
+    pattern = (r'\d{4}[\s.,/\\]?\d{1,2}[\s.,/\\]?\d{1,2}'
+               r'[\s.,/\\]?\d{1,2}[\s.,:/]?\d{1,2}')
+    matches = re.findall(pattern, text)
+    
+    if matches:
+        for time_str in matches:
+            for fmt in time_format_variants:
+                try:
+                    date_time = datetime.strptime(time_str, fmt)
+                    return date_time
+                
+                except ValueError:
+                    pass
+    
+    return False
+
+async def _incorrect_data_format(message: types.Message, text: str,
+                                 keyboard_inline:types.InlineKeyboardMarkup):
+        
+    await message.edit_text(
+        text=text,
+        reply_markup=keyboard_inline
+    )
