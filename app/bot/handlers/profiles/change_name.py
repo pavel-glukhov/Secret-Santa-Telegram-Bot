@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 async def change_username(callback: types.CallbackQuery):
     await ChangeUserName.waiting_for_first_name.set()
     state = dp.get_current().current_state()
-    await delete_user_message(callback.message.from_user.id,
-                              callback.message.message_id)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',

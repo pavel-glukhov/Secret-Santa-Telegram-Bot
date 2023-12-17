@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 async def delete_user_information(callback: types.CallbackQuery):
     await DeleteUserInformation.waiting_for_conformation.set()
     state = dp.get_current().current_state()
-    await delete_user_message(callback.message.from_user.id,
-                              callback.message.message_id)
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',

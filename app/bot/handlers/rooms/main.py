@@ -56,19 +56,19 @@ async def my_room(callback: types.CallbackQuery):
             f'<b>Управление комнатой {room.name}'
             f' ({room.number})</b>\n\n'
             f'<b>Бюджет</b>: {room.budget}\n\n'
-            'Владелец комнаты ещё не назначил время жеребьевки.'
         )
-        
+        text_control_room_not_scheduler = (
+            '<b>Время жеребьёвки ещё не назначено.</b>'
+        )
         if scheduler_task:
             text_control_room_scheduler = (
                 '<b>🕓 Игра в текущей комнате запущена на '
                 f'{scheduler_task.next_run_time.strftime("%Y-%b-%d")}</b>\n\n'
             )
             
-            scheduler_text = text_control_room_scheduler
-            message_text = scheduler_text + text_control_room
+            message_text = text_control_room + text_control_room_scheduler
         else:
-            message_text = text_control_room
+            message_text = text_control_room + text_control_room_not_scheduler
         
         await callback.message.edit_text(
             text=message_text,

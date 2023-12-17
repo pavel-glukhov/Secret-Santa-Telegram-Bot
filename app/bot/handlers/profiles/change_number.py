@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 async def change_phone_number(callback: types.CallbackQuery):
     await ChangePhoneNuber.waiting_for_phone_number.set()
     state = dp.get_current().current_state()
-    await delete_user_message(callback.message.from_user.id,
-                              callback.message.message_id)
+
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'}
     )
     

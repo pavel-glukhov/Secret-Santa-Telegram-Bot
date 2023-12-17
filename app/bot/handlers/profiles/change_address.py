@@ -24,8 +24,6 @@ async def change_user_address(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await delete_user_message(callback.message.from_user.id,
-                              callback.message.message_id)
 
     message_text = (
         'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
