@@ -22,6 +22,7 @@ async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     room_members = await RoomDB.get_list_members(room_number)
     task = get_task(task_id=room_number)
+    
     keyboard = {
         "Изменить время 🕘": f"room_change-game-dt_{room_number}",
         "Вернуться назад ◀️": f"room_menu_{room_number}"
@@ -72,9 +73,9 @@ async def change_game_datetime(callback: types.CallbackQuery):
 
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
 
 
 @dp.message_handler(state=StartGame.waiting_for_datetime)
@@ -90,15 +91,15 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-
+    
     date_time = _parse_date(text)
     if date_time:
         if date_time > datetime.now():
-            if task:=get_task(task_id=room_number):
+            if task := get_task(task_id=room_number):
                 task.remove()
             
             add_task(task_func=send_result_of_game, date_time=date_time,
-                    task_id=room_number, room_number=room_number)
+                     task_id=room_number, room_number=room_number)
             
             await RoomDB.update(room_number, started_at=datetime.now(),
                                 closed_at=None, is_closed=False)
@@ -117,7 +118,7 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                 'Вы указали прошедшую дату. Попробуте снова и укажите '
                 'правильную дату для жеребьевки.'
             )
-
+            
             await _incorrect_data_format(last_message, message_text,
                                          cancel_keyboard_inline)
     else:
@@ -127,6 +128,7 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
         )
         await _incorrect_data_format(last_message, message_text,
                                      cancel_keyboard_inline)
+
 
 def _parse_date(text) -> datetime | bool:
     time_format_variants = ['%Y,%m,%d,%H,%M', '%Y %m %d %H:%M',
@@ -149,9 +151,11 @@ def _parse_date(text) -> datetime | bool:
     
     return False
 
-async def _incorrect_data_format(message: types.Message, text: str,
-                                 keyboard_inline:types.InlineKeyboardMarkup):
-        
+
+async def _incorrect_data_format(
+        message: types.Message,
+        text: str,
+        keyboard_inline: types.InlineKeyboardMarkup) -> None:
     await message.edit_text(
         text=text,
         reply_markup=keyboard_inline

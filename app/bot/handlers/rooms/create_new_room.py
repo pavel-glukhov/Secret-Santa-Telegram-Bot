@@ -64,12 +64,35 @@ async def process_name(message: types.Message, state: FSMContext):
         'на подарок Тайного Санты.\n'
         'Напиши в чат сумму в любом формате, '
         'например 2000 тенге,'
-        '200 руб или 20$\n'
+        '200 рублей или 20$\n\n'
+        'Длина сообщения не должна превышать 12 символов.'
     )
     
     await last_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
+    )
+
+
+@dp.message_handler(lambda message:
+                    len(message.text.lower()) > 12,
+                    state=CreateRoom.waiting_for_room_budget)
+async def process_budget_invalid(message: types.Message):
+    state_data = await dp.get_current().current_state().get_data()
+    last_message = state_data['last_message']
+    await delete_user_message(message.from_user.id, message.message_id)
+    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    logger.info('long budget message'
+                f' command from [{message.from_user.id}] ')
+    
+    message_text = (
+        'Вы введи слишком длинное сообщение для бюджета.\n '
+        'Длина сообщения не может быть больше 12 символов\n'
+        'Для изменения вашего бюджета, отправьте новое сообщение.\n'
+    )
+    await last_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
     )
 
 

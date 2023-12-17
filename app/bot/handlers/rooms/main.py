@@ -24,7 +24,7 @@ async def my_room(callback: types.CallbackQuery):
                                           room_number=room_number)
     
     if room.is_closed:
-        await room_is_closed(callback, room.number, user_id)
+        await _room_is_closed(callback, room.number, user_id)
     
     else:
         keyboard_dict = {
@@ -76,7 +76,7 @@ async def my_room(callback: types.CallbackQuery):
         )
 
 
-async def room_is_closed(callback: types.CallbackQuery,
+async def _room_is_closed(callback: types.CallbackQuery,
                          room_number: int, user_id: int) -> None:
     recipient = await GameResultDB.get_recipient(room_id=room_number,
                                                  user_id=user_id)
