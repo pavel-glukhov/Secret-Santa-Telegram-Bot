@@ -18,3 +18,6 @@ class JoinRoom(StatesGroup):
 
 class ChangeRoomName(StatesGroup):
     waiting_for_room_name = State()
+
+class ChangeBudget(StatesGroup):
+    waiting_for_budget = State()

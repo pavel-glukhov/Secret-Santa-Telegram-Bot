@@ -13,6 +13,7 @@ async def configuration_room(callback: types.CallbackQuery):
     keyboard_inline = generate_inline_keyboard(
         {
             "Изменить имя комнаты ⚒": f"room_change-name_{room_number}",
+            "Изменить бюджет 💶": f"room_change-budget_{room_number}",
             "Изменить владельца 👤": f"room_change-owner_{room_number}",
             "Удалить комнату ❌": f"room_delete_{room_number}",
             "Вернуться назад ◀️": f"room_menu_{room_number}",
