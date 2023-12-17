@@ -3,18 +3,13 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.profiles.states import ChangeUserName
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
-
-
-class ChangeUserName(StatesGroup):
-    waiting_for_first_name = State()
-    waiting_for_last_name = State()
 
 
 @dp.callback_query_handler(Text(equals='profile_edit_name'))
@@ -27,10 +22,14 @@ async def change_username(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+    
+    message_text = (
         'Хохохо, пора указать твои данные для Санты 🎅\n'
         'Учти, что оно будет использоваться для отправки подарка Сантой.\n\n'
-        '<b>Сначала напиши свое имя</b>\n\n',
+        '<b>Сначала напиши свое имя</b>\n\n'
+    )
+    await message.answer(
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -41,14 +40,13 @@ async def process_changing_first_name(message: types.Message,
     first_name = message.text
     await state.update_data(first_name=first_name)
 
-    keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        })
-
+    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    
+    message_text = '<b>Теперь укажи свою фамилию</b>\n\n'
+    
     await ChangeUserName.next()
     await message.answer(
-        '<b>Теперь укажи свою фамилию</b>\n\n',
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -69,8 +67,11 @@ async def process_changing_last_name(message: types.Message,
     await UserDB.update_user(user_id,
                              first_name=first_name,
                              last_name=last_name)
+    
+    message_text = 'Имя и фамилия изменены.'
+    
     await message.answer(
-        'Имя и фамилия изменены.',
+        text=message_text,
         reply_markup=keyboard_inline,
     )
     await state.finish()

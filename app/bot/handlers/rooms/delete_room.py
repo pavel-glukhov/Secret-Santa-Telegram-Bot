@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers.operations import get_room_number, delete_user_message
+from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import DeleteRoom
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.rooms import RoomDB

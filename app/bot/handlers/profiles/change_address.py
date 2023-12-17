@@ -3,18 +3,15 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from app.store.encryption import CryptData
+
 from app.bot import dispatcher as dp
+from app.bot.handlers.profiles.states import ChangeAddress
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.users import UserDB
 from app.config import load_config
+from app.store.database.queries.users import UserDB
+from app.store.encryption import CryptData
 
 logger = logging.getLogger(__name__)
-
-
-class ChangeAddress(StatesGroup):
-    waiting_for_address_information = State()
 
 
 @dp.callback_query_handler(Text(equals='profile_edit_address'))
@@ -64,8 +61,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=address)
         await UserDB.update_user(user_id, encrypted_address=encrypted_data)
+        
+        message_text = 'Адрес изменен.'
+        
         await message.answer(
-            'Адрес изменен.',
+            text=message_text,
             reply_markup=keyboard_inline,
         )
         await state.finish()

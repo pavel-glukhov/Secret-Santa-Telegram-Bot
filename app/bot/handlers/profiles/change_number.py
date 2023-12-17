@@ -4,19 +4,15 @@ import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.profiles.states import ChangePhoneNuber
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
 from app.store.database.queries.users import UserDB
 from app.store.encryption import CryptData
 
 logger = logging.getLogger(__name__)
-
-
-class ChangePhoneNuber(StatesGroup):
-    waiting_for_phone_number = State()
 
 
 @dp.callback_query_handler(Text(equals='profile_edit_number'))
@@ -29,11 +25,16 @@ async def change_phone_number(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-    await message.answer(
+    
+    message_text = (
         'Укажите ваш номер телефона, что бы почтовые служащие '
         'смогли оповестить вас о прибывшем подарке\n'
         '<b>Укажи свой номер используя формат: +7|8(___)___-__-__ </b> \n'
-        '<b>Например:</b> 8 700 111 11 11',
+        '<b>Например:</b> 8 700 111 11 11'
+    )
+    
+    await message.answer(
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -54,8 +55,9 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         
         await UserDB.update_user(user_id, encrypted_number=encrypted_data)
         
+        message_text = 'Номер изменен.'
         await message.answer(
-            'Номер изменен.',
+            text=message_text,
             reply_markup=keyboard_inline,
         )
         await state.finish()

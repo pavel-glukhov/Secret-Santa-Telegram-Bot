@@ -3,19 +3,16 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from app.bot import dispatcher as dp, bot
+from app.bot import bot
+from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
+from app.bot.handlers.wishes.states import ChangeWish
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.rooms import RoomDB
 from app.store.database.queries.wishes import WishDB
 
 logger = logging.getLogger(__name__)
-
-
-class ChangeWish(StatesGroup):
-    waiting_for_wishes = State()
 
 
 @dp.callback_query_handler(Text(startswith='room_show-wish'))
@@ -53,6 +50,7 @@ async def update_wishes(callback: types.CallbackQuery):
         }
     )
     message_text = '<b>Напиши новое желание:</b>\n'
+    
     await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
@@ -82,6 +80,7 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
     await bot.delete_message(chat_id=message.from_id,
                              message_id=question_message_id)
     await message.delete()
+    
     message_text = (
         f'Ваши желания в комнате <b>{room.name}</b> изменены на:\n\n'
         f'{wish}\n\n'

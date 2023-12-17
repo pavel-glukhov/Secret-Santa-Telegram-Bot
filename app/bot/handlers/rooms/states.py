@@ -1,5 +1,6 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
+
 class DeleteRoom(StatesGroup):
     waiting_conformation = State()
     

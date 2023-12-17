@@ -5,9 +5,9 @@ from datetime import datetime
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.game.states import StartGame
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
@@ -15,10 +15,6 @@ from app.store.database.queries.rooms import RoomDB
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
-
-
-class StartGame(StatesGroup):
-    waiting_for_datetime = State()
 
 
 @dp.callback_query_handler(Text(startswith='room_start-game'))
@@ -120,15 +116,24 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                 started_at=datetime.now(),
                 closed_at=None, is_closed=False
             )
-            await message.answer(
+            
+            message_text = (
                 'Дата рассылки установлена на'
-                f' {date.strftime("%Y-%b-%d, %H:%M:%S")}',
+                f' {date.strftime("%Y-%b-%d, %H:%M:%S")}'
+            )
+            await message.answer(
+                text=message_text,
                 reply_markup=keyboard_inline
             )
         else:
-            await message.answer(
+    
+            message_text = (
                 'Вы указали прошедшую дату. Попробуте снова и укажите '
-                'правильную дату для жеребьевки.',
+                'правильную дату для жеребьевки.'
+            )
+            
+            await message.answer(
+                text=message_text,
                 reply_markup=keyboard_inline
             )
     

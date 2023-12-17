@@ -3,17 +3,13 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.profiles.states import DeleteUserInformation
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.users import UserDB
 
 logger = logging.getLogger(__name__)
-
-
-class DeleteUserInformation(StatesGroup):
-    waiting_for_conformation = State()
 
 
 @dp.callback_query_handler(Text(equals='profile_edit_delete_all'))
@@ -45,8 +41,13 @@ async def process_deleting_information_invalid(message: types.Message):
             "Отмена": 'cancel',
         }
     )
+    
+    message_text = (
+        'Вы ввели неверную команду для подтверждения, '
+        'попробуйте снова.\n'
+    )
     return await message.answer(
-        'Вы ввели неверную команду для подтверждения, попробуйте снова.\n',
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -73,8 +74,11 @@ async def process_deleting_information(message: types.Message,
             "Вернуться назад ◀️": "menu_user_profile",
         }
     )
+    
+    message_text = 'Все данные о вас были удалены.\n\n'
+    
     await message.answer(
-        'Все данные о вас были удалены.\n\n',
+        text=message_text,
         reply_markup=keyboard_inline
     )
     await state.finish()

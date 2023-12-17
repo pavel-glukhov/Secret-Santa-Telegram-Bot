@@ -35,7 +35,7 @@ class UserDB:
         return user
     
     @staticmethod
-    async def update_user(user_id: int, **kwargs: str) -> None:
+    async def update_user(user_id: int, **kwargs) -> None:
         """
         Update any field of user instance
         """

@@ -59,6 +59,7 @@ async def completed_message_to_santa(message: types.Message,
     )
     
     message_text = 'Сообщение вашему получателю было отправлено'
+    
     await message.answer(
         text=message_text,
         reply_markup=keyboard_inline,

@@ -23,8 +23,8 @@ async def my_profile(callback: types.CallbackQuery):
 
     user = await UserDB.get_user_or_none(message.chat.id)
     user_information = profile_information_formatter(user)
-
-    await message.edit_text(
+    
+    message_text = (
         'Предоставленные вами данные необходимы для отправки'
         ' подарка вашим Тайным Сантой.\n\n'
         '<b>Ваш профиль</b>:\n\n'
@@ -34,7 +34,10 @@ async def my_profile(callback: types.CallbackQuery):
         'Если вы желаете изменить личные данные,'
         ' или удалить их, нажмите на кнопку '
         '<b>Изменить профиль</b>\n\n'
-        ,
+    )
+    
+    await message.edit_text(
+        text=message_text,
         reply_markup=keyboard_inline
     )
 
@@ -51,5 +54,10 @@ async def edit_profile(callback: types.CallbackQuery, ):
             "Вернуться назад ◀️": "menu_user_profile"
         }
     )
-    await message.edit_text("Выберите, что вы хотите изменить:",
-                            reply_markup=keyboard_inline)
+    
+    message_text = "Выберите, что вы хотите изменить:"
+    
+    await message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
