@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import ChangeAddress
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
@@ -16,14 +17,15 @@ logger = logging.getLogger(__name__)
 
 @dp.callback_query_handler(Text(equals='profile_edit_address'))
 async def change_user_address(callback: types.CallbackQuery):
-    message = callback.message
     await ChangeAddress.waiting_for_address_information.set()
-
+    state = dp.get_current().current_state()
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
+    await delete_user_message(callback.message.from_user.id,
+                              callback.message.message_id)
 
     message_text = (
         'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
@@ -41,7 +43,8 @@ async def change_user_address(callback: types.CallbackQuery):
         '<b>Например: Россия, Московская область, г. Фрязино, ул. Пупкина,'
         ' д. 99, кв. 999, этаж 25, индекс 123987.</b>\n'
     )
-    await message.answer(
+    async with state.proxy() as data:
+        data['last_message'] = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
@@ -49,6 +52,8 @@ async def change_user_address(callback: types.CallbackQuery):
 
 @dp.message_handler(state=ChangeAddress.waiting_for_address_information)
 async def process_changing_owner(message: types.Message, state: FSMContext):
+    state_data = await dp.current_state().get_data()
+    last_message = state_data['last_message']
     address = message.text
     user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
@@ -56,15 +61,17 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": "menu_user_profile",
         }
     )
-
+    await delete_user_message(message.from_user.id,
+                              message.message_id)
     if len(address) < 150:
         crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=address)
+        
         await UserDB.update_user(user_id, encrypted_address=encrypted_data)
         
         message_text = 'Адрес изменен.'
         
-        await message.answer(
+        await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
@@ -74,7 +81,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             'Адресные данные не могут превышать 150 символов.'
             ' Попробуйте снова.'
         )
-        await message.answer(
+        await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )

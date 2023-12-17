@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
+from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import DeleteUserInformation
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.database.queries.users import UserDB
@@ -14,9 +15,10 @@ logger = logging.getLogger(__name__)
 
 @dp.callback_query_handler(Text(equals='profile_edit_delete_all'))
 async def delete_user_information(callback: types.CallbackQuery):
-    message = callback.message
     await DeleteUserInformation.waiting_for_conformation.set()
-
+    state = dp.get_current().current_state()
+    await delete_user_message(callback.message.from_user.id,
+                              callback.message.message_id)
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -26,7 +28,8 @@ async def delete_user_information(callback: types.CallbackQuery):
         'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
     )
 
-    await message.answer(
+    async with state.proxy() as data:
+        data['last_message'] = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )
@@ -36,6 +39,11 @@ async def delete_user_information(callback: types.CallbackQuery):
                     message.text.lower() != 'подтверждаю',
                     state=DeleteUserInformation.waiting_for_conformation)
 async def process_deleting_information_invalid(message: types.Message):
+    state = dp.get_current().current_state()
+    state_data = await state.get_data()
+    last_message = state_data['last_message']
+    await delete_user_message(message.from_user.id, message.message_id)
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -43,10 +51,10 @@ async def process_deleting_information_invalid(message: types.Message):
     )
     
     message_text = (
-        'Вы ввели неверную команду для подтверждения, '
-        'попробуйте снова.\n'
-    )
-    return await message.answer(
+        'Вы ввели неверную команду. Попробуйте снова.\n\n'
+        'Для подтверждения, введите слово <b>"подтверждаю"</b>'
+        )
+    return await last_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )
@@ -58,6 +66,9 @@ async def process_deleting_information_invalid(message: types.Message):
 async def process_deleting_information(message: types.Message,
                                        state: FSMContext):
     user_id = message.chat.id
+    state_data = await state.get_data()
+    last_message = state_data['last_message']
+    await delete_user_message(message.from_user.id, message.message_id)
 
     data = {
         'first_name': None,
@@ -77,7 +88,7 @@ async def process_deleting_information(message: types.Message,
     
     message_text = 'Все данные о вас были удалены.\n\n'
     
-    await message.answer(
+    await last_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )
