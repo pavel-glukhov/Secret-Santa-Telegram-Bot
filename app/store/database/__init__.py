@@ -1,6 +1,6 @@
 import logging
 
-from tortoise import Tortoise
+from tortoise import Tortoise, exceptions
 
 from app.config import load_config
 
@@ -25,9 +25,12 @@ TORTOISE_ORM = {
 }
 
 async def init_db() -> None:
-    await Tortoise.init(
-        config=TORTOISE_ORM
-    )
+    try:
+        await Tortoise.init(
+            config=TORTOISE_ORM
+        )
+    except exceptions.DBConnectionError as ex:
+        logger.error(ex)
 
 async def close_db() -> None:
     await Tortoise.close_connections()
