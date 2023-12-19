@@ -102,6 +102,11 @@
  - uvicorn main:create_app --reload
 
 
+### Запуск Бота в Docker контейнере:
+ - Установить Docker https://docs.docker.com/engine/install/ubuntu/
+ - Создать свой .env файл по шаблону .env.example
+ - docker-compose up --build
+
 - ### Регистрация вебхука
     Используем линк в браузере
     https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
