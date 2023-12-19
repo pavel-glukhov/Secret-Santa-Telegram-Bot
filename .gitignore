@@ -153,3 +153,5 @@ test.py
 /migrations/migrate.bat
 /ngrok/
 /ngrok.bat
+/.env_stage
+/.env_prod

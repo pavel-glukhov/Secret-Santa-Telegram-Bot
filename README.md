@@ -124,3 +124,7 @@
     https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/
 
 - Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя команду **/setdomain**
+
+### Бекапы
+Бекапить базу данных можно с помощью команды ниже, добавленной в крон:  
+docker exec -t <имя_контейнера> pg_dump -U <имя_пользователя> <имя_базы_данных> > <имя_файла>.sql
