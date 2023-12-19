@@ -2,7 +2,7 @@ version: '3.10'
 
 services:
   db:
-    image: postgres:latest
+    image: postgres:16.1
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -16,7 +16,7 @@ services:
     env_file:
       - .env_prod
   redis:
-    image: redis:latest
+    image: redis:7.2.3
     command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
     ports:
       - 6379
@@ -25,7 +25,7 @@ services:
     env_file:
       - .env_prod
   web:
-    image: nginx:latest
+    image: nginx:1.25.3
     ports:
       - 80:80
       - 443:443
