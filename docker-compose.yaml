@@ -1,0 +1,62 @@
+version: '3.10'
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./data/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432
+    env_file:
+      - .env
+  redis:
+    image: redis:latest
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    ports:
+      - 6379
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+  web:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - static_value:/var/html/static/
+      - template_value:/var/html/template/
+    depends_on:
+      - app
+  app:
+    build: .
+    restart: always
+    command: bash -c "aerich init-db && aerich migrate && aerich upgrade &&
+      uvicorn main:create_app --proxy-headers --host 0.0.0.0 --port 8000"
+    volumes:
+      - static_value:/code/static/
+      - template_value:/code/templates/
+      - log_value:/code/logs/
+    environment:
+      - TZ=Asia/Almaty
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  template_value:
+  redis_data:
+  log_value:
+  static_value:
