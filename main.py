@@ -1,8 +1,6 @@
 import logging
 import os
 
-import uvicorn
-
 from app.bot import bot
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -28,7 +26,18 @@ exception_handlers = {
 def get_config():
     return AuthJWTSettings()
 
+def init_routers(app: FastAPI)-> None:
+    app.include_router(main.router)
+    app.include_router(users.router)
+    app.include_router(auth.router)
+    app.include_router(rooms.router)
+    app.include_router(active_games.router)
+    app.include_router(webhooks.router)
 
+def init_handlers(app: FastAPI) -> None:
+    app.add_event_handler("startup", on_startup)
+    app.add_event_handler("shutdown", on_shutdown)
+    
 def create_app() -> FastAPI:
     app = FastAPI(
         debug=False,
@@ -36,20 +45,13 @@ def create_app() -> FastAPI:
         docs_url=None,
         redoc_url=None
     )
-    app.add_event_handler("startup", on_startup)
-    app.add_event_handler("shutdown", on_shutdown)
     app.mount(
         "/static",
         StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
         name="static"
     )
-
-    app.include_router(main.router)
-    app.include_router(users.router)
-    app.include_router(auth.router)
-    app.include_router(rooms.router)
-    app.include_router(active_games.router)
-    app.include_router(webhooks.router)
+    init_handlers(app)
+    init_routers(app)
     return app
 
 async def on_startup():
@@ -69,6 +71,3 @@ async def on_shutdown():
     logger.info("App has been stopped")
 
 
-if __name__ == "__main__":
-    app = create_app()
-    uvicorn.run(app, port=8000)
