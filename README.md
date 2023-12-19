@@ -96,9 +96,10 @@
    ```
  - Создать свой .env файл по шаблону .env.example
  - pip install -r requirements
+ - aerich init-db
  - aerich migrate
  - aerich upgrade
- - python main.py
+ - uvicorn main:create_app --reload
 
 
 - ### Регистрация вебхука
