@@ -14,7 +14,7 @@ services:
     ports:
       - 5432
     env_file:
-      - .env
+      - .env_prod
   redis:
     image: redis:latest
     command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
@@ -23,7 +23,7 @@ services:
     volumes:
       - redis_data:/data
     env_file:
-      - .env
+      - .env_prod
   web:
     image: nginx:latest
     ports:
@@ -43,7 +43,9 @@ services:
     volumes:
       - static_value:/code/static/
       - template_value:/code/templates/
-      - log_value:/code/logs/
+      - type: bind
+        source: ${LOGS_MOUNT_FOLDER}
+        target: /code/logs/
     environment:
       - TZ=Asia/Almaty
     ports:
@@ -52,7 +54,7 @@ services:
       - db
       - redis
     env_file:
-      - .env
+      - .env_prod
 
 volumes:
   postgres_data:
