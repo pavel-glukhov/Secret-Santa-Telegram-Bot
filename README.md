@@ -88,31 +88,39 @@
 7. Redis
 
 ### Запуск Бота:
+#### Ручной запуск:
  - Установить PostgreSQL и Redis, сконфигурировать и создать БД. 
- - Redis требует включения доступа по паролю:
-    ```
-   sudo nano /etc/redis/redis.conf
-   # requirepass foobared
-   ```
- - Создать свой .env файл по шаблону .env.example
- - pip install -r requirements
- - aerich init-db
- - aerich migrate
- - aerich upgrade
- - uvicorn main:create_app --reload
+   - Redis требует включения доступа по паролю:
+      ```
+     sudo nano /etc/redis/redis.conf
+     # requirepass foobared
+     ```
+   - Создать свой .env файл по шаблону .env.example
+   - pip install -r requirements
+   - aerich init-db
+   - aerich migrate
+   - aerich upgrade
+   - uvicorn main:create_app --reload
 
-
-### Запуск Бота в Docker контейнере:
+#### В Docker контейнере:
  - Установить Docker https://docs.docker.com/engine/install/ubuntu/
- - Создать свой .env файл по шаблону .env.example
- - docker-compose up --build
+   - Создать свой .env файл по шаблону .env.example
+   - docker-compose up --build
 
+### Права доступа:
+ - Что бы добавить Superuser права пользователю, выполните: 
+  ```console
+     python .\manage.py set_superuser <telegram_user_id>
+  ```
+ - Что бы удалить их, выполните **** 
+  ```console
+      python .\manage.py remove_superuser <telegram_user_id>
+  ```
 - ### Регистрация вебхука
-    Используем линк в браузере
+    Сформируйте и сделайте GET запрос
     https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
 
     Пример:
-    https://api.telegram.org/bot5473814321:AAEFDZ1A5SoRsd6RFDONysEbYkl3D_VAfss/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/
-
+    https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/
 
 - Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя команду **/setdomain**
