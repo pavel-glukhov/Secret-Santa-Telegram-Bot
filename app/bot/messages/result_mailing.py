@@ -27,6 +27,7 @@ class Person:
     def set_sender(self, player_to_send):
         self.to_send = player_to_send
 
+
 async def creating_active_users_pool(room_number):
     room_members = await RoomDB.get_list_members(room_number)
     row_list_players = [member for member in room_members]
@@ -37,12 +38,12 @@ async def creating_active_users_pool(room_number):
         
         address = player.get_address() if player.get_address() \
             else ('Адрес указан, свяжитесь с участником через чат '
-                'для уточнения информации')
+                  'для уточнения информации')
         number = player.get_number() if player.get_number() \
             else ('Контактный номер не указан, '
-                    'свяжитесь с участником через чат '
-                    'для уточнения информации')
-                
+                  'свяжитесь с участником через чат '
+                  'для уточнения информации')
+        
         if is_active_user:
             wish = await WishDB.get(player.user_id, room_number)
             player_information = {
@@ -60,17 +61,26 @@ async def creating_active_users_pool(room_number):
     return verified_users_list
 
 
-async def send_result_of_game(room_number) -> None:
+async def send_result_of_game(room_number, semaphore) -> None:
     verified_users = await creating_active_users_pool(room_number)
-    count_verified_users = len(verified_users)
     
-    if count_verified_users < 3:
-        return await _insufficient_number_players(room_number,
-                                                 count_verified_users)
+    if not _check_sending_capability(verified_users):
+        await _insufficient_number_players(room_number)
+        
+    data = await _prepare_sending_data(verified_users, room_number)
+    await RoomDB.update(room_number,
+                        is_closed=True,
+                        closed_at=datetime.datetime.now())
+    
+    async with semaphore:
+        await broadcaster(data)
+
+
+async def _prepare_sending_data(verified_users: list, room_number: int) -> list:
     random.shuffle(verified_users)
     persons = [Person(user) for user in verified_users]
     persons[-1].set_sender(persons[0])
-    prepared_users_list = []
+    sending_data = []
     
     for index in range(len(persons) - 1):
         persons[index].set_sender(persons[index + 1])
@@ -87,14 +97,9 @@ async def send_result_of_game(room_number) -> None:
             person.to_send.player['player_wish']
             if person.to_send.player['player_wish'] else ''
         )
-        
         await GameResultDB.insert(room_number,
                                   recipient_id,
                                   sender_id)
-        
-        await RoomDB.update(room_number,
-                            is_closed=True,
-                            closed_at=datetime.datetime.now())
         
         message_text = message_formatter(sender_name,
                                          receiver_first_name,
@@ -102,18 +107,23 @@ async def send_result_of_game(room_number) -> None:
                                          address_to_send,
                                          phone_to_send,
                                          wish_to_send)
-        prepared_users_list.append(
+        sending_data.append(
             {
                 'user_id': person.player['player_id'],
                 'text': message_text
-                
             }
         )
-    
-    await broadcaster(prepared_users_list)
+    return sending_data
 
-async def _insufficient_number_players(room_number: int,
-                                      count_verified_users: int) -> None:
+
+async def _check_sending_capability(verified_users):
+    count_verified_users = len(verified_users)
+    if count_verified_users < 3:
+        return False
+    return True
+
+
+async def _insufficient_number_players(room_number: int) -> None:
     room = await RoomDB.get(room_number)
     owner = await room.owner
     
@@ -126,17 +136,18 @@ async def _insufficient_number_players(room_number: int,
                         is_closed=True,
                         closed_at=datetime.datetime.now())
     
+    remove_task(room_number)
+    
     message_text = (
-            f'Вы получили данное сообщение, т.к. '
-            f'рассылка в вашей комнате '
-            f'[<b>{room.name}</b>] '
-            f'была указана на данную дату.\n\n К сожалению, '
-            f'в вашей комнате недостаточно '
-            'активных игроков.\n\n'
-            'Активных игроков должно быть 3 или более.\n'
-            f'В данный момент у вас {count_verified_users}.\n\n'
-            '<b>Пригласите больше игроков и задайте '
-            'новую дату жеребьевки</b>')
+        f'Вы получили данное сообщение, т.к. '
+        f'рассылка в вашей комнате '
+        f'[<b>{room.name}</b>] '
+        f'была указана на данную дату.\n\n К сожалению, '
+        f'в вашей комнате недостаточно '
+        'активных игроков.\n\n'
+        'Активных игроков должно быть 3 или более.\n\n'
+        '<b>Пригласите больше игроков и задайте '
+        'новую дату жеребьевки</b>')
     
     await send_message(
         user_id=owner.user_id,
@@ -144,6 +155,5 @@ async def _insufficient_number_players(room_number: int,
         reply_markup=keyboard_inline
     )
     
-    remove_task(room_number)
     logger.info(f'Insufficient number of players '
                 f'for the room [{room_number}]. The task was removed.')

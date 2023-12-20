@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 from datetime import datetime
@@ -82,8 +83,9 @@ async def change_game_datetime(callback: types.CallbackQuery):
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     room_number = state_data['room_number']
-    text = message.text
     last_message = state_data['last_message']
+    text = message.text
+    semaphore = asyncio.Semaphore(1)
     await delete_user_message(message.from_user.id, message.message_id)
     cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     keyboard_inline = generate_inline_keyboard(
@@ -99,7 +101,8 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                 task.remove()
             
             add_task(task_func=send_result_of_game, date_time=date_time,
-                     task_id=room_number, room_number=room_number)
+                     task_id=room_number, room_number=room_number,
+                     semaphore=semaphore)
             
             await RoomDB.update(room_number, started_at=datetime.now(),
                                 closed_at=None, is_closed=False)

@@ -60,7 +60,6 @@ def add_task(
     :param kwargs:
     :return:
     """
-    
     task = scheduler.add_job(
         task_func,
         'date',
