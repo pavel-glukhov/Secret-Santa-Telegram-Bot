@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 async def change_phone_number(callback: types.CallbackQuery):
     await ChangePhoneNuber.waiting_for_phone_number.set()
     state = dp.get_current().current_state()
-
+    
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'}
-    )
+                                               )
     
     message_text = (
         'Укажите ваш номер телефона, что бы почтовые служащие '
@@ -30,12 +30,12 @@ async def change_phone_number(callback: types.CallbackQuery):
         '<b>Введите свой номер используя формат: +7|8(___)___-__-__ </b> \n'
         '<b>Например:</b> +7 700 111 11 11'
     )
-
+    
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
 
 
 @dp.message_handler(state=ChangePhoneNuber.waiting_for_phone_number)
