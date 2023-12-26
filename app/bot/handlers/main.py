@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.config import load_config
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ async def create_user_or_enable(message: types.Message):
     username = message.chat.username
     first_name = message.chat.first_name
     last_name = message.chat.last_name
-    user, created = await UserDB.get_or_create(
+    user, created = await UserRepo().get_or_create(
         user_id=user_id,
         username=username,
         first_name=first_name,
@@ -45,9 +45,8 @@ async def create_user_or_enable(message: types.Message):
     )
     if created:
         logger.info(f'The new user "{user_id}" has been created')
-
     if not user.is_active:
-        await UserDB.enable_user(message.chat.id)
+        await UserRepo().enable_user(message.chat.id)
         logger.info(f'The new user "{user_id}" has been enabled')
 
     return user, created

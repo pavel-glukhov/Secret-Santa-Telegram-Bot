@@ -10,8 +10,8 @@ from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import ChangePhoneNuber
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
-from app.store.database.queries.users import UserDB
 from app.store.encryption import CryptData
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +57,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     if re.search(pattern, phone_number):
         crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=phone_number)
-        
-        await UserDB.update_user(user_id, encrypted_number=encrypted_data)
+        await UserRepo().update_user(user_id, encrypted_number=encrypted_data)
         logger.info(f'The user [{user_id}] updated call number.')
         message_text = 'Номер изменен.'
         

@@ -2,9 +2,9 @@ from fastapi import Depends, Request
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
-from app.web.templates import template
 from app.store.database.models import User
 from app.web.dependencies import get_current_user
+from app.web.templates import template
 
 
 async def not_authenticated(request: Request, exc):

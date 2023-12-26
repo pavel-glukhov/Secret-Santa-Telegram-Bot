@@ -9,9 +9,8 @@ from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import ChangeOwner
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
-from app.store.database.models import User
-from app.store.database.queries.rooms import RoomDB
-from app.store.database.queries.users import UserDB
+from app.store.queries.rooms import RoomRepo
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -52,12 +51,12 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    user = await UserDB.get_user_or_none(new_owner)
+    user = await UserRepo().get_user_or_none(new_owner)
     
     if user:
-        count_rooms = await RoomDB.get_count_user_rooms(user.user_id)
+        count_rooms = await RoomRepo().get_count_user_rooms(user.user_id)
         if count_rooms < load_config().room.user_rooms_count:
-            await RoomDB.change_owner(new_owner, room_number)
+            await RoomRepo().change_owner(new_owner, room_number)
 
             message_text = (
                 '"Хо-хо-хо! 🎅\n\n'

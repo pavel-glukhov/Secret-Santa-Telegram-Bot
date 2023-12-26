@@ -9,8 +9,8 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.handlers.wishes.states import ChangeWish
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
-from app.store.database.queries.wishes import WishDB
+from app.store.queries.rooms import RoomRepo
+from app.store.queries.wishes import WishRepo
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ async def show_wishes(callback: types.CallbackQuery):
     )
 
     user_id = message.chat.id
-    wishes = await WishDB.get(user_id, room_number)
+    wishes = await WishRepo().get(user_id, room_number)
 
     await message.edit_text('Ваши тайные желания 🙊: \n'
                             f'{wishes.wish}\n',
@@ -63,19 +63,17 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
     question_message_id = state_data['wishes_question_message_id']
     wish = message.text
     user_id = message.chat.id
-
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    await WishDB.update_or_create(
+    await WishRepo().update_or_create(
         wish,
         user_id,
         room_number
     )
-
-    room = await RoomDB.get(room_number)
+    room = await RoomRepo().get(room_number)
     await state.finish()
     await bot.delete_message(chat_id=message.from_id,
                              message_id=question_message_id)

@@ -7,8 +7,8 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.game_result import GameResultDB
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.game_result import GameResultRepo
+from app.store.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
 
 logger = logging.getLogger(__name__)
@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 async def my_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     scheduler_task = get_task(room_number)
-    room = await RoomDB.get(room_number)
+    room = await RoomRepo().get(room_number)
     user_id = callback.message.chat.id
-    is_room_owner = await RoomDB.is_owner(user_id=user_id,
-                                          room_number=room_number)
+    is_room_owner = await RoomRepo().is_owner(user_id=user_id,
+                                              room_number=room_number)
     
     if room.is_closed:
         await _room_is_closed(callback, room.number, user_id)
@@ -77,13 +77,13 @@ async def my_room(callback: types.CallbackQuery):
 
 
 async def _room_is_closed(callback: types.CallbackQuery,
-                         room_number: int, user_id: int) -> None:
-    recipient = await GameResultDB.get_recipient(room_id=room_number,
-                                                 user_id=user_id)
+                          room_number: int, user_id: int) -> None:
+    recipient = await GameResultRepo().get_recipient(room_id=room_number,
+                                                     user_id=user_id)
     
     if not recipient:
-        room_owner = await RoomDB.is_owner(user_id=user_id,
-                                           room_number=room_number)
+        room_owner = await RoomRepo().is_owner(user_id=user_id,
+                                               room_number=room_number)
         
         keyboard_dict = {
             'Активировать комнату ✅': f'room_activate_{room_number}',
@@ -140,7 +140,7 @@ async def members_list(callback: types.CallbackQuery):
             'Вернуться назад ◀️': f'room_menu_{room_number}'
         }
     )
-    room = await RoomDB.get(room_number)
+    room = await RoomRepo().get(room_number)
     members = await room.members
     member_string = ''
     

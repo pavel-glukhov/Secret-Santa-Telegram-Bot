@@ -7,6 +7,7 @@ from app.bot import bot
 
 logger = logging.getLogger(__name__)
 
+
 def get_room_number(callback: types.CallbackQuery) -> int:
     """
     Gets the room number from callback data
@@ -14,6 +15,7 @@ def get_room_number(callback: types.CallbackQuery) -> int:
     :return:
     """
     return int(callback.data[callback.data.rfind('_') + 1:])
+
 
 async def delete_user_message(chat_id, message_id):
     try:

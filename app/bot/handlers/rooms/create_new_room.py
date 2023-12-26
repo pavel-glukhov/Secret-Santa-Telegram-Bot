@@ -9,21 +9,20 @@ from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.rooms.states import CreateRoom
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
 
 @dp.callback_query_handler(Text(equals='menu_create_new_room'))
 async def create_room(callback: types.CallbackQuery, ):
-    
-    count_user_rooms = await RoomDB.get_count_user_rooms(
+    count_user_rooms = await RoomRepo().get_count_user_rooms(
         callback.message.chat.id)
     logger.info(count_user_rooms)
-    if count_user_rooms >=load_config().room.user_rooms_count:
+    if count_user_rooms >= load_config().room.user_rooms_count:
         keyboard_inline = generate_inline_keyboard(
             {
-              "Вернуться назад ◀️": "root_menu",
+                "Вернуться назад ◀️": "root_menu",
             }
         )
         message_text = (
@@ -48,10 +47,10 @@ async def create_room(callback: types.CallbackQuery, ):
     )
     
     async with state.proxy() as data:
-        data['last_message'] =  await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+        data['last_message'] = await callback.message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
 
 
 @dp.message_handler(state=CreateRoom.waiting_for_room_name)
@@ -63,7 +62,7 @@ async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(budget_question_id=message.message_id)
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     await delete_user_message(message.from_user.id, message.message_id)
-
+    
     if not len(room_name) < 13:
         keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
         
@@ -126,7 +125,7 @@ async def process_budget(message: types.Message, state: FSMContext):
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
     await delete_user_message(message.from_user.id, message.message_id)
-
+    
     await CreateRoom.next()
     
     message_text = (
@@ -150,12 +149,11 @@ async def process_wishes(message: types.Message, state: FSMContext):
     last_message = state_data['last_message']
     keyboard_inline = generate_inline_keyboard({"Меню ◀️": 'root_menu'})
     await delete_user_message(message.from_user.id, message.message_id)
-
-    room = await RoomDB.create(user_wish=user_wishes,
-                               owner=message.chat.id,
-                               name=state_data['room_name'],
-                               budget=state_data['room_budget'])
-
+    room = await RoomRepo().create(user_wish=user_wishes,
+                                   owner=message.chat.id,
+                                   name=state_data['room_name'],
+                                   budget=state_data['room_budget'])
+    
     logger.info(
         f'The new room "{room.number}" has been created by {message.chat.id}'
     )

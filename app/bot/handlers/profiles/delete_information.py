@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import DeleteUserInformation
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +25,12 @@ async def delete_user_information(callback: types.CallbackQuery):
     message_text = (
         'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
     )
-
+    
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
 
 
 @dp.message_handler(lambda message:
@@ -51,7 +51,7 @@ async def process_deleting_information_invalid(message: types.Message):
     message_text = (
         'Вы ввели неверную команду. Попробуйте снова.\n\n'
         'Для подтверждения, введите слово <b>"подтверждаю"</b>'
-        )
+    )
     return await last_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
@@ -67,7 +67,7 @@ async def process_deleting_information(message: types.Message,
     state_data = await state.get_data()
     last_message = state_data['last_message']
     await delete_user_message(message.from_user.id, message.message_id)
-
+    
     data = {
         'first_name': None,
         'last_name': None,
@@ -75,10 +75,9 @@ async def process_deleting_information(message: types.Message,
         'encrypted_address': None,
         'encrypted_number': None,
     }
-
-    await UserDB.update_user(user_id=user_id, **data)
+    await UserRepo().update_user(user_id=user_id, **data)
     logger.info(f'The user [{user_id}] deleted personal information.'
-    )
+                )
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "menu_user_profile",

@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 async def left_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
-    await RoomDB.remove_member(user_id, room_number)
+    await RoomRepo().remove_member(user_id, room_number)
     
     keyboard_inline = generate_inline_keyboard(
         {

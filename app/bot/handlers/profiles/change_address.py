@@ -9,8 +9,8 @@ from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import ChangeAddress
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
-from app.store.database.queries.users import UserDB
 from app.store.encryption import CryptData
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +64,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     if len(address) < 150:
         crypt = CryptData(key=load_config().encryption.key)
         encrypted_data = crypt.encrypt(data=address)
-        
-        await UserDB.update_user(user_id, encrypted_address=encrypted_data)
+        await UserRepo().update_user(user_id, encrypted_address=encrypted_data)
         logger.info(f'The user [{user_id}] updated an address.')
         
         message_text = 'Адрес изменен.'

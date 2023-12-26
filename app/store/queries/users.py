@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from app.store.database.models import User, Room
+from app.store.database.models import Room, User
 
 
 class UserRepo:
@@ -19,7 +19,7 @@ class UserRepo:
         return user, created
     
     async def get_user_or_none(self, user: Union[int,
-                                                 str]) -> Union[User, None]:
+    str]) -> Union[User, None]:
         """
         Get or do nothing
         :param user:
@@ -48,8 +48,7 @@ class UserRepo:
         """
         Check if user is owner or room
         """
-        # TODO Переделать запрос
-        user_rooms = await UserRepo.list_rooms_where_owner(user)
+        user_rooms = await UserRepo().list_rooms_where_owner(user)
         room = await Room.filter(number=room_number).first()
         return room in user_rooms
     

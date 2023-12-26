@@ -19,10 +19,8 @@ class RoomRepo:
         :param user_wish: The wishes of the creator of the room
         :return: Room instance
         """
-        user_repo = UserRepo()
-        room_repo = RoomRepo()
-        user = await user_repo.get_user_or_none(owner)
-        unique_number = await room_repo._get_room_unique_number()
+        user = await UserRepo().get_user_or_none(owner)
+        unique_number = await RoomRepo()._get_room_unique_number()
         room = await Room.create(
             name=name,
             budget=budget,
@@ -56,8 +54,7 @@ class RoomRepo:
         :param room_number: Number of game room
         :return: Bool
         """
-        user_repo = UserRepo()
-        user = await user_repo.get_user_or_none(user_id)
+        user = await UserRepo().get_user_or_none(user_id)
         room = await Room.filter(number=room_number).first()
         
         if not room:
@@ -84,8 +81,7 @@ class RoomRepo:
         :param room_number: Number of game room
         :return: None
         """
-        user_repo = UserRepo()
-        user = await user_repo.get_user_or_none(user_id)
+        user = await UserRepo().get_user_or_none(user_id)
         room = await Room.filter(number=room_number).first()
         await room.members.remove(user)
     
@@ -126,8 +122,7 @@ class RoomRepo:
         :param room_number: Room number of the Santa Game
         :return: User instance or False if the user is not found.
         """
-        user_repo = UserRepo()
-        user = await user_repo.get_user_or_none(username)
+        user = await UserRepo().get_user_or_none(username)
         room = await Room.filter(number=room_number).first()
         room_members = await room.members
         

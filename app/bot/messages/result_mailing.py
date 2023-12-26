@@ -7,9 +7,9 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
-from app.store.database.queries.game_result import GameResultDB
-from app.store.database.queries.rooms import RoomDB
-from app.store.database.queries.wishes import WishDB
+from app.store.queries.game_result import GameResultRepo
+from app.store.queries.rooms import RoomRepo
+from app.store.queries.wishes import WishRepo
 from app.store.scheduler.operations import remove_task
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class Person:
 
 
 async def creating_active_users_pool(room_number):
-    room_members = await RoomDB.get_list_members(room_number)
+    room_members = await RoomRepo().get_list_members(room_number)
     row_list_players = [member for member in room_members]
     verified_users_list = []
     
@@ -45,7 +45,7 @@ async def creating_active_users_pool(room_number):
                   'для уточнения информации')
         
         if is_active_user:
-            wish = await WishDB.get(player.user_id, room_number)
+            wish = await WishRepo().get(player.user_id, room_number)
             player_information = {
                 'player_id': player.user_id,
                 'player_address': address,
@@ -66,11 +66,11 @@ async def send_result_of_game(room_number, semaphore) -> None:
     
     if not _check_sending_capability(verified_users):
         await _insufficient_number_players(room_number)
-        
+    
     data = await _prepare_sending_data(verified_users, room_number)
-    await RoomDB.update(room_number,
-                        is_closed=True,
-                        closed_at=datetime.datetime.now())
+    await RoomRepo().update(room_number,
+                            is_closed=True,
+                            closed_at=datetime.datetime.now())
     
     async with semaphore:
         await broadcaster(data)
@@ -97,9 +97,9 @@ async def _prepare_sending_data(verified_users: list, room_number: int) -> list:
             person.to_send.player['player_wish']
             if person.to_send.player['player_wish'] else ''
         )
-        await GameResultDB.insert(room_number,
-                                  recipient_id,
-                                  sender_id)
+        await GameResultRepo().insert(room_number,
+                                      recipient_id,
+                                      sender_id)
         
         message_text = message_formatter(sender_name,
                                          receiver_first_name,
@@ -124,7 +124,7 @@ async def _check_sending_capability(verified_users):
 
 
 async def _insufficient_number_players(room_number: int) -> None:
-    room = await RoomDB.get(room_number)
+    room = await RoomRepo().get(room_number)
     owner = await room.owner
     
     keyboard_inline = generate_inline_keyboard(
@@ -132,9 +132,9 @@ async def _insufficient_number_players(room_number: int) -> None:
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    await RoomDB.update(room_number,
-                        is_closed=True,
-                        closed_at=datetime.datetime.now())
+    await RoomRepo().update(room_number,
+                            is_closed=True,
+                            closed_at=datetime.datetime.now())
     
     remove_task(room_number)
     

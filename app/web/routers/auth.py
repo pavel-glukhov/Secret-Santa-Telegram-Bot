@@ -6,15 +6,15 @@ from starlette.exceptions import HTTPException
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
-from app.config import load_config, AppConfig
-from app.web.templates import template
+from app.config import AppConfig, load_config
 from app.store.queries.users import UserRepo
 from app.web.auth_widget.exceptions import (TelegramDataError,
                                             TelegramDataIsOutdated)
-from app.web.schemes import AuthJWTSettings
 from app.web.auth_widget.schemes import TelegramAuth
 from app.web.auth_widget.validators import validate_telegram_data
-from app.web.auth_widget.widget import TelegramLoginWidget, Size
+from app.web.auth_widget.widget import Size, TelegramLoginWidget
+from app.web.schemes import AuthJWTSettings
+from app.web.templates import template
 
 router = APIRouter()
 
@@ -42,7 +42,6 @@ async def login(request: Request,
     """
     Authorize.jwt_optional()
     current_user = Authorize.get_jwt_subject()
-    user_repo = UserRepo()
     redirect_response = RedirectResponse(url='/', status_code=307)
     
     if current_user:
@@ -69,7 +68,7 @@ async def login(request: Request,
     try:
         result = validate_telegram_data(config.bot.token, params)
         if result:
-            await user_repo.get_or_create(
+            await UserRepo().get_or_create(
                 user_id=params.id,
                 first_name=params.first_name,
                 last_name=params.last_name,

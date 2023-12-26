@@ -9,8 +9,8 @@ from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.rooms.states import JoinRoom
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
-from app.store.database.queries.rooms import RoomDB
-from app.store.database.queries.wishes import WishDB
+from app.store.queries.rooms import RoomRepo
+from app.store.queries.wishes import WishRepo
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +30,9 @@ async def join_room(callback: types.CallbackQuery):
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
 
 
 @dp.message_handler(state=JoinRoom.waiting_for_room_number)
@@ -49,7 +49,7 @@ async def process_room_number(message: types.Message):
             "Отмена": 'cancel',
         }
     )
-
+    
     if not room_number.isdigit():
         message_text = (
             'Номер комнаты может содержать только цифры, '
@@ -59,23 +59,21 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-
-    room = await RoomDB.get(room_number=room_number)
-
+    room = await RoomRepo().get(room_number=room_number)
+    
     if not room or room.is_closed is True:
         return await _is_not_exists_room(last_message,
                                          room_number, keyboard_inline)
-    
-    is_member_of_room = await RoomDB.is_member(
-            user_id=message.chat.id,
-            room_number=room_number
-        )
+    is_member_of_room = await RoomRepo().is_member(
+        user_id=message.chat.id,
+        room_number=room_number
+    )
     
     if is_member_of_room:
         keyboard_inline = await create_common_keyboards(message)
-    
+        
         message_text = 'Вы уже состоите в этой комнате.'
-    
+        
         await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
@@ -85,7 +83,7 @@ async def process_room_number(message: types.Message):
             f'already is member of the room [{room_number}]'
         )
         await state.finish()
-
+    
     else:
         await JoinRoom.next()
         
@@ -96,11 +94,12 @@ async def process_room_number(message: types.Message):
             'Ваши комментарии помогут Тайному Санте '
             'выбрать для вас подарок.\n'
         )
-    
+        
         await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
+
 
 async def _is_not_exists_room(message, room_number, keyboard_inline):
     message_text = (
@@ -115,7 +114,8 @@ async def _is_not_exists_room(message, room_number, keyboard_inline):
         f'Incorrect room number [{room_number}] '
         f'from [{message.from_user.id}]'
     )
-    
+
+
 @dp.message_handler(state=JoinRoom.waiting_for_wishes)
 async def process_room_wishes(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
@@ -124,18 +124,17 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
     room_number = state_data['room_number']
     last_message = state_data['last_message']
     await delete_user_message(message.from_user.id, message.message_id)
-
-    await RoomDB.add_member(
+    await RoomRepo().add_member(
         user_id=user_id,
         room_number=room_number
     )
-    await WishDB.update_or_create(
+    await WishRepo().update_or_create(
         wish=wishes,
         user_id=user_id,
         room_id=room_number
     )
     keyboard_inline = await create_common_keyboards(message)
-
+    
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
         f'Вы вошли в комнату <b>{room_number}</b>.\n'
@@ -143,7 +142,7 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         'Следи за анонсами владельца комнаты.\n\n'
         'Желаю хорошей игры! 😋'
     )
-
+    
     await last_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,

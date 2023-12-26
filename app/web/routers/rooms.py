@@ -6,16 +6,15 @@ from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
+from app.store.database.models import Room, User
 from app.store.queries.pagination import PaginatorRepo
-from app.web.templates import template
-from app.store.database.models import User, Room
 from app.store.queries.rooms import RoomRepo
 from app.store.queries.users import UserRepo
 from app.store.scheduler import operations as scheduler_operations
 from app.web.dependencies import get_current_user
-from app.web.permissions import (is_admin_is_room_own_or_member,
-                                 is_admin)
+from app.web.permissions import is_admin, is_admin_is_room_own_or_member
 from app.web.schemes import RemoveMemberConfirmation
+from app.web.templates import template
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -51,12 +50,11 @@ async def index(request: Request, room_number: int,
                 permissions=Depends(is_admin_is_room_own_or_member),
                 templates: Jinja2Templates = Depends(template)):
     """The endpoint provided information about selected room."""
-    room_repo = RoomRepo()
-    room = await room_repo.get(room_number)
+    room = await RoomRepo().get(room_number)
     if not room:
         raise HTTPException(status_code=404)
     
-    members = await room_repo.get_list_members(room_number=room_number)
+    members = await RoomRepo().get_list_members(room_number=room_number)
     room_toss_time = scheduler_operations.get_task(room.number)
     current_room_owner = await room.owner
     
@@ -87,11 +85,9 @@ async def remove_member_conf(request: Request, room_number: int,
     Permissions: Only the superuser and the owner of the room,
                  but the owners cannot remove themselves from the room
     """
-    room_repo = RoomRepo()
-    user_repo = UserRepo()
-    is_room_owner = await room_repo.is_owner(room_number=room_number,
-                                             user_id=params.dict().get(
-                                                 'user_id'))
+    is_room_owner = await RoomRepo().is_owner(room_number=room_number,
+                                              user_id=params.dict().get(
+                                                  'user_id'))
     if is_room_owner:
         raise HTTPException(status_code=403)
     
@@ -100,7 +96,7 @@ async def remove_member_conf(request: Request, room_number: int,
         'request': request,
         'current_user': current_user,
         'number': room_number,
-        'user': await user_repo.get_user_or_none(user_id),
+        'user': await UserRepo().get_user_or_none(user_id),
         'referer': quote(request.headers.get('referer'), safe=''),
     }
     
@@ -125,9 +121,8 @@ async def remove_member(request: Request, user_id: int = Form(...),
                  
                  members forward to index page, others to room page.
     """
-    room_repo = RoomRepo()
-    is_room_owner = await room_repo.is_owner(room_number=room_number,
-                                             user_id=user_id)
+    is_room_owner = await RoomRepo().is_owner(room_number=room_number,
+                                              user_id=user_id)
     
     index_page_redirect_response = RedirectResponse(url='/',
                                                     status_code=301)
@@ -138,7 +133,7 @@ async def remove_member(request: Request, user_id: int = Form(...),
         raise HTTPException(status_code=403)
     
     if confirm:
-        await room_repo.remove_member(user_id, room_number)
+        await RoomRepo().remove_member(user_id, room_number)
     
     if current_user.user_id == user_id:
         return index_page_redirect_response
