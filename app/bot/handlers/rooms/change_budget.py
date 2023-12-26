@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import ChangeBudget
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +73,7 @@ async def process_changing_budget(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    
-    await RoomDB.update(room_number, budget=new_budget)
+    await RoomRepo().update(room_number, budget=new_budget)
     
     message_text = (
         f'Бюджет для комнаты {room_number} был обновлен.\n\n'

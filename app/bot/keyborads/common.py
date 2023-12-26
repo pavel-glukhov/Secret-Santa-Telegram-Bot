@@ -1,21 +1,22 @@
 from aiogram import types
 
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
+from app.config import load_config
 from app.store.database.models import Room
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
 
 
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
     keyboard_inline = types.InlineKeyboardMarkup()
-
+    
     for key, val in buttons.items():
         button = types.InlineKeyboardButton(
             text=key,
             callback_data=val
         )
         keyboard_inline.add(button)
-
+    
     return keyboard_inline
 
 
@@ -45,14 +46,16 @@ async def create_common_keyboards(
     :return:
     """
     # general buttons
-    keyboard_dict = {
-        MAIN_REPLY_BUTTONS['join_room']: "menu_join_room",
-        MAIN_REPLY_BUTTONS['create_room']: "menu_create_new_room",
-
-    }
+    count_user_rooms = await RoomRepo().get_count_user_rooms(
+        message.chat.id)
+    keyboard_dict = {MAIN_REPLY_BUTTONS['join_room']: "menu_join_room"}
+    if count_user_rooms < load_config().room.user_rooms_count:
+        keyboard_dict.update(
+            {MAIN_REPLY_BUTTONS['create_room']: "menu_create_new_room"}
+        )
     user_id = message.chat.id
-    user_rooms = await RoomDB.get_all_users_of_room(user_id)
-
+    user_rooms = await RoomRepo().get_all_users_of_room(user_id)
+    
     if user_rooms:
         for room in user_rooms:
             owner = await room.owner
@@ -73,5 +76,5 @@ async def create_common_keyboards(
         }
     )
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
-
+    
     return keyboard_inline

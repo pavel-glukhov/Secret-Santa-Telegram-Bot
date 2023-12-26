@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
 from app.bot.handlers.profiles.states import ChangeUserName
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def change_username(callback: types.CallbackQuery):
     await ChangeUserName.waiting_for_first_name.set()
     state = dp.get_current().current_state()
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
@@ -31,9 +31,9 @@ async def change_username(callback: types.CallbackQuery):
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
 
 
 @dp.message_handler(state=ChangeUserName.waiting_for_first_name)
@@ -65,7 +65,6 @@ async def process_changing_last_name(message: types.Message,
     first_name = state_data['first_name']
     last_name = message.text
     user_id = message.chat.id
-
     await delete_user_message(message.from_user.id,
                               message.message_id)
     
@@ -74,9 +73,9 @@ async def process_changing_last_name(message: types.Message,
             "Вернуться назад ◀️": "menu_user_profile",
         }
     )
-    await UserDB.update_user(user_id,
-                             first_name=first_name,
-                             last_name=last_name)
+    await UserRepo().update_user(user_id,
+                                 first_name=first_name,
+                                 last_name=last_name)
     logger.info(f'The user [{user_id}] updated fist and last name.')
     message_text = 'Имя и фамилия изменены.'
     

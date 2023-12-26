@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import Text
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 
 @dp.callback_query_handler(Text(startswith='room_config'))
@@ -19,7 +19,7 @@ async def configuration_room(callback: types.CallbackQuery):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    room = await RoomDB.get(room_number)
+    room = await RoomRepo().get(room_number)
 
     message_text = (
         '"Настройки комнаты:" '

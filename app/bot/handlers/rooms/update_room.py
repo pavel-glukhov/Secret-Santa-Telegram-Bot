@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import ChangeRoomName
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ async def update_room_name(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
-
+    
     await ChangeRoomName.waiting_for_room_name.set()
     
     message_text = (
@@ -28,9 +28,10 @@ async def update_room_name(callback: types.CallbackQuery):
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
+
 
 @dp.message_handler(state=ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
@@ -43,9 +44,9 @@ async def update_room_name_get_value(message: types.Message,
     if not len(new_room_name) < 13:
         await _invalid_room_name(message, state_data)
         
-    await RoomDB.update(room_number=room_number,
-                        name=new_room_name)
-
+    await RoomRepo().update(room_number=room_number,
+                            name=new_room_name)
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",

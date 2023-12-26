@@ -8,7 +8,7 @@ from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.handlers.rooms.states import DeleteRoom
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,9 @@ async def process_delete_room_invalid(message: types.Message):
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     logger.info('Incorrect confirmation'
                 f' command from [{message.from_user.id}] ')
-        
+    
     await delete_user_message(message.from_user.id, message.message_id)
-
+    
     message_text = (
         f'Вы ввели неверную команду "'
         f'<b>{message.text}</b>" для подтверждения.\n\n'
@@ -56,9 +56,9 @@ async def process_delete_room_invalid(message: types.Message):
         'введите в чат <b>подтверждаю</b>.\n\n '
     )
     await last_message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
 
 
 @dp.message_handler(
@@ -75,8 +75,7 @@ async def completed_process_delete_room(message: types.Message,
             "Вернуться назад ◀️": "root_menu",
         }
     )
-
-    is_room_deleted = await RoomDB.delete(room_number=room_number)
+    is_room_deleted = await RoomRepo().delete(room_number=room_number)
     
     if is_room_deleted:
         message_text = (
@@ -87,7 +86,7 @@ async def completed_process_delete_room(message: types.Message,
             text=message_text,
             reply_markup=keyboard_inline,
         )
-
+        
         logger.info(
             f'The user [{message.from_user.id}]'
             f' removed the room [{room_number}]'
@@ -101,8 +100,8 @@ async def completed_process_delete_room(message: types.Message,
         )
         logger.info(
             f'The room [{room_number}]'
-                    'was not removed removed'
-                    f' by[{message.from_user.id}] '
+            'was not removed removed'
+            f' by[{message.from_user.id}] '
         )
     
     await state.finish()

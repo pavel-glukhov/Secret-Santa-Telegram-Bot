@@ -2,7 +2,8 @@ import hashlib
 import hmac
 import time
 
-from app.web.auth_widget.exceptions import TelegramDataError, TelegramDataIsOutdated
+from app.web.auth_widget.exceptions import (TelegramDataError,
+                                            TelegramDataIsOutdated)
 from app.web.auth_widget.schemes import TelegramAuth
 
 

@@ -11,11 +11,10 @@ logger = logging.getLogger(__name__)
 
 async def update_user_permissions(telegram_user_id, is_superuser: bool):
     await init_db()
-    user_repo = UserRepo()
-    user = await user_repo.get_user_or_none(int(telegram_user_id))
+    user = await UserRepo().get_user_or_none(int(telegram_user_id))
     if user:
-        await user_repo.update_user(int(telegram_user_id),
-                                    is_superuser=is_superuser)
+        await UserRepo().update_user(int(telegram_user_id),
+                                     is_superuser=is_superuser)
     await close_db()
     return True if user else False
 
@@ -37,7 +36,7 @@ def remove_superuser(telegram_user_id):
 def register_webhook():
     url = (
         f'https://api.telegram.org/bot{load_config().bot.token}/'
-        f'setWebhook?url={load_config().web.site_url}/bot/')
+        f'setWebhook?url={load_config().web.domain_name}/bot/')
     
     response = requests.get(url)
     data = response.json()

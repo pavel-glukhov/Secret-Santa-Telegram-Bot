@@ -1,10 +1,9 @@
+from aiogram import Bot, Dispatcher, types
 from fastapi import APIRouter
 
-from app.config import load_config, webhook_settings
-from app.bot import dispatcher as dp
 from app.bot import bot
-from aiogram import types, Bot, Dispatcher
-
+from app.bot import dispatcher as dp
+from app.config import load_config, webhook_settings
 
 router = APIRouter()
 webhook_path = webhook_settings(load_config)['webhook_path']

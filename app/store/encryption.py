@@ -1,7 +1,7 @@
 import logging
 
+from cryptography.exceptions import AlreadyFinalized, InternalError, InvalidKey
 from cryptography.fernet import Fernet
-from cryptography.exceptions import AlreadyFinalized, InvalidKey, InternalError
 
 logger = logging.getLogger(__name__)
 

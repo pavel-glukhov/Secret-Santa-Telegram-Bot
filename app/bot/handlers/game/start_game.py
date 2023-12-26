@@ -9,10 +9,10 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.game.states import StartGame
-from app.bot.handlers.operations import get_room_number, delete_user_message
+from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
-from app.store.database.queries.rooms import RoomDB
+from app.store.queries.rooms import RoomRepo
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @dp.callback_query_handler(Text(startswith='room_start-game'))
 async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
-    room_members = await RoomDB.get_list_members(room_number)
+    room_members = await RoomRepo().get_list_members(room_number)
     task = get_task(task_id=room_number)
     
     keyboard = {
@@ -71,7 +71,7 @@ async def change_game_datetime(callback: types.CallbackQuery):
         '<b>yyyy.mm.dd h:m</b> - <b>год.месяц.день час:минуты</b>\n\n'
         '<b>Пример: 2023.12.01 12:00</b>'
     )
-
+    
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
             text=message_text,
@@ -103,9 +103,8 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             add_task(task_func=send_result_of_game, date_time=date_time,
                      task_id=room_number, room_number=room_number,
                      semaphore=semaphore)
-            
-            await RoomDB.update(room_number, started_at=datetime.now(),
-                                closed_at=None, is_closed=False)
+            await RoomRepo().update(room_number, started_at=datetime.now(),
+                                    closed_at=None, is_closed=False)
             
             message_text = (
                 'Дата рассылки установлена на'

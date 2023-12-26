@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from app.bot import dispatcher as dp
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,7 @@ async def my_profile(callback: types.CallbackQuery):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-
-    user = await UserDB.get_user_or_none(message.chat.id)
+    user = await UserRepo().get_user_or_none(message.chat.id)
     user_information = profile_information_formatter(user)
     
     message_text = (

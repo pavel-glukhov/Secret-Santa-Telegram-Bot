@@ -2,6 +2,7 @@ import logging.config
 import os
 from dataclasses import dataclass
 from functools import lru_cache
+
 import yaml
 from dotenv import load_dotenv
 
@@ -18,7 +19,7 @@ class JWTSettings:
 @dataclass()
 class WebSettings:
     jwt_settings: JWTSettings
-    site_url: str
+    domain_name: str
 
 
 @dataclass
@@ -87,7 +88,7 @@ def load_config() -> AppConfig:
             jwt_settings=JWTSettings(
                 authjwt_secret_key=os.getenv('AUTH_JWT_SECRET_KEY')
             ),
-            site_url=os.getenv('SITE_URL'),
+            domain_name=os.getenv('DOMAIN_NAME'),
         ),
         db=DataBaseConfig(
             name=os.getenv('DATABASE_NAME'),
@@ -119,7 +120,7 @@ def load_config() -> AppConfig:
 
 def webhook_settings(config) -> dict:
     webhook_path = f"/bot/{config().bot.token}"
-    webhook_url = config().web.site_url + webhook_path
+    webhook_url = 'https://' + config().web.domain_name + webhook_path
     return {
         'webhook_path': webhook_path,
         'webhook_url': webhook_url
