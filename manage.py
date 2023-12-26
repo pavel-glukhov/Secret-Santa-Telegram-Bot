@@ -4,17 +4,18 @@ import requests
 import asyncio
 from app.config import load_config
 from app.store.database import init_db, close_db
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
 
 async def update_user_permissions(telegram_user_id, is_superuser: bool):
     await init_db()
-    user = await UserDB.get_user_or_none(int(telegram_user_id))
+    user_repo = UserRepo()
+    user = await user_repo.get_user_or_none(int(telegram_user_id))
     if user:
-        await UserDB.update_user(int(telegram_user_id),
-                                 is_superuser=is_superuser)
+        await user_repo.update_user(int(telegram_user_id),
+                                    is_superuser=is_superuser)
     await close_db()
     return True if user else False
 

@@ -8,7 +8,7 @@ from starlette.templating import Jinja2Templates
 
 from app.config import load_config, AppConfig
 from app.web.templates import template
-from app.store.database.queries.users import UserDB
+from app.store.queries.users import UserRepo
 from app.web.auth_widget.exceptions import (TelegramDataError,
                                             TelegramDataIsOutdated)
 from app.web.schemes import AuthJWTSettings
@@ -42,7 +42,7 @@ async def login(request: Request,
     """
     Authorize.jwt_optional()
     current_user = Authorize.get_jwt_subject()
-    
+    user_repo = UserRepo()
     redirect_response = RedirectResponse(url='/', status_code=307)
     
     if current_user:
@@ -69,7 +69,7 @@ async def login(request: Request,
     try:
         result = validate_telegram_data(config.bot.token, params)
         if result:
-            await UserDB.get_or_create(
+            await user_repo.get_or_create(
                 user_id=params.id,
                 first_name=params.first_name,
                 last_name=params.last_name,

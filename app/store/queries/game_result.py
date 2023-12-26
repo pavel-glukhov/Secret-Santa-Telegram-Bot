@@ -1,31 +1,27 @@
 from app.store.database.models import GameResult, Room, User
-from typing import Optional
 
-class GameResultDB:
 
-    @staticmethod
-    async def insert(
-            room_id: int,
-            recipient_id: int,
-            sender_id: int
-    ) -> GameResult:
+class GameResultRepo:
+    async def insert(self,
+                     room_id: int,
+                     recipient_id: int,
+                     sender_id: int
+                     ) -> GameResult:
         """ Create game result record"""
         room = await Room.filter(number=room_id).first()
         recipient = await User.filter(user_id=recipient_id).first()
         sender = await User.filter(user_id=sender_id).first()
-
         result = await GameResult.create(
             room=room,
             recipient=recipient,
             sender=sender
         )
         return result
-
-    @staticmethod
-    async def get_recipient(
-            room_id,
-            user_id
-    ) -> User | None:
+    
+    async def get_recipient(self,
+                            room_id,
+                            user_id
+                            ) -> User | None:
         """Get result for specific user"""
         results = await GameResult.filter(
             room__number=room_id,
@@ -34,12 +30,11 @@ class GameResultDB:
         if not results:
             return None
         return await results.recipient
-
-    @staticmethod
-    async def get_sender(
-            room_id,
-            user_id
-    ) -> User:
+    
+    async def get_sender(self,
+                         room_id,
+                         user_id
+                         ) -> User:
         """Get result for specific user"""
         results = await GameResult.filter(
             room__number=room_id,

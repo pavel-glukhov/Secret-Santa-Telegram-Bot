@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime
 from typing import Callable
@@ -9,42 +8,6 @@ from app.store.scheduler import scheduler
 
 logger = logging.getLogger(__name__)
 
-
-
-# TODO Добавить semaphore
-"""
-import asyncio
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from asyncio import Lock
-
-async def task():
-    # Ваша асинхронная логика здесь
-    pass
-
-async def limited_task(semaphore):
-    async with semaphore:
-        await task()
-
-async def main():
-    scheduler = AsyncIOScheduler()
-
-    # Создание семафора с максимальным количеством одновременно выполняемых задач
-    semaphore = asyncio.Semaphore(1)
-
-    # Запуск задачи с ограничением через семафор
-    scheduler.add_job(limited_task, "interval", seconds=10, args=[semaphore])
-
-    scheduler.start()
-
-    try:
-        while True:
-            await asyncio.sleep(1)
-    except KeyboardInterrupt:
-        scheduler.shutdown()
-
-asyncio.run(main())
-
-"""
 
 def add_task(
         task_func: Callable,
@@ -83,6 +46,7 @@ def get_task(task_id: int) -> Job:
     task = scheduler.get_job(task_id)
     return task
 
+
 def get_all_task() -> list[Job]:
     """
     Get all task from job store.
@@ -90,6 +54,7 @@ def get_all_task() -> list[Job]:
     """
     tasks = scheduler.get_jobs()
     return tasks
+
 
 def remove_task(task_id: int) -> bool:
     """

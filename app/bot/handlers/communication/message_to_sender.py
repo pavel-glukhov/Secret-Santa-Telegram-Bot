@@ -9,7 +9,7 @@ from app.bot.handlers.communication.states import MessageToSanta
 from app.bot.handlers.operations import get_room_number, delete_user_message
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.send_messages import send_message
-from app.store.database.queries.game_result import GameResultDB
+from app.store.queries.game_result import GameResultRepo
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +52,8 @@ async def completed_message_to_santa(message: types.Message,
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    sender = await GameResultDB.get_sender(room_id=room_id,
-                                           user_id=user_id)
+    sender = await GameResultRepo().get_sender(room_id=room_id,
+                                               user_id=user_id)
     await send_message(user_id=sender.user_id,
                        text=text)
     
@@ -64,4 +64,3 @@ async def completed_message_to_santa(message: types.Message,
         reply_markup=keyboard_inline,
     )
     await state.finish()
-    

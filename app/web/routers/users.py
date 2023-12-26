@@ -6,11 +6,11 @@ from starlette.exceptions import HTTPException
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
-from app.store.database.queries.pagination import Paginator
+from app.store.queries.pagination import PaginatorRepo
 from app.web.templates import template
 from app.store.database.models import User
-from app.store.database.queries.rooms import RoomDB
-from app.store.database.queries.users import UserDB
+from app.store.queries.rooms import RoomRepo
+from app.store.queries.users import UserRepo
 from app.web.dependencies import get_current_user
 from app.web.permissions import is_admin, is_admin_or_owner
 
@@ -24,9 +24,10 @@ async def profile(request: Request, user_id: int,
                   templates: Jinja2Templates = Depends(template),
                   permissions=Depends(is_admin_or_owner)):
     """The endpoint provided information about selected user."""
-    
-    user = await UserDB.get_user_or_none(user_id)
-    rooms = await RoomDB.get_all_users_of_room(user_id)
+    user_repo = UserRepo()
+    room_repo = RoomRepo()
+    user = await user_repo.get_user_or_none(user_id)
+    rooms = await room_repo.get_all_users_of_room(user_id)
     
     if not user:
         raise HTTPException(status_code=404)
@@ -48,7 +49,8 @@ async def users(request: Request, page: int = 1, limit: int = 10,
                 templates: Jinja2Templates = Depends(template),
                 permissions=Depends(is_admin)):
     """The endpoint provided list all users."""
-    users, total_users = await Paginator.paginate(User, page, limit)
+    pagination_repo = PaginatorRepo()
+    users, total_users = await pagination_repo.paginate(User, page, limit)
     context = {
         'request': request,
         'current_user': current_user,
@@ -67,18 +69,20 @@ async def activate(request: Request, user_id: int,
                    current_user: User = Depends(get_current_user),
                    templates: Jinja2Templates = Depends(template),
                    permissions=Depends(is_admin)):
-    """The endpoint to activate\deactivate user's account."""
-    
-    user = await UserDB.get_user_or_none(user=user_id)
+    """
+    The endpoint to activate or deactivate user's account.
+    """
+    user_repo = UserRepo()
+    user = await user_repo.get_user_or_none(user=user_id)
     referer = request.headers.get('referer')
     
     if not user:
         raise HTTPException(status_code=404)
     
     if user.is_active:
-        await  UserDB.disable_user(user_id)
+        await user_repo.disable_user(user_id)
     else:
-        await  UserDB.enable_user(user_id)
+        await user_repo.enable_user(user_id)
     
     return RedirectResponse(url=referer, status_code=301)
 
@@ -91,7 +95,8 @@ async def index(request: Request, user_id: int,
     """The endpoint conformation that user can be deleted from DB."""
     
     referer = quote(request.headers.get('referer'), safe='')
-    user = await UserDB.get_user_or_none(user_id),
+    user_repo = UserRepo()
+    user = await user_repo.get_user_or_none(user_id),
     
     context = {
         'request': request,
@@ -111,8 +116,8 @@ async def delete(request: Request, user_id: int = Form(...),
                  templates: Jinja2Templates = Depends(template),
                  permissions=Depends(is_admin)):
     """The endpoint for deleting user from DB."""
-    
+    user_repo = UserRepo()
     if confirm:
-        await UserDB.delete_user(user_id)
+        await user_repo.delete_user(user_id)
     
     return RedirectResponse(url=unquote(referer), status_code=301)
