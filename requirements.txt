@@ -1,4 +1,4 @@
-aiogram==2.21
+aiogram==2.25.1
 python-dotenv==0.20.0
 asyncpg==0.26.0
 tortoise_orm==0.19.2
