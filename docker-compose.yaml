@@ -14,7 +14,7 @@ services:
     ports:
       - 5432
     env_file:
-      - .env_prod
+      - .env
 
   redis:
     image: redis:7.2.3
@@ -24,7 +24,7 @@ services:
     volumes:
       - redis_data:/data
     env_file:
-      - .env_prod
+      - .env
 
   web:
     image: nginx:1.25.3
@@ -69,7 +69,7 @@ services:
       - db
       - redis
     env_file:
-      - .env_prod
+      - .env
 
 volumes:
   postgres_data:
