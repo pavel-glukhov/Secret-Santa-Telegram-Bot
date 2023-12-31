@@ -61,7 +61,6 @@ services:
     depends_on:
       - db
       - redis
-      - nginx
     env_file:
       - .env
 
