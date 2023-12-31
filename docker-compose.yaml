@@ -12,7 +12,7 @@ services:
       - ./data/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
       - postgres_data:/var/lib/postgresql/data/
     ports:
-      - 5432
+      - "5432"
     env_file:
       - .env
 
@@ -20,7 +20,7 @@ services:
     image: redis:7.2.3
     command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
     ports:
-      - 6379
+      - "6379"
     volumes:
       - redis_data:/data
     env_file:
@@ -29,10 +29,10 @@ services:
   web:
     image: nginx:1.25.3
     ports:
-      - 80:80
-      - 443:443
+      - "80:00"
+      - "443:443"
     volumes:
-      - ./data/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./data/nginx/nginx.conf:/etc/nginx/nginx.conf
       - static_value:/var/html/static/
       - template_value:/var/html/template/
       - ./nginx/certbot/www:/var/www/certbot/:ro
@@ -53,13 +53,15 @@ services:
     build: .
     restart: always
     command: bash -c "aerich init-db && aerich migrate && aerich upgrade &&
-      uvicorn main:create_app --proxy-headers --host 0.0.0.0 --port 8000"
+      uvicorn main:create_app --host 0.0.0.0 --port 8000"
     volumes:
       - static_value:/code/static/
       - template_value:/code/templates/
       - type: bind
         source: ${LOGS_MOUNT_FOLDER}
         target: /code/logs/
+    ports:
+      - "8000:8000"
     environment:
       - TZ=Asia/Almaty
     depends_on:
