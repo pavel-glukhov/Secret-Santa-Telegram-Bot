@@ -28,7 +28,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./data/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./data/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - static_value:/var/html/static/
       - template_value:/var/html/template/
       - ./data/nginx/certbot/www:/var/www/certbot/:ro
