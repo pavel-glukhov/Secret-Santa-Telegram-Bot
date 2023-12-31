@@ -49,7 +49,6 @@ services:
       - ./nginx/certbot/conf/:/etc/letsencrypt/:rw
     depends_on:
       - web
-
   app:
     build: .
     restart: always
