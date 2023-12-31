@@ -34,7 +34,7 @@ services:
       - ./nginx/certbot/www:/var/www/certbot/:ro
       - ./nginx/certbot/conf/:/etc/nginx/ssl/:ro
     depends_on:
-      - app
+      - backend
     restart: always
 
   certbot:
@@ -44,7 +44,7 @@ services:
       - ./nginx/certbot/www/:/var/www/certbot/:rw
       - ./nginx/certbot/conf/:/etc/letsencrypt/:rw
     depends_on:
-      - web
+      - nginx
   backend:
     build: .
     restart: always
@@ -61,6 +61,7 @@ services:
     depends_on:
       - db
       - redis
+      - nginx
     env_file:
       - .env
 
