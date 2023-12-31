@@ -48,8 +48,7 @@ services:
   backend:
     build: .
     restart: always
-    command: bash -c "aerich init-db && aerich migrate && aerich upgrade &&
-      uvicorn main:create_app --host 0.0.0.0 --port 8000"
+    command: bash -c "aerich init-db && aerich migrate && aerich upgrade && uvicorn main:create_app --host 0.0.0.0 --port 8000"
     volumes:
       - static_value:/code/static/
       - template_value:/code/templates/
