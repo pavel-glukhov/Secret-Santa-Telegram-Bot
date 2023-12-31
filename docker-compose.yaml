@@ -55,6 +55,8 @@ services:
       - type: bind
         source: ${LOGS_MOUNT_FOLDER}
         target: /code/logs/
+    ports:
+      - "8000:8000"
     environment:
       - TZ=Asia/Almaty
     depends_on:
