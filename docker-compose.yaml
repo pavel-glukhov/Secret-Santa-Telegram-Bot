@@ -39,7 +39,7 @@ services:
 
   certbot:
     image: certbot/certbot:latest
-#    command: certonly --webroot --webroot-path=/var/www/certbot/ --force-renewal --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME}
+    command: certonly --webroot --webroot-path=/var/www/certbot/ --force-renewal --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME}
     volumes:
       - ./data/nginx/certbot/www/:/var/www/certbot/:rw
       - ./data/nginx/certbot/conf/:/etc/letsencrypt/:rw
