@@ -106,7 +106,8 @@
 #### В Docker контейнере:
  - Установить Docker https://docs.docker.com/engine/install/ubuntu/
    - Создать свой .env файл по шаблону .env.example
-   - docker-compose up --build
+   - sudo docker compose -f docker-compose_ssl.yaml up
+   - sudo docker compose -f docker-compose.yaml up --build
 
 ### Права доступа:
  - Что бы добавить Superuser права пользователю, выполните: 
