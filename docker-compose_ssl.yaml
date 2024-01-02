@@ -13,7 +13,7 @@ services:
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
     environment:
-      HOST_NAME: ${DOMAIN_NAME}
+      NGINX_HOST_NAME: ${DOMAIN_NAME}
     restart: always
 
   certbot:
