@@ -8,7 +8,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/nginx/getting_ssl/default.conf:/etc/nginx/conf.d/default.conf
+      - ./deploy/nginx/getting_ssl/templates:/etc/nginx/templates
       - static_value:/var/html/static/
       - template_value:/var/html/template/
       - ./deploy/certbot/www/:/var/www/certbot/:ro

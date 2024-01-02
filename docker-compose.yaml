@@ -29,7 +29,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/nginx/prod/default.conf:/etc/nginx/conf.d/default.conf
+      - ./deploy/nginx/prod/templates:/etc/nginx/templates
       - static_value:/var/html/static/
       - template_value:/var/html/template/
       - ./deploy/certbot/www/:/var/www/certbot/:ro
@@ -37,7 +37,7 @@ services:
     env_file:
       - .env
     environment:
-      - NGINX_HOST_NAME=testhost.tech
+      - NGINX_HOST_NAME=${DOMAIN_NAME}
 
 
   certbot:
