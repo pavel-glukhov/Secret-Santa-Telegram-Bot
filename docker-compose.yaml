@@ -33,18 +33,14 @@ services:
       - template_value:/var/html/template/
       - ./data/nginx/certbot/www/:/var/www/certbot/:ro
       - ./data/nginx/certbot/conf/:/etc/nginx/ssl/:ro
-    depends_on:
-      - backend
     restart: always
 
   certbot:
     image: certbot/certbot:latest
-    command: certonly --webroot --webroot-path=/var/www/certbot/ --force-renewal --email ${EMAIL} --agree-tos --no-eff-email -d ${DOMAIN_NAME}
     volumes:
       - ./data/nginx/certbot/www/:/var/www/certbot/:rw
       - ./data/nginx/certbot/conf/:/etc/letsencrypt/:rw
-    depends_on:
-      - nginx
+
   backend:
     build: .
     restart: always
@@ -62,6 +58,7 @@ services:
     depends_on:
       - db
       - redis
+      - nginx
     env_file:
       - .env
 
