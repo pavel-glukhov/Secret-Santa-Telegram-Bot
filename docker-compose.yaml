@@ -34,7 +34,7 @@ services:
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
     environment:
-      - ENV_HOST_NAME=$REDIS_PASSWORD
+      - NGINX_HOST_NAME=${DOMAIN_NAME}
     restart: always
 
   certbot:
