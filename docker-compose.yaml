@@ -34,7 +34,7 @@ services:
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
     environment:
-      DOMAIN_NAME: ${DOMAIN_NAME}
+      HOSTNAME: ${DOMAIN_NAME}
     restart: always
 
   certbot:
