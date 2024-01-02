@@ -24,6 +24,7 @@ services:
 
   nginx:
     image: nginx:1.25.3
+    restart: always
     ports:
       - "80:80"
       - "443:443"
@@ -33,9 +34,11 @@ services:
       - template_value:/var/html/template/
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
+    env_file:
+      - .env
     environment:
-      - NGINX_HOST_NAME=${DOMAIN_NAME}
-    restart: always
+      - NGINX_HOST_NAME=testhost.tech
+
 
   certbot:
     image: certbot/certbot:latest
