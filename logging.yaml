@@ -28,21 +28,25 @@ loggers:
     handlers: [console_handler, timed_rotating_handler]
 
   fastapi:
-    level: INFO
+    level: ERROR
     handlers: [console_handler, timed_rotating_handler]
 
   aiogram.event:
-    level: INFO
+    level: ERROR
     handlers: [console_handler, timed_rotating_handler]
 
   tortoise:
-    level: INFO
+    level: ERROR
     handlers: [console_handler, timed_rotating_handler]
 
   apscheduler:
-    level: INFO
+    level: ERROR
     handlers: [console_handler, timed_rotating_handler]
 
   asyncio:
+    level: ERROR
+    handlers: [console_handler, timed_rotating_handler]
+
+  asyncpg:
     level: ERROR
     handlers: [console_handler, timed_rotating_handler]
