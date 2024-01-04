@@ -67,7 +67,7 @@ async def process_room_number(message: types.Message):
         user_id=message.chat.id,
         room_number=room_number
     )
-    await delete_user_message(message.from_user.id, message.message_id)
+    
     if is_member_of_room:
         keyboard_inline = await create_common_keyboards(message)
         
@@ -98,7 +98,7 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-
+    await delete_user_message(message.from_user.id, message.message_id)
 
 async def _is_not_exists_room(message, room_number, keyboard_inline):
     message_text = (
