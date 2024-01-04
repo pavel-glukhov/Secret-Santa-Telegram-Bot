@@ -29,6 +29,7 @@ async def join_room(callback: types.CallbackQuery):
         'Введи номер комнаты в которую ты хочешь зайти.\n'
     )
     async with state.proxy() as data:
+        data['chat_id'] = callback.message.chat.id
         data['last_message'] = await callback.message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
@@ -37,19 +38,19 @@ async def join_room(callback: types.CallbackQuery):
 
 @dp.message_handler(state=JoinRoom.waiting_for_room_number)
 async def process_room_number(message: types.Message):
-    room_number = message.text
     state = dp.get_current().current_state()
+    await state.update_data(room_number=message.text)
     state_data = await state.get_data()
     
     last_message = state_data['last_message']
-    await state.update_data(room_number=room_number)
+    await state.update_data(room_number=state_data['room_number'])
     keyboard_inline = generate_inline_keyboard(
         {
             "Отмена": 'cancel',
         }
     )
     
-    if not room_number.isdigit():
+    if not state_data['room_number'].isdigit():
         message_text = (
             'Номер комнаты может содержать только цифры, '
             'попробуйте снова.'
@@ -58,16 +59,17 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-    room = await RoomRepo().get(room_number=room_number)
+    room = await RoomRepo().get(room_number=state_data['room_number'])
     
     if not room or room.is_closed is True:
         return await _is_not_exists_room(last_message,
-                                         room_number, keyboard_inline)
+                                         state_data['room_number'],
+                                         keyboard_inline)
     is_member_of_room = await RoomRepo().is_member(
         user_id=message.chat.id,
-        room_number=room_number
+        room_number=state_data['room_number']
     )
-    
+    await delete_user_message(message.from_user.id, message.message_id)
     if is_member_of_room:
         keyboard_inline = await create_common_keyboards(message)
         
@@ -79,7 +81,7 @@ async def process_room_number(message: types.Message):
         )
         logger.info(
             f'The user[{message.from_user.id}] '
-            f'already is member of the room [{room_number}]'
+            f'already is member of the room [{state_data["room_number"]}]'
         )
         await state.finish()
     
@@ -98,7 +100,7 @@ async def process_room_number(message: types.Message):
             text=message_text,
             reply_markup=keyboard_inline,
         )
-    await delete_user_message(message.from_user.id, message.message_id)
+    
 
 async def _is_not_exists_room(message, room_number, keyboard_inline):
     message_text = (
@@ -119,16 +121,17 @@ async def _is_not_exists_room(message, room_number, keyboard_inline):
 async def process_room_wishes(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     wishes = message.text
-    user_id = message.chat.id
+    chat_id = state_data['chat_id']
     room_number = state_data['room_number']
     last_message = state_data['last_message']
+    
     await RoomRepo().add_member(
-        user_id=user_id,
+        user_id=chat_id,
         room_number=room_number
     )
     await WishRepo().update_or_create(
         wish=wishes,
-        user_id=user_id,
+        user_id=chat_id,
         room_id=room_number
     )
     keyboard_inline = await create_common_keyboards(message)
