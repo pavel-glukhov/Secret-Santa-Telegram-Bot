@@ -73,6 +73,7 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
         user_id,
         room_number
     )
+    
     room = await RoomRepo().get(room_number)
     await state.finish()
     await bot.delete_message(chat_id=message.from_id,

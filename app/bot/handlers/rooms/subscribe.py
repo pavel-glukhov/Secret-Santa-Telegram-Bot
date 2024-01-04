@@ -38,7 +38,6 @@ async def join_room(callback: types.CallbackQuery):
 @dp.message_handler(state=JoinRoom.waiting_for_room_number)
 async def process_room_number(message: types.Message):
     room_number = message.text
-    await delete_user_message(message.from_user.id, message.message_id)
     state = dp.get_current().current_state()
     state_data = await state.get_data()
     
@@ -68,7 +67,7 @@ async def process_room_number(message: types.Message):
         user_id=message.chat.id,
         room_number=room_number
     )
-    
+    await delete_user_message(message.from_user.id, message.message_id)
     if is_member_of_room:
         keyboard_inline = await create_common_keyboards(message)
         
@@ -123,7 +122,6 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     room_number = state_data['room_number']
     last_message = state_data['last_message']
-    await delete_user_message(message.from_user.id, message.message_id)
     await RoomRepo().add_member(
         user_id=user_id,
         room_number=room_number
@@ -134,7 +132,7 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         room_id=room_number
     )
     keyboard_inline = await create_common_keyboards(message)
-    
+    await delete_user_message(message.from_user.id, message.message_id)
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
         f'Вы вошли в комнату <b>{room_number}</b>.\n'
