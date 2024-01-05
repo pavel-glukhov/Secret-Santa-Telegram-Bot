@@ -4,6 +4,7 @@ from typing import Union
 from app.config import load_config
 from app.store.database.models import Room, User, WishRoom
 from app.store.queries.users import UserRepo
+from app.store.queries.wishes import WishRepo
 
 
 class RoomRepo:
@@ -150,7 +151,6 @@ class RoomRepo:
         room = await Room.filter(number=room_number).first()
         if not room:
             return False
-        await Wish.filter(room=room).delete()
         await room.delete()
         return True
     
