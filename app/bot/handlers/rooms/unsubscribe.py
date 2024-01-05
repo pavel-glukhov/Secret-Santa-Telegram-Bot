@@ -38,6 +38,6 @@ async def left_room(callback: types.CallbackQuery):
         reply_markup=keyboard_inline,
     )
     logger.info(
-        f'The user[{callback.message.from_user.id}]'
+        f'The user[{callback.message.chat.id}]'
         f' left from the room[{room_number}]'
     )

@@ -19,13 +19,13 @@ class User(Model):
     
     class Meta:
         table = "users"
-
+    
     def get_address(self) -> str | None:
         if self.encrypted_address:
             crypt = CryptData(key=load_config().encryption.key)
             return crypt.decrypt(self.encrypted_address).decode('UTF8')
         return None
-
+    
     def get_number(self) -> str | None:
         if self.encrypted_number:
             crypt = CryptData(key=load_config().encryption.key)
@@ -51,6 +51,10 @@ class Room(Model):
                                      related_name='members',
                                      through='rooms_users',
                                      on_delete='CASCADE')
+    wishes = fields.ManyToManyField('models.User',
+                                    through='wishes_rooms',
+                                    related_name='wishes_in_room',
+                                    on_delete='CASCADE')
     
     class Meta:
         table = "rooms"
@@ -59,22 +63,31 @@ class Room(Model):
         return f"Room {self.number}: {self.name}"
 
 
-class Wish(Model):
-    id = fields.IntField(pk=True)
+# class Wish(Model):
+#     id = fields.IntField(pk=True)
+#     wish = fields.CharField(max_length=256, null=False)
+#     room = fields.ForeignKeyField('models.Room', related_name='room',
+#                                   on_delete='CASCADE')
+#     user = fields.ForeignKeyField(
+#         'models.User',
+#         related_name='wishes_of_owner'
+#     )
+#
+#     class Meta:
+#         table = "wishes"
+#         unique_together = (("room", "user"),)
+#
+#     def __str__(self):
+#         return f"Room {self.room}: {self.user}"
+
+
+class WishRoom(Model):
+    room = fields.ForeignKeyField('models.Room', related_name='room_wishes')
+    user = fields.ForeignKeyField('models.User', related_name='user_wishes')
     wish = fields.CharField(max_length=256, null=False)
-    room = fields.ForeignKeyField('models.Room', related_name='room',
-                                  on_delete='CASCADE')
-    user = fields.ForeignKeyField(
-        'models.User',
-        related_name='wishes_of_owner'
-    )
     
     class Meta:
-        table = "wishes"
-        unique_together = (("room", "user"),)
-    
-    def __str__(self):
-        return f"Room {self.room}: {self.user}"
+        table = "wishes_rooms"
 
 
 class GameResult(Model):

@@ -2,7 +2,7 @@ import random
 from typing import Union
 
 from app.config import load_config
-from app.store.database.models import Room, User, Wish
+from app.store.database.models import Room, User, WishRoom
 from app.store.queries.users import UserRepo
 
 
@@ -29,10 +29,7 @@ class RoomRepo:
         )
         
         await room.members.add(user)
-        await Wish.create(
-            wish=user_wish,
-            user=user, room=room
-        )
+        await WishRoom.create(wish=user_wish, user=user, room=room)
         
         return room
     
@@ -84,7 +81,8 @@ class RoomRepo:
         user = await UserRepo().get_user_or_none(user_id)
         room = await Room.filter(number=room_number).first()
         await room.members.remove(user)
-    
+        await WishRoom.filter(user=user, room=room).delete()
+
     async def is_exists(self, room_number: int) -> bool:
         result = await Room.filter(number=room_number).exists()
         return result

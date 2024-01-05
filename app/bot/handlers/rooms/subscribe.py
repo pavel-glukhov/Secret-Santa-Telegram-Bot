@@ -129,11 +129,13 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         user_id=chat_id,
         room_number=room_number
     )
-    await WishRepo().update_or_create(
+    
+    await WishRepo().create_wish_for_room(
         wish=wishes,
         user_id=chat_id,
         room_id=room_number
     )
+    
     keyboard_inline = await create_common_keyboards(message)
     await delete_user_message(message.from_user.id, message.message_id)
     message_text = (

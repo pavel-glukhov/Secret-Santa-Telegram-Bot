@@ -68,10 +68,10 @@ async def process_updating_wishes(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    await WishRepo().update_or_create(
-        wish,
-        user_id,
-        room_number
+    await WishRepo().create_wish_for_room(
+        wish=wish,
+        user_id=user_id,
+        room_id=room_number
     )
     
     room = await RoomRepo().get(room_number)

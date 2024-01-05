@@ -2,7 +2,7 @@ aiogram==2.25.1
 python-dotenv==0.20.0
 asyncpg==0.26.0
 tortoise_orm==0.19.2
-aerich==0.6.3
+aerich
 Jinja2==3.1.2
 fastapi-jwt-auth==0.5.0
 fastapi==0.95.1
