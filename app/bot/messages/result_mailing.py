@@ -45,7 +45,7 @@ async def creating_active_users_pool(room_number):
                             'для уточнения информации'))
             player_name = (
                 f'{player.first_name}'
-                if any([player.first_name, player.first_name])
+                if player.first_name
                 else player.username
             )
             wish = await WishRepo().get(player.user_id, room_number)
