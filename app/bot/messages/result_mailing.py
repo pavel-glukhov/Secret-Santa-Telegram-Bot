@@ -44,7 +44,7 @@ async def creating_active_users_pool(room_number):
                             'свяжитесь с участником через чат '
                             'для уточнения информации'))
             player_name = (
-                f'{player.first_name} {player.last_name}'
+                f'{player.first_name}'
                 if any([player.first_name, player.first_name])
                 else player.username
             )

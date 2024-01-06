@@ -145,7 +145,11 @@ async def members_list(callback: types.CallbackQuery):
     member_string = ''
     
     for number, member in enumerate(members, start=1):
-        member_string += f'{number}) @{member.username}\n'
+        username = ("@" + member.username
+                    if member.username
+                    else member.first_name)
+        member_string += (
+            f'{number}) {username}"\n')
     
     message_text = (
         'Список участников комнаты: '
