@@ -16,7 +16,15 @@ services:
 
   redis:
     image: redis:7.2.3
-    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    command:
+      - 'redis-server'
+      - '--loglevel ${REDIS_LOGLEVEL:-warning}'
+      - '--save 900 1'
+      - '--save 300 10'
+      - '--save 60 10000'
+      - '--maxmemory ${REDIS_MAXMEM:-300mb}'
+      - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
+      - '--requirepass ${$$REDIS_PASSWORD}'
     volumes:
       - redis_data:/data
     env_file:
