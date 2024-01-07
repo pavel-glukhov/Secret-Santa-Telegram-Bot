@@ -109,17 +109,27 @@
    - sudo docker compose -f docker-compose_ssl.yaml up
    - sudo docker compose -f docker-compose.yaml up --build
 
+    Миграции
+      ```console
+        docker exec -t <backend container> aerich init-db
+        docker exec -t <backend container> aerich migrate
+        docker exec -t <backend container> aerich upgrade
+      ```
 ### Права доступа:
  - Что бы добавить Superuser права пользователю, выполните: 
-  ```console
-     python .\manage.py set_superuser <telegram_user_id>
-  ```
+      ```console
+         python .\manage.py set_superuser <telegram_user_id>
+      ```
  - Что бы удалить их, выполните **** 
-  ```console
-      python .\manage.py remove_superuser <telegram_user_id>
-  ```
+      ```console
+          python .\manage.py remove_superuser <telegram_user_id>
+      ```
 - ### Регистрация вебхука
-    Сформируйте и сделайте GET запрос
+    ```console
+      python .\manage.py register_webhook
+    ```
+  
+    Или сформируйте и сделайте GET запрос
     https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
 
     Пример:
