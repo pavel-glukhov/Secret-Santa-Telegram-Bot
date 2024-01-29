@@ -36,27 +36,14 @@ async def creating_active_users_pool(room_number):
     for player in row_list_players:
         is_active_user = await checking_user_is_active(player.user_id)
         if is_active_user:
-            address = (player.get_address() if player.get_address()
-                       else ('Адрес указан, свяжитесь с участником через чат '
-                             'для уточнения информации'))
-            number = (player.get_number() if player.get_number()
-                      else ('Контактный номер не указан, '
-                            'свяжитесь с участником через чат '
-                            'для уточнения информации'))
-            player_name = (
-                f'{player.first_name}'
-                if player.first_name
-                else player.username
-            )
             wish = await WishRepo().get(player.user_id, room_number)
-            
             player_information = {
                 'player_id': player.user_id,
-                'player_name': player_name,
-                'player_address': address,
+                'player_name': player.first_name,
+                'player_address': player.get_address(),
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
-                'player_contact_number': number,
+                'player_contact_number': player.get_number(),
                 'player_wish': wish.wish
             }
             
@@ -121,7 +108,7 @@ async def _prepare_sending_data(verified_users: list, room_number: int) -> list:
     return sending_data
 
 
-async def _check_sending_capability(verified_users):
+def _check_sending_capability(verified_users):
     count_verified_users = len(verified_users)
     if count_verified_users < 3:
         return False

@@ -102,7 +102,7 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    #TODO добавить контакт для связи
+    # TODO добавить контакт для связи
     message_text = (
         '<b>Тайный Санта</b> - это игра, '
         'которую часто проводят перед Рождеством '

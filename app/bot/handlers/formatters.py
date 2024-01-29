@@ -1,6 +1,4 @@
-from app.config import load_config
 from app.store.database.models import User
-from app.store.encryption import CryptData
 
 
 def user_information_formatter(user: User) -> list:

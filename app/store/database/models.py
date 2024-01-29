@@ -6,7 +6,7 @@ from app.store.encryption import CryptData
 
 
 class User(Model):
-    user_id = fields.IntField(pk=True)
+    user_id = fields.BigIntField(pk=True)
     username = fields.CharField(max_length=256, unique=True, null=True)
     first_name = fields.CharField(max_length=128, null=True)
     last_name = fields.CharField(max_length=128, null=True)
@@ -61,24 +61,6 @@ class Room(Model):
     
     def __str__(self):
         return f"Room {self.number}: {self.name}"
-
-
-# class Wish(Model):
-#     id = fields.IntField(pk=True)
-#     wish = fields.CharField(max_length=256, null=False)
-#     room = fields.ForeignKeyField('models.Room', related_name='room',
-#                                   on_delete='CASCADE')
-#     user = fields.ForeignKeyField(
-#         'models.User',
-#         related_name='wishes_of_owner'
-#     )
-#
-#     class Meta:
-#         table = "wishes"
-#         unique_together = (("room", "user"),)
-#
-#     def __str__(self):
-#         return f"Room {self.room}: {self.user}"
 
 
 class WishRoom(Model):
