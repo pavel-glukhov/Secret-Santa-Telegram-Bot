@@ -44,7 +44,6 @@ async def completed_message_to_santa(message: types.Message,
     state_data = await state.get_data()
     user_id = message.chat.id
     room_id = state_data['room_number']
-    text = message.text
     last_message = state_data['last_message']
     await delete_user_message(message.from_user.id, message.message_id)
     keyboard_inline = generate_inline_keyboard(
@@ -52,6 +51,11 @@ async def completed_message_to_santa(message: types.Message,
             "Вернуться назад ◀️": "root_menu",
         }
     )
+    text = (f'<b>Сообщение от от вашего получателя ({room_id}):</b>\n'
+            f'------------\n\n'
+            f'{message.text}\n\n'
+            f'------------\n\n'
+            )
     sender = await GameResultRepo().get_sender(room_id=room_id,
                                                user_id=user_id)
     await send_message(user_id=sender.user_id,

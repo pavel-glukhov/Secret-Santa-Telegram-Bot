@@ -43,7 +43,6 @@ async def completed_message_to_santa(message: types.Message,
     state_data = await state.get_data()
     room_id = state_data['room_number']
     user_id = message.chat.id
-    text = message.text
     last_message = state_data['last_message']
     recipient = await GameResultRepo().get_recipient(room_id=room_id,
                                                      user_id=user_id)
@@ -53,6 +52,11 @@ async def completed_message_to_santa(message: types.Message,
             "Вернуться назад ◀️": "root_menu",
         }
     )
+    text = (f'<b>Сообщение от Тайного Санты ({room_id}):</b>\n'
+            f'------------\n\n'
+            f'{message.text}\n\n'
+            f'------------\n\n'
+            )
     await delete_user_message(message.from_user.id, message.message_id)
     await send_message(user_id=recipient.user_id,
                        text=text)
