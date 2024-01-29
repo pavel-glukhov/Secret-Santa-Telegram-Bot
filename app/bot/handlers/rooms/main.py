@@ -78,13 +78,11 @@ async def my_room(callback: types.CallbackQuery):
 
 async def _room_is_closed(callback: types.CallbackQuery,
                           room_number: int, user_id: int) -> None:
-    recipient = await GameResultRepo().get_recipient(room_id=room_number,
-                                                     user_id=user_id)
-    
-    if not recipient:
-        room_owner = await RoomRepo().is_owner(user_id=user_id,
-                                               room_number=room_number)
-        
+    game_results = await GameResultRepo().get_all_recipients(
+        room_id=room_number)
+    room_owner = await RoomRepo().is_owner(user_id=user_id,
+                                           room_number=room_number)
+    if not game_results:
         keyboard_dict = {
             'Активировать комнату ✅': f'room_activate_{room_number}',
             'Настройки ⚒': f'room_config_{room_number}',
@@ -92,9 +90,9 @@ async def _room_is_closed(callback: types.CallbackQuery,
         }
         
         if not room_owner:
-            del keyboard_dict['Настройки ⚒']
             del keyboard_dict['Активировать комнату ✅']
-        
+            del keyboard_dict['Настройки ⚒']
+            
         message_text = (
             f'<b>Игра в комнате {room_number} завершена!</b>\n\n'
             'К сожалению, количество игроков оказалось недостаточным '
@@ -114,6 +112,8 @@ async def _room_is_closed(callback: types.CallbackQuery,
             'Связаться с получателем': f'room_closed-con-rec_{room_number}',
             'Вернуться в меню': 'root_menu'
         }
+        recipient = await GameResultRepo().get_recipient(room_id=room_number,
+                                                         user_id=user_id)
         user_information = profile_information_formatter(recipient)
         
         message_text = (

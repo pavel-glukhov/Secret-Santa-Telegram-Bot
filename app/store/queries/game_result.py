@@ -31,6 +31,17 @@ class GameResultRepo:
             return None
         return await results.recipient
     
+    async def get_all_recipients(self,
+                                 room_id,
+                                 ) -> GameResult | None:
+        """Get all results"""
+        results = await GameResult.filter(
+            room__number=room_id,
+        ).all()
+        if not results:
+            return None
+        return results
+    
     async def get_sender(self,
                          room_id,
                          user_id

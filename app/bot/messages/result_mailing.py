@@ -57,7 +57,7 @@ async def send_result_of_game(room_number, semaphore) -> None:
     verified_users = await creating_active_users_pool(room_number)
     
     if not _check_sending_capability(verified_users):
-        await _insufficient_number_players(room_number)
+        return await _insufficient_number_players(room_number)
     
     data = await _prepare_sending_data(verified_users, room_number)
     await RoomRepo().update(room_number,
@@ -65,7 +65,7 @@ async def send_result_of_game(room_number, semaphore) -> None:
                             closed_at=datetime.datetime.now())
     
     async with semaphore:
-        await broadcaster(data)
+        return await broadcaster(data)
 
 
 async def _prepare_sending_data(verified_users: list, room_number: int) -> list:
