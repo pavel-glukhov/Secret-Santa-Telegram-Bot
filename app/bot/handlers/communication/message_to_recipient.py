@@ -10,6 +10,7 @@ from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.send_messages import send_message
 from app.store.queries.game_result import GameResultRepo
+from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -41,22 +42,23 @@ async def message_to_recipient(callback: types.CallbackQuery):
 async def completed_message_to_santa(message: types.Message,
                                      state: FSMContext):
     state_data = await state.get_data()
-    room_id = state_data['room_number']
+    room = await RoomRepo().get(state_data['room_number'])
     user_id = message.chat.id
     last_message = state_data['last_message']
-    recipient = await GameResultRepo().get_recipient(room_id=room_id,
+    recipient = await GameResultRepo().get_recipient(room_id=room.number,
                                                      user_id=user_id)
-    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    text = (f'<b>Сообщение от Тайного Санты ({room_id}):</b>\n'
-            f'------------\n\n'
-            f'{message.text}\n\n'
-            f'------------\n\n'
-            )
+    text = (
+        f'<b>Сообщение от Тайного Санты:</b>\n'
+        f'Комната: {room.name} {[room.number]}\n'
+        f'------------\n\n'
+        f'{message.text}\n\n'
+        f'------------\n\n'
+    )
     await delete_user_message(message.from_user.id, message.message_id)
     await send_message(user_id=recipient.user_id,
                        text=text)
