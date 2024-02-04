@@ -8,7 +8,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import pytz
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
-from app.bot.handlers.paginator import paginator
+from app.bot.handlers.pagination import Pagination
 from app.bot.handlers.time_zones.states import TimeZoneStates
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.users import UserRepo
@@ -24,7 +24,7 @@ async def get_letter(callback: types.CallbackQuery):
     
     if room_number:
         await state.update_data(room_number=room_number)
-        
+    
     message_text = (
         "Для смены часового пояса, выберите букву,"
         " на которую начинается страна:"
@@ -80,7 +80,7 @@ async def process_timezone_callback(callback: types.CallbackQuery,
         callback_query = f"room_start-game_{room_number}"
     else:
         callback_query = "profile_edit"
-        
+    
     message_text = f"Выбран часовой пояс {timezone}"
     keyboard = {
         "Вернуться назад ◀️": callback_query
@@ -88,25 +88,21 @@ async def process_timezone_callback(callback: types.CallbackQuery,
     keyboard_inline = generate_inline_keyboard(keyboard)
     await UserRepo().update_user(user_id=callback.message.chat.id,
                                  timezone=timezone)
-    await callback.message.edit_text(message_text,reply_markup=keyboard_inline)
+    await callback.message.edit_text(message_text, reply_markup=keyboard_inline)
     await state.finish()
 
 
 def get_country_keyboard(letter, page=1):
     countries = [country for country in pycountry.countries if
                  country.name.startswith(letter)]
-    return paginator(
-        objects=countries,
-        page_size=5,
-        page=page,
-        obj_callback_prefix='selected_country',
-        keyboard_query={'object': True,
-                        'method_or_name': 'name'},
-        obj_keyboard_method='alpha_2',
-        callback_next_prefix=f'next_country:{letter}',
-        callback_back_prefix=f'prev_country:{letter}'
-    )
-
+    return Pagination(countries, 5,
+                      callback_next_prefix=f'next_country:{letter}',
+                      callback_back_prefix=f'prev_country:{letter}',
+                      callback_prefix='selected_country',
+                      keyboard_name_or_method='name',
+                      callback_name_or_method='alpha_2'
+                      ).inline_pagination(page)
+    
 
 @dp.callback_query_handler(filters.Regexp(r'prev_country:[A-Z]:\d+'),
                            state=TimeZoneStates.selecting_timezone)
@@ -134,15 +130,11 @@ async def process_next_country_callback(callback: types.CallbackQuery):
 
 def get_timezone_keyboard(country_code, page=1):
     timezones = pytz.country_timezones.get(country_code, [])
-    return paginator(
-        objects=timezones,
-        page_size=5,
-        page=page,
-        obj_callback_prefix='selected_timezone',
-        keyboard_query={'object': True},
-        callback_next_prefix=f'next_timezone:{country_code}',
-        callback_back_prefix=f'prev_timezone:{country_code}'
-    )
+    return Pagination(timezones, 5,
+                      callback_next_prefix=f'next_timezone:{country_code}',
+                      callback_back_prefix=f'prev_timezone:{country_code}',
+                      callback_prefix='selected_timezone',
+                      ).inline_pagination(page)
 
 
 @dp.callback_query_handler(filters.Regexp(r'prev_timezone:[A-Z]{2}:\d+'),
