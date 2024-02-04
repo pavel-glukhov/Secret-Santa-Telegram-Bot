@@ -13,6 +13,7 @@ from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
 from app.store.queries.rooms import RoomRepo
+from app.store.queries.users import UserRepo
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
@@ -23,9 +24,14 @@ async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     room_members = await RoomRepo().get_list_members(room_number)
     task = get_task(task_id=room_number)
-    
+    user = await UserRepo().get_user_or_none(callback.message.chat.id)
+    timezone = user.timezone or ('⚠️ Ваш часовой пояс не задан. '
+                                 'Для того, что бы задать корректное время,'
+                                 ' вам нужно указать свой часовой пояс,'
+                                 ' иначе будет использоваться время сервера.')
     keyboard = {
         "Изменить время 🕘": f"room_change-game-dt_{room_number}",
+        "Изменить часовой пояс 🕘": f"change_time_zone_{room_number}",
         "Вернуться назад ◀️": f"room_menu_{room_number}"
     }
     
@@ -40,7 +46,8 @@ async def start_game(callback: types.CallbackQuery):
         if not task:
             message_text = (
                 '<b>Время не назначено</b>\n\n'
-                '<b>Для запуска игры требуется минимум 3 участника игры</b>'
+                '<b>Для запуска игры требуется минимум 3 участника игры</b>\n\n'
+                f'<b>Ваш часовой пояс</b>: {timezone}'
             )
         else:
             message_text = (

@@ -1,131 +1,153 @@
 import logging
+
+import pycountry
 from aiogram import types, filters
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import pytz
-import pycountry
 from app.bot import dispatcher as dp
-
+from app.bot.handlers.operations import get_room_number
+from app.bot.handlers.paginator import paginator
 from app.bot.handlers.time_zones.states import TimeZoneStates
+from app.bot.keyborads.common import generate_inline_keyboard
+from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
 
 @dp.callback_query_handler(Text(startswith='change_time_zone'))
 async def get_letter(callback: types.CallbackQuery):
-    await callback.message.edit_text(
-        "Выберите букву, на которую начинается страна:",
-        reply_markup=get_letter_keyboard())
     await TimeZoneStates.selecting_letter.set()
+    state = dp.get_current().current_state()
+    room_number = get_room_number(callback)
     
+    if room_number:
+        await state.update_data(room_number=room_number)
+        
+    message_text = (
+        "Для смены часового пояса, выберите букву,"
+        " на которую начинается страна:"
+    )
+    
+    await callback.message.edit_text(
+        message_text,
+        reply_markup=_get_letter_keyboard())
+    await TimeZoneStates.next()
 
-def get_letter_keyboard():
+
+def _get_letter_keyboard():
     alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     keyboard_markup = InlineKeyboardMarkup(row_width=5)
     for letter in alphabet:
         button = InlineKeyboardButton(text=letter,
-                                      callback_data=f'select_letter:{letter}')
+                                      callback_data=f'selected_letter:{letter}')
         keyboard_markup.insert(button)
     return keyboard_markup
 
 
-@dp.callback_query_handler(state=TimeZoneStates.selecting_letter)
-async def process_letter_callback(callback: types.CallbackQuery,
-                                  state: FSMContext):
+@dp.callback_query_handler(Text(startswith='selected_letter'),
+                           state=TimeZoneStates.selecting_country)
+async def process_letter_callback(callback: types.CallbackQuery):
     letter = callback.data.split(':')[-1]
-    await callback.message.reply("Выберите страну:",
-                                 reply_markup=get_country_keyboard(letter))
+    message_text = "Выберите страну:"
+    await callback.message.edit_text(message_text,
+                                     reply_markup=get_country_keyboard(
+                                         letter))
     await TimeZoneStates.next()
 
 
-@dp.callback_query_handler(state=TimeZoneStates.selecting_country)
+@dp.callback_query_handler(Text(startswith='selected_country'),
+                           state=TimeZoneStates.selecting_timezone)
 async def process_country_callback(callback: types.CallbackQuery):
     country_code = callback.data.split(':')[-1]
-    country = pycountry.countries.get(alpha_2=country_code)
-    await callback.message.reply(f"Выбрана страна {country.name}")
-    await callback.message.reply("Выберите таймзону:",
-                                 reply_markup=get_timezone_keyboard(
-                                     country.alpha_2))
+    message_text = 'Выберите таймзону:'
+    await callback.message.edit_text(text=message_text,
+                                     reply_markup=get_timezone_keyboard(
+                                         country_code))
     await TimeZoneStates.next()
 
 
-@dp.callback_query_handler(state=TimeZoneStates.selecting_timezone)
-async def process_timezone_callback(callback: types.CallbackQuery):
+@dp.callback_query_handler(Text(startswith='selected_timezone'),
+                           state=TimeZoneStates.confirmation)
+async def process_timezone_callback(callback: types.CallbackQuery,
+                                    state: FSMContext):
     timezone = callback.data.split(':')[-1]
-    await callback.message.reply(callback.id,
-                                 f"Выбрана таймзона {timezone}")
-    # Здесь можно добавить логику обработки выбранной таймзоны
+    state_data = await state.get_data()
+    room_number = state_data.get('room_number')
+    
+    if room_number:
+        callback_query = f"room_start-game_{room_number}"
+    else:
+        callback_query = "profile_edit"
+        
+    message_text = f"Выбран часовой пояс {timezone}"
+    keyboard = {
+        "Вернуться назад ◀️": callback_query
+    }
+    keyboard_inline = generate_inline_keyboard(keyboard)
+    await UserRepo().update_user(user_id=callback.message.chat.id,
+                                 timezone=timezone)
+    await callback.message.edit_text(message_text,reply_markup=keyboard_inline)
+    await state.finish()
 
 
-# Функция для создания клавиатуры с странами
 def get_country_keyboard(letter, page=1):
     countries = [country for country in pycountry.countries if
                  country.name.startswith(letter)]
-    countries = countries[(page - 1) * 5:page * 5]
-    
-    keyboard_markup = InlineKeyboardMarkup(row_width=1)
-    for country in countries:
-        button = InlineKeyboardButton(text=country.name,
-                                      callback_data=f'select_country:{country.alpha_2}')
-        keyboard_markup.insert(button)
-    
-    # Добавление кнопок пагинации
-    prev_button = InlineKeyboardButton(text='<< Пред.',
-                                       callback_data=f'prev_country:{letter}:{page}')
-    next_button = InlineKeyboardButton(text='След. >>',
-                                       callback_data=f'next_country:{letter}:{page + 1}')
-    keyboard_markup.row(prev_button, next_button)
-    
-    return keyboard_markup
+    return paginator(
+        objects=countries,
+        page_size=5,
+        page=page,
+        obj_callback_prefix='selected_country',
+        keyboard_query={'object': True,
+                        'method_or_name': 'name'},
+        obj_keyboard_method='alpha_2',
+        callback_next_prefix=f'next_country:{letter}',
+        callback_back_prefix=f'prev_country:{letter}'
+    )
 
 
-@dp.callback_query_handler(filters.Regexp(r'prev_country:[A-Z]:\d+'))
-async def process_prev_country_callback(callback_query: types.CallbackQuery):
-    data = callback_query.data.split(':')
+@dp.callback_query_handler(filters.Regexp(r'prev_country:[A-Z]:\d+'),
+                           state=TimeZoneStates.selecting_timezone)
+async def process_prev_country_callback(callback: types.CallbackQuery):
+    data = callback.data.split(':')
     letter = data[1]
     page = int(data[2])
-    await callback_query.message.edit_text('Страна',
-                                           reply_markup=get_country_keyboard(
-                                               letter, page - 1))
+    message_text = 'Страна'
+    await callback.message.edit_text(message_text,
+                                     reply_markup=get_country_keyboard(
+                                         letter, page - 1))
 
 
-@dp.callback_query_handler(filters.Regexp(r'next_country:[A-Z]:\d+'))
-async def process_next_country_callback(callback_query: types.CallbackQuery):
-    data = callback_query.data.split(':')
+@dp.callback_query_handler(filters.Regexp(r'next_country:[A-Z]:\d+'),
+                           state=TimeZoneStates.selecting_timezone)
+async def process_next_country_callback(callback: types.CallbackQuery):
+    data = callback.data.split(':')
     letter = data[1]
     page = int(data[2])
-    await callback_query.message.edit_text('Страна',
-                                           reply_markup=get_country_keyboard(
-                                               letter, page + 1))
+    message_text = 'Страна'
+    await callback.message.edit_text(message_text,
+                                     reply_markup=get_country_keyboard(
+                                         letter, page + 1))
 
 
-# Функция для создания клавиатуры с таймзонами для выбранной страны
 def get_timezone_keyboard(country_code, page=1):
-    country = pycountry.countries.get(alpha_2=country_code)
     timezones = pytz.country_timezones.get(country_code, [])
-    items_per_page = 5
-    start_index = (page - 1) * items_per_page
-    end_index = start_index + items_per_page
-    
-    keyboard_markup = InlineKeyboardMarkup(row_width=1)
-    for tz in timezones[start_index:end_index]:
-        button = InlineKeyboardButton(text=tz,
-                                      callback_data=f'select_timezone:{tz}')
-        keyboard_markup.insert(button)
-    
-    # Добавление кнопок пагинации
-    prev_button = InlineKeyboardButton(text='<< Пред.',
-                                       callback_data=f'prev_page:{country_code}:{page}')
-    next_button = InlineKeyboardButton(text='След. >>',
-                                       callback_data=f'next_page:{country_code}:{page + 1}')
-    keyboard_markup.row(prev_button, next_button)
-    
-    return keyboard_markup
+    return paginator(
+        objects=timezones,
+        page_size=5,
+        page=page,
+        obj_callback_prefix='selected_timezone',
+        keyboard_query={'object': True},
+        callback_next_prefix=f'next_timezone:{country_code}',
+        callback_back_prefix=f'prev_timezone:{country_code}'
+    )
 
 
-@dp.callback_query_handler(filters.Regexp(r'prev_page:[A-Z]{2}:\d+'))
-async def process_prev_page_callback(callback_query: types.CallbackQuery):
+@dp.callback_query_handler(filters.Regexp(r'prev_timezone:[A-Z]{2}:\d+'),
+                           state=TimeZoneStates.confirmation)
+async def process_prev_timezone_callback(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
     country_code = data[1]
     page = int(data[2])
@@ -134,8 +156,9 @@ async def process_prev_page_callback(callback_query: types.CallbackQuery):
                                                country_code, page - 1))
 
 
-@dp.callback_query_handler(filters.Regexp(r'next_page:[A-Z]{2}:\d+'))
-async def process_next_page_callback(callback_query: types.CallbackQuery):
+@dp.callback_query_handler(filters.Regexp(r'next_timezone:[A-Z]{2}:\d+'),
+                           state=TimeZoneStates.confirmation)
+async def process_next_timezone_callback(callback_query: types.CallbackQuery):
     data = callback_query.data.split(':')
     country_code = data[1]
     page = int(data[2])

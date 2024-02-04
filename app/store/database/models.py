@@ -16,6 +16,7 @@ class User(Model):
     registered_at = fields.DatetimeField(auto_now_add=True)
     is_active = fields.BooleanField(default=True)
     is_superuser = fields.BooleanField(default=False)
+    timezone = fields.CharField(max_length=32, null=True)
     
     class Meta:
         table = "users"
