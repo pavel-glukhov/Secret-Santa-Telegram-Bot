@@ -43,7 +43,7 @@ async def create_room(callback: types.CallbackQuery, ):
         'Хо-хо-хо! 🎅\n\n'
         'Как ты хочешь назвать свою комнату?\n'
         'Напиши мне ее название и мы пойдем дальше\n\n'
-        'Имя комнаты не должно превышать 12 символов.\n'
+        'Имя комнаты не должно превышать 16 символов.\n'
     )
     
     async with state.proxy() as data:
@@ -63,13 +63,13 @@ async def process_name(message: types.Message, state: FSMContext):
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     await delete_user_message(message.from_user.id, message.message_id)
     
-    if not len(room_name) < 13:
+    if not len(room_name) < 17:
         keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
         
         message_text = (
             'Вы ввели слишком длинное имя, '
             'пожалуйста придумайте другое.\n'
-            'Имя комнаты не должно превышать 12 символов.\n'
+            'Имя комнаты не должно превышать 16 символов.\n'
         )
         
         return await last_message.edit_text(
@@ -85,7 +85,7 @@ async def process_name(message: types.Message, state: FSMContext):
         'Напиши в чат сумму в любом формате, '
         'например 2000 тенге,'
         '200 рублей или 20$\n\n'
-        'Длина сообщения не должна превышать 12 символов.'
+        'Длина сообщения не должна превышать 16 символов.'
     )
     
     await last_message.edit_text(
@@ -95,7 +95,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(lambda message:
-                    len(message.text.lower()) > 12,
+                    len(message.text.lower()) > 16,
                     state=CreateRoom.waiting_for_room_budget)
 async def process_budget_invalid(message: types.Message):
     state_data = await dp.get_current().current_state().get_data()
@@ -107,7 +107,7 @@ async def process_budget_invalid(message: types.Message):
     
     message_text = (
         'Вы введи слишком длинное сообщение для бюджета.\n '
-        'Длина сообщения не может быть больше 12 символов\n'
+        'Длина сообщения не может быть больше 16 символов\n'
         'Для изменения вашего бюджета, отправьте новое сообщение.\n'
     )
     await last_message.edit_text(

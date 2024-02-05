@@ -83,7 +83,7 @@ class RoomRepo:
         room = await Room.filter(number=room_number).first()
         await room.members.remove(user)
         await WishRoom.filter(user=user, room=room).delete()
-
+    
     async def is_exists(self, room_number: int) -> bool:
         result = await Room.filter(number=room_number).exists()
         return result
