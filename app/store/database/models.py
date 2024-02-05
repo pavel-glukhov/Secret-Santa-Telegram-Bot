@@ -39,9 +39,9 @@ class User(Model):
 
 class Room(Model):
     id = fields.IntField(pk=True)
-    name = fields.CharField(max_length=12, null=False)
+    name = fields.CharField(max_length=16, null=False)
     number = fields.IntField(null=False, unique=True)
-    budget = fields.CharField(max_length=12, null=False)
+    budget = fields.CharField(max_length=16, null=False)
     created_at = fields.DatetimeField(auto_now_add=True)
     is_closed = fields.BooleanField(default=False)
     started_at = fields.DatetimeField(null=True)
