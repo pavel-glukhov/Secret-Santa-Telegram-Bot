@@ -14,7 +14,11 @@ def get_room_number(callback: types.CallbackQuery) -> int:
     :param callback:
     :return:
     """
-    return int(callback.data[callback.data.rfind('_') + 1:])
+    try:
+        room_number = int(callback.data[callback.data.rfind('_') + 1:])
+        return room_number
+    except ValueError:
+        return False
 
 
 async def delete_user_message(chat_id, message_id):

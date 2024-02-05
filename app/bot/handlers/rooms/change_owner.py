@@ -48,7 +48,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"room_menu_{room_number}",
+            "Вернуться назад ◀️": f"room_config_{room_number}",
         }
     )
     user = await UserRepo().get_user_or_none(new_owner)

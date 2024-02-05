@@ -28,7 +28,7 @@ async def change_room_budget(callback: types.CallbackQuery):
         'Напиши в чат сумму в любом формате, '
         'например 2000 тенге,'
         '200 рублей или 20$\n\n'
-        'Длина сообщения не должна превышать 12 символов.'
+        'Длина сообщения не должна превышать 16 символов.'
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
@@ -38,7 +38,7 @@ async def change_room_budget(callback: types.CallbackQuery):
 
 
 @dp.message_handler(lambda message:
-                    len(message.text.lower()) > 12,
+                    len(message.text.lower()) > 16,
                     state=ChangeBudget.waiting_for_budget)
 async def process_change_budget_invalid(message: types.Message):
     state_data = await dp.get_current().current_state().get_data()
@@ -51,7 +51,7 @@ async def process_change_budget_invalid(message: types.Message):
     
     message_text = (
         'Вы введи слишком длинное сообщение для бюджета.\n '
-        'Длина сообщения не может быть больше 12 символов\n'
+        'Длина сообщения не может быть больше 16 символов\n'
         'Для изменения вашего бюджета, отправьте новое сообщение.\n'
     )
     await last_message.edit_text(
@@ -70,7 +70,7 @@ async def process_changing_budget(message: types.Message, state: FSMContext):
     
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"room_menu_{room_number}",
+            "Вернуться назад ◀️": f"room_config_{room_number}",
         }
     )
     await RoomRepo().update(room_number, budget=new_budget)

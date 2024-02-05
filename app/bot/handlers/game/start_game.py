@@ -2,7 +2,7 @@ import asyncio
 import logging
 import re
 from datetime import datetime
-
+import pytz
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -13,6 +13,7 @@ from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
 from app.store.queries.rooms import RoomRepo
+from app.store.queries.users import UserRepo
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
@@ -23,9 +24,14 @@ async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     room_members = await RoomRepo().get_list_members(room_number)
     task = get_task(task_id=room_number)
-    
+    user = await UserRepo().get_user_or_none(callback.message.chat.id)
+    timezone = user.timezone or ('⚠️ Ваш часовой пояс не задан. '
+                                 'Для того, что бы задать корректное время,'
+                                 ' вам нужно указать свой часовой пояс,'
+                                 ' иначе будет использоваться время сервера.')
     keyboard = {
         "Изменить время 🕘": f"room_change-game-dt_{room_number}",
+        "Изменить часовой пояс 🕘": f"change_time_zone_{room_number}",
         "Вернуться назад ◀️": f"room_menu_{room_number}"
     }
     
@@ -40,7 +46,8 @@ async def start_game(callback: types.CallbackQuery):
         if not task:
             message_text = (
                 '<b>Время не назначено</b>\n\n'
-                '<b>Для запуска игры требуется минимум 3 участника игры</b>'
+                '<b>Для запуска игры требуется минимум 3 участника игры</b>\n\n'
+                f'<b>Ваш часовой пояс</b>: {timezone}'
             )
         else:
             message_text = (
@@ -79,12 +86,19 @@ async def change_game_datetime(callback: types.CallbackQuery):
         )
 
 
+def convert_datetime_with_timezone(datetime_obj: datetime,
+                                   timezone) -> datetime:
+    return timezone.localize(datetime_obj)
+
+
 @dp.message_handler(state=StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     last_message = state_data['last_message']
     text = message.text
+    user = await UserRepo().get_user_or_none(message.chat.id)
+    timezone = user.timezone
     semaphore = asyncio.Semaphore(1)
     await delete_user_message(message.from_user.id, message.message_id)
     cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
@@ -93,14 +107,22 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
+    # TODO проверить
+    if timezone:
+        timezone = pytz.timezone(timezone)
+        datetime_obj = convert_datetime_with_timezone(_parse_date(text),
+                                                      timezone)
+        current_time = datetime.now(timezone)
+    else:
+        datetime_obj = _parse_date(text)
+        current_time = datetime.now()
     
-    date_time = _parse_date(text)
-    if date_time:
-        if date_time > datetime.now():
+    if datetime_obj:
+        if datetime_obj > current_time:
             if task := get_task(task_id=room_number):
                 task.remove()
             
-            add_task(task_func=send_result_of_game, date_time=date_time,
+            add_task(task_func=send_result_of_game, date_time=datetime_obj,
                      task_id=room_number, room_number=room_number,
                      semaphore=semaphore)
             await RoomRepo().update(room_number, started_at=datetime.now(),
@@ -108,7 +130,7 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             
             message_text = (
                 'Дата рассылки установлена на'
-                f' {date_time.strftime("%Y-%b-%d, %H:%M:%S")}'
+                f' {datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")}'
             )
             await last_message.edit_text(
                 text=message_text,
@@ -116,9 +138,13 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             )
             await state.finish()
         else:
+            current_time_str = current_time.strftime('%Y-%b-%d, %H:%M:%S')
+            datetime_obj_str = datetime_obj.strftime('%Y-%b-%d, %H:%M:%S')
             message_text = (
                 'Вы указали прошедшую дату. Попробуте снова и укажите '
-                'правильную дату для жеребьевки.'
+                'правильную дату для жеребьевки. \n\n'
+                f'<b>Время на сервере:</b> {current_time_str}\n'
+                f'<b>Ваше указанное время:</b> {datetime_obj_str}'
             )
             
             await _incorrect_data_format(last_message, message_text,

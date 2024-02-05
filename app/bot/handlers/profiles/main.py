@@ -49,6 +49,7 @@ async def edit_profile(callback: types.CallbackQuery, ):
             "Изменить имя": "profile_edit_name",
             "Изменить адрес": "profile_edit_address",
             "Изменить номер телефона": "profile_edit_number",
+            "Изменить часовой пояс": "change_time_zone",
             "Удалить всю информацию ❌": "profile_edit_delete_all",
             "Вернуться назад ◀️": "menu_user_profile"
         }

@@ -92,7 +92,7 @@ async def _room_is_closed(callback: types.CallbackQuery,
         if not room_owner:
             del keyboard_dict['Активировать комнату ✅']
             del keyboard_dict['Настройки ⚒']
-            
+        
         message_text = (
             f'<b>Игра в комнате {room_number} завершена!</b>\n\n'
             'К сожалению, количество игроков оказалось недостаточным '
@@ -125,36 +125,6 @@ async def _room_is_closed(callback: types.CallbackQuery,
         )
     
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
-    
-    await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
-
-
-@dp.callback_query_handler(Text(startswith='room_member-list'))
-async def members_list(callback: types.CallbackQuery):
-    room_number = get_room_number(callback)
-    keyboard_inline = generate_inline_keyboard(
-        {
-            'Вернуться назад ◀️': f'room_menu_{room_number}'
-        }
-    )
-    room = await RoomRepo().get(room_number)
-    members = await room.members
-    member_string = ''
-    
-    for number, member in enumerate(members, start=1):
-        username = ("@" + member.username
-                    if member.username
-                    else member.first_name)
-        member_string += (
-            f'{number}) {username}"\n')
-    
-    message_text = (
-        'Список участников комнаты: '
-        f'<b>{room.name} ({room_number})</b>:\n\n{member_string}'
-    )
     
     await callback.message.edit_text(
         text=message_text,

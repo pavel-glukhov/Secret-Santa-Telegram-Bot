@@ -55,13 +55,16 @@ async def process_room_number(message: types.Message):
             'Номер комнаты может содержать только цифры, '
             'попробуйте снова.'
         )
+        await delete_user_message(message.from_user.id, message.message_id)
         return await last_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
+    
     room = await RoomRepo().get(room_number=state_data['room_number'])
     
     if not room or room.is_closed is True:
+        await delete_user_message(message.from_user.id, message.message_id)
         return await _is_not_exists_room(last_message,
                                          state_data['room_number'],
                                          keyboard_inline)
@@ -107,10 +110,12 @@ async def _is_not_exists_room(message, room_number, keyboard_inline):
         'Введенной комнаты не существует, или игра завершена.\n'
         'Введите корректный номер комнаты.'
     )
+    
     await message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
+    
     logger.info(
         f'Incorrect room number [{room_number}] '
         f'from [{message.from_user.id}]'
@@ -135,8 +140,12 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         user_id=chat_id,
         room_id=room_number
     )
-    
-    keyboard_inline = await create_common_keyboards(message)
+
+    keyboard_inline = generate_inline_keyboard(
+        {
+            "В комнату ➡️": f"room_menu_{room_number}",
+        }
+    )
     await delete_user_message(message.from_user.id, message.message_id)
     message_text = (
         '"Хо-хо-хо! 🎅\n\n'
@@ -155,3 +164,6 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         f'successful subscribed to the room [{state_data["room_number"]}]'
     )
     await state.finish()
+
+
+#
