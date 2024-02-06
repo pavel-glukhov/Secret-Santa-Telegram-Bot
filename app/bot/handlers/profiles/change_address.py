@@ -56,7 +56,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "menu_user_profile",
+            "Вернуться назад ◀️": "profile_edit",
         }
     )
     await delete_user_message(message.from_user.id,

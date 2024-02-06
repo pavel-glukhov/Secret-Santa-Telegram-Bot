@@ -21,20 +21,20 @@ async def change_room_owner(callback: types.CallbackQuery):
     await ChangeOwner.waiting_for_owner_name.set()
     state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
-
+    
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     
     message_text = (
         'Хочешь поменять владельца комнаты?\n'
-        'Новый владелец комнаты должен являться ее участником. '
+        'Новый владелец комнаты должен являться ее участником.\n'
         '<b>Учти, что ты потеряешь контроль за комнатой.</b>\n\n'
         '<b>Для смены владельца, напиши его ник.</b>\n'
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
 
 
 @dp.message_handler(state=ChangeOwner.waiting_for_owner_name)
@@ -48,7 +48,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"room_config_{room_number}",
+            "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
     user = await UserRepo().get_user_or_none(new_owner)
@@ -57,7 +57,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         count_rooms = await RoomRepo().get_count_user_rooms(user.user_id)
         if count_rooms < load_config().room.user_rooms_count:
             await RoomRepo().change_owner(new_owner, room_number)
-
+            
             message_text = (
                 '"Хо-хо-хо! 🎅\n\n'
                 f'Я сменил владельца, теперь это <b>{new_owner}</b>'
@@ -73,7 +73,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         else:
             message_text = ('Данный участник не может '
                             'быть назначен владельцем комнаты.')
-    
+            
             await last_message.edit_text(
                 text=message_text,
                 reply_markup=keyboard_inline,

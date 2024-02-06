@@ -70,7 +70,7 @@ async def process_changing_last_name(message: types.Message,
     
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "menu_user_profile",
+            "Вернуться назад ◀️": "profile_edit",
         }
     )
     await UserRepo().update_user(user_id,

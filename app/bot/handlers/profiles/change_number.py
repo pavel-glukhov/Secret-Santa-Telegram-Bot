@@ -49,7 +49,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "menu_user_profile",
+            "Вернуться назад ◀️": "profile_edit",
         }
     )
     
