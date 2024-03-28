@@ -124,7 +124,7 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
         'Один игрок может являться владельцем только '
         f'{load_config().room.user_rooms_count} комнат.\n\n'
         '  В случае возникновения ошибок, или вопросов, '
-        'вы можете связаться с @{}\n\n'
+        f'вы можете связаться с @{load_config().support_account}\n\n'
     )
 
     await message.edit_text(

@@ -72,6 +72,7 @@ class AppConfig:
     room: RoomConfig
     log: LoggingConfig
     encryption: Encryption
+    support_account: str
 
 
 @lru_cache
@@ -114,7 +115,9 @@ def load_config() -> AppConfig:
         ),
         encryption=Encryption(
             key=os.getenv('ENCRYPT_SECRET_KEY')
-        )
+        ),
+        support_account=os.getenv('SUPPORT_ACCOUNT')
+    
     )
 
 
