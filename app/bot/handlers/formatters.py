@@ -1,16 +1,22 @@
 from app.store.database.models import User
 
 
+def get_full_name(user: User) -> str | None:
+    if not user.first_name:
+        return user.username
+    
+    if all([user.first_name, user.last_name]):
+        return f'{user.first_name} {user.last_name}'
+    else:
+        return user.first_name
+
+
 def user_information_formatter(user: User) -> list:
-    first_name = user.first_name
-    last_name = user.last_name
     address_value = user.get_address() or 'адрес не указан'
     number_value = user.get_number() or 'номер не указан'
     timezone = user.timezone or 'часовой пояс не указан'
-    full_name = (
-        f'{first_name} {last_name}' if all([first_name, last_name])
-        else first_name
-    )
+    
+    full_name = get_full_name(user)
     return [full_name, address_value, number_value, timezone]
 
 
