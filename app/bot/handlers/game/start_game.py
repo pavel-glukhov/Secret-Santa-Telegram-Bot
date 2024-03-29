@@ -2,6 +2,7 @@ import asyncio
 import logging
 import re
 from datetime import datetime
+
 import pytz
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -107,7 +108,6 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
             "Вернуться назад ◀️": f"room_menu_{room_number}"
         }
     )
-    # TODO проверить
     if timezone:
         timezone = pytz.timezone(timezone)
         datetime_obj = convert_datetime_with_timezone(_parse_date(text),

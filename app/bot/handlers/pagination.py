@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 class Pagination:

@@ -1,4 +1,4 @@
-from app.store.database.models import WishRoom, User, Room
+from app.store.database.models import Room, User, WishRoom
 from app.store.queries.users import UserRepo
 
 

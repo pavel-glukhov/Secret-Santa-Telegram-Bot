@@ -1,11 +1,12 @@
 import logging
 
 import pycountry
-from aiogram import types, filters
+import pytz
+from aiogram import filters, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-import pytz
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.handlers.pagination import Pagination
