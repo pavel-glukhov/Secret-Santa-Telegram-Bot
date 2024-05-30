@@ -3,8 +3,7 @@
 
 * Бот для игры в Тайного Санту через Telegram бота
 
-Схема: https://miro.com/welcomeonboard/VGVSaFFwYVBZZWRJNUQ0MGh4bUw4ZG5rM002c0I5ajZMZkxRRmlRN3VibG9KNUVVVG9sOGJHNzcwWk5nc2preHwzMDc0NDU3MzYxMjU1Nzc4NjQ4fDI=?share_link_id=672854202905
-### Реализованные Возможности
+Схема: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 
 1. #### Создание персональных комнат
 
