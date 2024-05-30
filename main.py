@@ -1,13 +1,13 @@
 import logging
 import os
 
-from app.bot import bot
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
 
-from app.config import load_config, ROOT_PATH, webhook_settings, setup_logging
-from app.store.database import init_db, close_db
+from app.bot import bot
+from app.config import ROOT_PATH, load_config, setup_logging, webhook_settings
+from app.store.database import close_db, init_db
 from app.store.scheduler import scheduler
 from app.web.exceptions import app_exceptions
 from app.web.routers import active_games, auth, main, rooms, users, webhooks

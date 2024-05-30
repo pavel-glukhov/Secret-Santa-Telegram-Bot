@@ -1,9 +1,11 @@
 import argparse
-import logging
-import requests
 import asyncio
+import logging
+
+import requests
+
 from app.config import load_config
-from app.store.database import init_db, close_db
+from app.store.database import close_db, init_db
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
