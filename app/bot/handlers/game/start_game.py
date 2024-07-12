@@ -9,7 +9,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
-from app.bot.handlers.game.states import StartGame
+from app.bot.states.game import StartGame
 from app.bot.handlers.operations import delete_user_message, get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game

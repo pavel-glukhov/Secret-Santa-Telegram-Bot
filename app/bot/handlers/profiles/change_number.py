@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
-from app.bot.handlers.profiles.states import ChangePhoneNuber
+from app.bot.states.profiles import ChangePhoneNuber
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
 from app.store.encryption import CryptData
@@ -15,6 +15,7 @@ from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
+# ТЕКСТ ПЕРЕНЕСЕН
 
 @dp.callback_query_handler(Text(equals='profile_edit_number'))
 async def change_phone_number(callback: types.CallbackQuery):

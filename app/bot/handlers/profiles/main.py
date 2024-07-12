@@ -11,6 +11,7 @@ from app.store.queries.users import UserRepo
 logger = logging.getLogger(__name__)
 
 
+# ТЕКСТ ПЕРЕНЕСЕН
 @dp.callback_query_handler(Text(equals='menu_user_profile'))
 async def my_profile(callback: types.CallbackQuery):
     message = callback.message

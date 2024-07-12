@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import Text
 from app.bot import bot
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
-from app.bot.handlers.wishes.states import ChangeWish
+from app.bot.states.wishes import ChangeWish
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 from app.store.queries.wishes import WishRepo

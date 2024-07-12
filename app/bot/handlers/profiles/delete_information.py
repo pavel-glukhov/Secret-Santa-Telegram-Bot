@@ -6,12 +6,14 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
-from app.bot.handlers.profiles.states import DeleteUserInformation
+from app.bot.states.profiles import DeleteUserInformation
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
+
+# ТЕКСТ ПЕРЕНЕСЕН
 
 @dp.callback_query_handler(Text(equals='profile_edit_delete_all'))
 async def delete_user_information(callback: types.CallbackQuery):
@@ -34,7 +36,7 @@ async def delete_user_information(callback: types.CallbackQuery):
 
 
 @dp.message_handler(lambda message:
-                    message.text.lower() != 'подтверждаю',
+                    message.text.lower() != 'подтверждаю' or message.text.lower() != 'confirm',
                     state=DeleteUserInformation.waiting_for_conformation)
 async def process_deleting_information_invalid(message: types.Message):
     state = dp.get_current().current_state()
@@ -59,7 +61,7 @@ async def process_deleting_information_invalid(message: types.Message):
 
 
 @dp.message_handler(lambda message:
-                    message.text.lower() == 'подтверждаю',
+                    message.text.lower() == 'подтверждаю' or message.text.lower() == 'confirm',
                     state=DeleteUserInformation.waiting_for_conformation)
 async def process_deleting_information(message: types.Message,
                                        state: FSMContext):

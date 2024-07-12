@@ -6,12 +6,14 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
-from app.bot.handlers.profiles.states import ChangeUserName
+from app.bot.states.profiles import ChangeUserName
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
+
+# ТЕКСТ ПЕРЕНЕСЕН
 
 @dp.callback_query_handler(Text(equals='profile_edit_name'))
 async def change_username(callback: types.CallbackQuery):

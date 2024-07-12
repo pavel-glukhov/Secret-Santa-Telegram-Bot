@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 
 logger = logging.getLogger(__name__)
 
+
 class CryptData:
     def __init__(self, key):
         self.key = key

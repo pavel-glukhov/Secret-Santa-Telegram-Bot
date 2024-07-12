@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
-from app.bot.handlers.profiles.states import ChangeAddress
+from app.bot.states.profiles import ChangeAddress
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
 from app.store.encryption import CryptData
@@ -14,6 +14,8 @@ from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
+
+# ТЕКСТ ПЕРЕНЕСЕН
 
 @dp.callback_query_handler(Text(equals='profile_edit_address'))
 async def change_user_address(callback: types.CallbackQuery):
@@ -24,7 +26,7 @@ async def change_user_address(callback: types.CallbackQuery):
             "Отмена": 'cancel',
         }
     )
-
+    
     message_text = (
         'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
         'напишите ваш адрес куда необходимо отправить посылку'
@@ -43,9 +45,9 @@ async def change_user_address(callback: types.CallbackQuery):
     )
     async with state.proxy() as data:
         data['last_message'] = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+            text=message_text,
+            reply_markup=keyboard_inline,
+        )
 
 
 @dp.message_handler(state=ChangeAddress.waiting_for_address_information)

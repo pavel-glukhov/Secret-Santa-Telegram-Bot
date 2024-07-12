@@ -10,7 +10,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import get_room_number
 from app.bot.handlers.pagination import Pagination
-from app.bot.handlers.time_zones.states import TimeZoneStates
+from app.bot.states.time_zones import TimeZoneStates
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.users import UserRepo
 

@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 
 from app.bot import dispatcher as dp
 from app.bot.handlers.operations import delete_user_message
-from app.bot.handlers.rooms.states import JoinRoom
+from app.bot.states.rooms import JoinRoom
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.store.queries.rooms import RoomRepo

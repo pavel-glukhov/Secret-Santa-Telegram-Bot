@@ -13,6 +13,8 @@ from app.store.queries.users import UserRepo
 logger = logging.getLogger(__name__)
 
 
+# ТЕКСТ ПЕРЕНЕСЕН
+
 @dp.callback_query_handler(text_contains="cancel", state='*')
 async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
     message = callback.message
@@ -48,7 +50,7 @@ async def create_user_or_enable(message: types.Message):
     if not user.is_active:
         await UserRepo().enable_user(message.chat.id)
         logger.info(f'The new user "{user_id}" has been enabled')
-
+    
     return user, created
 
 
@@ -62,24 +64,24 @@ async def root_menu(
         data,
         types.CallbackQuery
     ) else data
-
+    
     user, created = await create_user_or_enable(message)
     keyboard = await create_common_keyboards(message)
-
+    
     is_profile_filled_out = all([user.encrypted_address, user.encrypted_number])
-
+    
     text_reminder_notification_for_user = (
         '❗ <b>Не забудь обновить свои конт актные данные '
         'в настройках профиля</b>.\n\n'
         '❗ <b>Иначе Санта не сможет отправить тебе подарок.</b>\n\n'
     )
     text_menu_message = '<b>Меню</b>'
-
+    
     message_text = (
         text_menu_message if is_profile_filled_out
         else text_reminder_notification_for_user + text_menu_message
     )
-
+    
     if edit_message:
         await message.edit_text(
             text=message_text,
@@ -96,7 +98,7 @@ async def root_menu(
 @dp.message_handler(commands=['about'], )
 async def about_game(data: types.Message | types.CallbackQuery, ):
     message = data.message if isinstance(data, types.CallbackQuery) else data
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
@@ -125,7 +127,7 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
         '  В случае возникновения ошибок, или вопросов, '
         f'вы можете связаться с @{load_config().support_account}\n\n'
     )
-
+    
     await message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,

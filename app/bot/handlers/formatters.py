@@ -1,6 +1,8 @@
 from app.store.database.models import User
 
 
+# ТЕКСТ ПЕРЕНЕСЕН
+
 def get_full_name(user: User) -> str | None:
     if not user.first_name:
         return user.username
