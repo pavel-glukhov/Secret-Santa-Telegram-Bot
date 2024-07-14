@@ -1,11 +1,8 @@
 import logging
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message
+from aiogram import F, Router, types
+from aiogram.fsm.context import FSMContext
 from app.bot.states.rooms import JoinRoom
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
@@ -13,41 +10,36 @@ from app.store.queries.rooms import RoomRepo
 from app.store.queries.wishes import WishRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(equals='menu_join_room'))
-async def join_room(callback: types.CallbackQuery):
-    state = dp.get_current().current_state()
-    await JoinRoom.waiting_for_room_number.set()
+@router.callback_query(F.data == 'menu_join_room')
+async def join_room(callback: types.CallbackQuery, state: FSMContext):
     keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        }
+        {"Отмена": 'cancel'}
     )
     message_text = (
-        '"Хо-хо-хо! 🎅\n\n'
+        'Хо-хо-хо! 🎅\n\n'
         'Введи номер комнаты в которую ты хочешь зайти.\n'
     )
-    async with state.proxy() as data:
-        data['chat_id'] = callback.message.chat.id
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(JoinRoom.waiting_for_room_number)
 
 
-@dp.message_handler(state=JoinRoom.waiting_for_room_number)
-async def process_room_number(message: types.Message):
-    state = dp.get_current().current_state()
+@router.message(JoinRoom.waiting_for_room_number)
+async def process_room_number(message: types.Message, state: FSMContext):
     await state.update_data(room_number=message.text)
     state_data = await state.get_data()
+    bot_message = state_data.get('bot_message_id')
     
-    last_message = state_data['last_message']
+    await message.delete()
+    
     await state.update_data(room_number=state_data['room_number'])
     keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        }
+        {"Отмена": 'cancel'}
     )
     
     if not state_data['room_number'].isdigit():
@@ -55,8 +47,7 @@ async def process_room_number(message: types.Message):
             'Номер комнаты может содержать только цифры, '
             'попробуйте снова.'
         )
-        await delete_user_message(message.from_user.id, message.message_id)
-        return await last_message.edit_text(
+        return await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
@@ -64,21 +55,19 @@ async def process_room_number(message: types.Message):
     room = await RoomRepo().get(room_number=state_data['room_number'])
     
     if not room or room.is_closed is True:
-        await delete_user_message(message.from_user.id, message.message_id)
-        return await _is_not_exists_room(last_message,
+        return await _is_not_exists_room(bot_message,
                                          state_data['room_number'],
                                          keyboard_inline)
     is_member_of_room = await RoomRepo().is_member(
         user_id=message.chat.id,
         room_number=state_data['room_number']
     )
-    await delete_user_message(message.from_user.id, message.message_id)
     if is_member_of_room:
         keyboard_inline = await create_common_keyboards(message)
         
         message_text = 'Вы уже состоите в этой комнате.'
         
-        await last_message.edit_text(
+        await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
@@ -86,10 +75,10 @@ async def process_room_number(message: types.Message):
             f'The user[{message.from_user.id}] '
             f'already is member of the room [{state_data["room_number"]}]'
         )
-        await state.finish()
+        await state.clear()
     
     else:
-        await JoinRoom.next()
+        await state.set_state(JoinRoom.waiting_for_wishes)
         
         message_text = (
             'А теперь напишите свои пожелания к подарку. '
@@ -99,11 +88,11 @@ async def process_room_number(message: types.Message):
             'выбрать для вас подарок.\n'
         )
         
-        await last_message.edit_text(
+        await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
-    
+
 
 async def _is_not_exists_room(message, room_number, keyboard_inline):
     message_text = (
@@ -122,13 +111,15 @@ async def _is_not_exists_room(message, room_number, keyboard_inline):
     )
 
 
-@dp.message_handler(state=JoinRoom.waiting_for_wishes)
+@router.message(JoinRoom.waiting_for_wishes)
 async def process_room_wishes(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     wishes = message.text
     chat_id = state_data['chat_id']
     room_number = state_data['room_number']
-    last_message = state_data['last_message']
+    bot_message = state_data.get('bot_message_id')
+    
+    await message.delete()
     
     await RoomRepo().add_member(
         user_id=chat_id,
@@ -140,22 +131,21 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         user_id=chat_id,
         room_id=room_number
     )
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             "В комнату ➡️": f"room_menu_{room_number}",
         }
     )
-    await delete_user_message(message.from_user.id, message.message_id)
     message_text = (
-        '"Хо-хо-хо! 🎅\n\n'
+        'Хо-хо-хо! 🎅\n\n'
         f'Вы вошли в комнату <b>{room_number}</b>.\n'
         'Теперь ты можешь играть с своими друзьями.\n'
         'Следи за анонсами владельца комнаты.\n\n'
         'Желаю хорошей игры! 😋'
     )
     
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
@@ -163,7 +153,6 @@ async def process_room_wishes(message: types.Message, state: FSMContext):
         f'The user[{message.from_user.id}] '
         f'successful subscribed to the room [{state_data["room_number"]}]'
     )
-    await state.finish()
-
+    await state.clear()
 
 #
