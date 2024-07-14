@@ -2,9 +2,10 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
+
 from app.bot.handlers.operations import get_room_number
-from app.bot.states.rooms import ChangeOwner
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.states.rooms import ChangeOwner
 from app.config import load_config
 from app.store.queries.rooms import RoomRepo
 from app.store.queries.users import UserRepo

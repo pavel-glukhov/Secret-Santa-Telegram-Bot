@@ -1,23 +1,20 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message, get_room_number
+from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from app.bot.handlers.operations import get_room_number
 from app.bot.states.rooms import ChangeBudget
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(startswith='room_change-budget'))
-async def change_room_budget(callback: types.CallbackQuery):
+@router.callback_query(F.data.startswith('room_change-budget'))
+async def change_room_budget(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)
-    await ChangeBudget.waiting_for_budget.set()
-    state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
     
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
@@ -30,43 +27,44 @@ async def change_room_budget(callback: types.CallbackQuery):
         '200 рублей или 20$\n\n'
         'Длина сообщения не должна превышать 16 символов.'
     )
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(ChangeBudget.waiting_for_budget)
 
 
-@dp.message_handler(lambda message:
-                    len(message.text.lower()) > 16,
-                    state=ChangeBudget.waiting_for_budget)
-async def process_change_budget_invalid(message: types.Message):
-    state_data = await dp.get_current().current_state().get_data()
-    last_message = state_data['last_message']
+@router.message(lambda message:
+                len(message.text.lower()) > 16,
+                StateFilter(ChangeBudget.waiting_for_budget))
+async def process_change_budget_invalid(message: types.Message, state: FSMContext):
+    state_data = await state.get_data()
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
-    
-    await delete_user_message(message.from_user.id, message.message_id)
     
     message_text = (
         'Вы введи слишком длинное сообщение для бюджета.\n '
         'Длина сообщения не может быть больше 16 символов\n'
         'Для изменения вашего бюджета, отправьте новое сообщение.\n'
     )
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
-    
 
-@dp.message_handler(state=ChangeBudget.waiting_for_budget)
+
+@router.message(state=ChangeBudget.waiting_for_budget)
 async def process_changing_budget(message: types.Message, state: FSMContext):
-    state_data = await dp.current_state().get_data()
+    state_data = await state.get_data()
     room_number = state_data['room_number']
-    last_message = state_data['last_message']
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     new_budget = message.text
-    await delete_user_message(message.from_user.id, message.message_id)
     
     keyboard_inline = generate_inline_keyboard(
         {
@@ -80,8 +78,8 @@ async def process_changing_budget(message: types.Message, state: FSMContext):
         f'<b>Новое значение</b>: {new_budget}'
     )
     
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
-    await state.finish()
+    await state.clear()

@@ -1,13 +1,16 @@
-from aiogram import types
-from aiogram.dispatcher.filters import Text
+import logging
 
-from app.bot import dispatcher as dp
+from aiogram import F, Router, types
+
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 
+logger = logging.getLogger(__name__)
+router = Router()
 
-@dp.callback_query_handler(Text(startswith='room_config'))
+
+@router.callback_query(F.data.startswith('room_config'))
 async def configuration_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
@@ -20,7 +23,7 @@ async def configuration_room(callback: types.CallbackQuery):
         }
     )
     room = await RoomRepo().get(room_number)
-
+    
     message_text = (
         '"Настройки комнаты:" '
         f' <b>{room.name}</b> (<b>{room_number}</b>)'

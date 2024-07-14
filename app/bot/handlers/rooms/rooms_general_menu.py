@@ -1,6 +1,7 @@
 import logging
 
 from aiogram import F, Router, types
+
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -9,7 +10,6 @@ from app.store.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
 
 logger = logging.getLogger(__name__)
-
 router = Router()
 
 

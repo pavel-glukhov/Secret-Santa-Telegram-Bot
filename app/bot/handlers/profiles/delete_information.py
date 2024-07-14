@@ -32,9 +32,9 @@ async def delete_user_information(callback: types.CallbackQuery, state: FSMConte
                 StateFilter(DeleteUserInformation.waiting_for_conformation))
 async def process_deleting_information_invalid(message: types.Message, state: FSMContext):
     command = message.text
+    state_data = await state.get_data()
     await message.delete()
     
-    state_data = await state.get_data()
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
         {"Отмена": 'cancel', }  # TODO перенести текст
