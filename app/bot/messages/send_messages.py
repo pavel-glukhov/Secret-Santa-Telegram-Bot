@@ -1,9 +1,12 @@
 import asyncio
 import logging
 
-from aiogram.utils import exceptions
+from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
+                                TelegramRetryAfter)
 
-from app.bot import bot
+from app.cli import bot
+
+# TODO ПЕПЕРИСАТЬ
 
 logger = logging.getLogger(__name__)
 
@@ -24,19 +27,16 @@ async def send_message(user_id: int,
                                disable_notification=disable_notification,
                                **kwargs)
 
-    except exceptions.BotBlocked:
+    except TelegramForbiddenError:
         logger.error(f"Target [ID:{user_id}]: blocked by user")
-    except exceptions.ChatNotFound:
-        logger.error(f"Target [ID:{user_id}]: invalid user ID")
-    except exceptions.RetryAfter as e:
+    except TelegramRetryAfter as e:
         logger.error(
             f"Target [ID:{user_id}]: Flood limit is exceeded."
-            f" Sleep {e.timeout} seconds.")
-        await asyncio.sleep(e.timeout)
+            f" Sleep {e.retry_after} seconds.")
+        await asyncio.sleep(e.retry_after)
         return await send_message(user_id, text)  # Recursive call
-    except exceptions.UserDeactivated:
-        logger.error(f"Target [ID:{user_id}]: user is deactivated")
-    except exceptions.TelegramAPIError:
+
+    except TelegramAPIError:
         logger.exception(f"Target [ID:{user_id}]: failed")
     else:
         logger.info(f"The message was sent to [ID:{user_id}]: success")

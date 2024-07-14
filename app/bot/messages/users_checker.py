@@ -1,9 +1,10 @@
 import asyncio
 import logging
 
-from aiogram.utils import exceptions
+from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
+                                TelegramRetryAfter)
 
-from app.bot import bot
+from app.cli import bot
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
@@ -16,32 +17,21 @@ async def checking_user_is_active(user_id):
     """
     try:
         await bot.send_chat_action(user_id, action='typing')
-
-    except exceptions.BotBlocked:
+    
+    except TelegramForbiddenError:
         logger.error(f"The bot was blocked by user [ID:{user_id}]")
         await UserRepo().disable_user(user_id)
         return False
-
-    except exceptions.UserDeactivated:
-        logger.error(f"The user [ID:{user_id}] is deactivated")
-        await UserRepo().disable_user(user_id)
-        return False
-
-    except exceptions.ChatNotFound:
-        logger.error(f"Target [ID:{user_id}]: invalid user ID")
-        await UserRepo().disable_user(user_id)
-        return False
-
-    except exceptions.RetryAfter as e:
+  
+    except TelegramRetryAfter as e:
         logger.error(
             f"Target [ID:{user_id}]: Flood limit is exceeded."
-            f" Sleep {e.timeout} seconds.")
-        await asyncio.sleep(e.timeout)
+            f" Sleep {e.retry_after} seconds.")
+        await asyncio.sleep(e.retry_after)
         return False
-
-    except exceptions.TelegramAPIError:
+    
+    except TelegramAPIError:
         logger.exception(f"Target [ID:{user_id}]: failed")
         return False
-
+    
     return True
-

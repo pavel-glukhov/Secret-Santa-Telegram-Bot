@@ -1,17 +1,15 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
+from aiogram import types, Router, F
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(startswith='room_activate'))
+@router.callback_query(F.data.startswith('room_activate'))
 async def members_list(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(

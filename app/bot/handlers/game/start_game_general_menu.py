@@ -4,23 +4,23 @@ import re
 from datetime import datetime
 
 import pytz
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.fsm.context import FSMContext
 
-from app.bot import dispatcher as dp
-from app.bot.states.game import StartGame
-from app.bot.handlers.operations import delete_user_message, get_room_number
+from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
+from app.bot.states.game import StartGame
 from app.store.queries.rooms import RoomRepo
 from app.store.queries.users import UserRepo
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)
 
+router = Router()
 
-@dp.callback_query_handler(Text(startswith='room_start-game'))
+
+@router.callback_query(F.data.startswith('room_start-game'))
 async def start_game(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     room_members = await RoomRepo().get_list_members(room_number)
@@ -51,9 +51,9 @@ async def start_game(callback: types.CallbackQuery):
                 f'<b>Ваш часовой пояс</b>: {timezone}'
             )
         else:
+            time_to_send = task.next_run_time.strftime("%b-%d-%Y %H:%M")
             message_text = (
-                '<b>Рассылка будет выполнена:</b>'
-                f' {task.next_run_time.strftime("%b-%d-%Y %H:%M")}'
+                f'<b>Рассылка будет выполнена:</b> {time_to_send}'
             )
     
     keyboard_inline = generate_inline_keyboard(keyboard)
@@ -63,28 +63,25 @@ async def start_game(callback: types.CallbackQuery):
     )
 
 
-@dp.callback_query_handler(Text(startswith='room_change-game-dt'))
-async def change_game_datetime(callback: types.CallbackQuery):
+@router.callback_query(F.data.startswith('room_change-game-dt'))
+async def change_game_datetime(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)
-    await StartGame.waiting_for_datetime.set()
-    state = dp.get_current().current_state()
     await state.update_data(room_number=room_number)
     
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     
     message_text = (
-        '"Хо-хо-хо! 🎅\n\n'
+        'Хо-хо-хо! 🎅\n\n'
         'Для того, что-бы назначить время рассылки, '
         'отправь сообщение в формате\n'
         '<b>yyyy.mm.dd h:m</b> - <b>год.месяц.день час:минуты</b>\n\n'
         '<b>Пример: 2023.12.01 12:00</b>'
     )
-    
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(StartGame.waiting_for_datetime)
 
 
 def convert_datetime_with_timezone(datetime_obj: datetime,
@@ -92,16 +89,18 @@ def convert_datetime_with_timezone(datetime_obj: datetime,
     return timezone.localize(datetime_obj)
 
 
-@dp.message_handler(state=StartGame.waiting_for_datetime)
+@router.message(StartGame.waiting_for_datetime)
 async def process_waiting_datetime(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     room_number = state_data['room_number']
-    last_message = state_data['last_message']
+    bot_message = state_data['bot_message_id']
     text = message.text
+    
+    await message.delete()
+    
     user = await UserRepo().get_user_or_none(message.chat.id)
     timezone = user.timezone
     semaphore = asyncio.Semaphore(1)
-    await delete_user_message(message.from_user.id, message.message_id)
     cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     keyboard_inline = generate_inline_keyboard(
         {
@@ -127,16 +126,15 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                      semaphore=semaphore)
             await RoomRepo().update(room_number, started_at=datetime.now(),
                                     closed_at=None, is_closed=False)
-            
+            datetime_set_to = datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")
             message_text = (
-                'Дата рассылки установлена на'
-                f' {datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")}'
+                f'Дата рассылки установлена на {datetime_set_to}'
             )
-            await last_message.edit_text(
+            await bot_message.edit_text(
                 text=message_text,
                 reply_markup=keyboard_inline
             )
-            await state.finish()
+            await state.clear()
         else:
             current_time_str = current_time.strftime('%Y-%b-%d, %H:%M:%S')
             datetime_obj_str = datetime_obj.strftime('%Y-%b-%d, %H:%M:%S')
@@ -147,14 +145,14 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext):
                 f'<b>Ваше указанное время:</b> {datetime_obj_str}'
             )
             
-            await _incorrect_data_format(last_message, message_text,
+            await _incorrect_data_format(bot_message, message_text,
                                          cancel_keyboard_inline)
     else:
         message_text = (
             'Вы указали неверную дату.\n\n Попробуте снова и укажите '
             'правильную дату для жеребьевки.'
         )
-        await _incorrect_data_format(last_message, message_text,
+        await _incorrect_data_format(bot_message, message_text,
                                      cancel_keyboard_inline)
 
 

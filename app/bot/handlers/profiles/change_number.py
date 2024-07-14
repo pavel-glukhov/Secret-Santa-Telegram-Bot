@@ -1,29 +1,23 @@
 import logging
 import re
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.fsm.context import FSMContext
 
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message
-from app.bot.states.profiles import ChangePhoneNuber
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.states.profiles import ChangePhoneNuber
 from app.config import load_config
 from app.store.encryption import CryptData
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
-# ТЕКСТ ПЕРЕНЕСЕН
+router = Router()
 
-@dp.callback_query_handler(Text(equals='profile_edit_number'))
-async def change_phone_number(callback: types.CallbackQuery):
-    await ChangePhoneNuber.waiting_for_phone_number.set()
-    state = dp.get_current().current_state()
-    
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'}
-                                               )
+
+@router.callback_query(F.data == 'profile_edit_number')
+async def change_phone_number(callback: types.CallbackQuery, state: FSMContext):
+    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     
     message_text = (
         'Укажите ваш номер телефона, что бы почтовые служащие '
@@ -32,22 +26,25 @@ async def change_phone_number(callback: types.CallbackQuery):
         '<b>Например:</b> +7 700 111 11 11'
     )
     
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(ChangePhoneNuber.waiting_for_phone_number)
 
 
-@dp.message_handler(state=ChangePhoneNuber.waiting_for_phone_number)
+@router.message(ChangePhoneNuber.waiting_for_phone_number)
 async def process_changing_owner(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
-    last_message = state_data['last_message']
     phone_number = message.text
     user_id = message.chat.id
-    await delete_user_message(message.from_user.id, message.message_id)
     
-    cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    await message.delete()
+    
+    bot_message = state_data['bot_message_id']
+    cancel_keyboard_inline = generate_inline_keyboard(
+        {"Отмена": 'cancel'}
+    )
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "profile_edit",
@@ -62,11 +59,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
         logger.info(f'The user [{user_id}] updated call number.')
         message_text = 'Номер изменен.'
         
-        await last_message.edit_text(
+        await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
-        await state.finish()
+        await state.clear()
     else:
         
         message_text = (
@@ -74,7 +71,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
             '<b>Укажи свой номер используя формат: +7|8(___)___-__-__ </b> \n'
             '<b>Например:</b> +7 700 111 11 11'
         )
-        return await last_message.edit_text(
+        return await bot_message.edit_text(
             text=message_text,
             reply_markup=cancel_keyboard_inline,
         )

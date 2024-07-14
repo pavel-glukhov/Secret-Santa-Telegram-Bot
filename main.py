@@ -28,7 +28,7 @@ def get_config():
     return AuthJWTSettings()
 
 
-def init_routers(app: FastAPI) -> None:
+def init_fast_api_routers(app: FastAPI) -> None:
     app.include_router(main.router)
     app.include_router(users.router)
     app.include_router(auth.router)
@@ -37,7 +37,7 @@ def init_routers(app: FastAPI) -> None:
     app.include_router(webhooks.router)
 
 
-def init_handlers(app: FastAPI) -> None:
+def init_fast_api_handlers(app: FastAPI) -> None:
     app.add_event_handler("startup", on_startup)
     app.add_event_handler("shutdown", on_shutdown)
 
@@ -54,8 +54,8 @@ def create_app() -> FastAPI:
         StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
         name="static"
     )
-    init_handlers(app)
-    init_routers(app)
+    init_fast_api_handlers(app)
+    init_fast_api_routers(app)
     return app
 
 

@@ -1,40 +1,11 @@
 from aiogram import types
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
 from app.config import load_config
 from app.store.database.models import Room
 from app.store.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
-
-
-def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
-    keyboard_inline = types.InlineKeyboardMarkup()
-    
-    for key, val in buttons.items():
-        button = types.InlineKeyboardButton(
-            text=key,
-            callback_data=val
-        )
-        keyboard_inline.add(button)
-    
-    return keyboard_inline
-
-
-def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
-    """
-    Formatter for user's room button.
-    Showing different message if user is owner of room.
-
-    :param room:
-    :param is_owner:
-    :return:
-    """
-    owner_tag = ' 🤴' if is_owner else ''
-    scheduler_tag = '⏱' if get_task(room.number) else ''
-    closed_tag = '✅' if room.is_closed else ''
-    text = 'Ваша комната'
-    return (f'{text}: {room.name} ({room.number})'
-            f'{owner_tag} {scheduler_tag}{closed_tag}')
 
 
 async def create_common_keyboards(
@@ -78,3 +49,31 @@ async def create_common_keyboards(
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
     
     return keyboard_inline
+
+
+def personal_room_keyboard_formatter(room: Room, is_owner: bool) -> str:
+    """
+    Formatter for user's room button.
+    Showing different message if user is owner of room.
+
+    :param room:
+    :param is_owner:
+    :return:
+    """
+    owner_tag = ' 🤴' if is_owner else ''
+    scheduler_tag = '⏱' if get_task(room.number) else ''
+    closed_tag = '✅' if room.is_closed else ''
+    text = 'Ваша комната'
+    return (f'{text}: {room.name} ({room.number})'
+            f'{owner_tag} {scheduler_tag}{closed_tag}')
+
+
+def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    for key, val in buttons.items():
+        button = types.InlineKeyboardButton(
+            text=key,
+            callback_data=val
+        )
+        builder.row(button)
+    return builder.as_markup()

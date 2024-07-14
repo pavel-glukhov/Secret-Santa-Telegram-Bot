@@ -1,18 +1,16 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
 
-from app.bot import dispatcher as dp
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-# ТЕКСТ ПЕРЕНЕСЕН
-@dp.callback_query_handler(Text(equals='menu_user_profile'))
+@router.callback_query(F.data == 'menu_user_profile')
 async def my_profile(callback: types.CallbackQuery):
     message = callback.message
     keyboard_inline = generate_inline_keyboard(
@@ -42,7 +40,7 @@ async def my_profile(callback: types.CallbackQuery):
     )
 
 
-@dp.callback_query_handler(Text(equals='profile_edit'))
+@router.callback_query(F.data == 'profile_edit')
 async def edit_profile(callback: types.CallbackQuery, ):
     message = callback.message
     keyboard_inline = generate_inline_keyboard(

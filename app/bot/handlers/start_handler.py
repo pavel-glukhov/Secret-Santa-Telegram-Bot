@@ -1,30 +1,28 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 
-from app.bot import dispatcher as dp
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.config import load_config
 from app.store.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-# ТЕКСТ ПЕРЕНЕСЕН
-
-@dp.callback_query_handler(text_contains="cancel", state='*')
+@router.callback_query(F.data == "cancel")
 async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
     message = callback.message
-    await state.reset_state()
+    await state.clear()
     await root_menu(message)
 
 
-@dp.message_handler(commands=['start'])
+@router.message(Command(commands=["start"]))
 async def start(message: types.Message, state: FSMContext):
-    await state.reset_state()
+    await state.clear()
     message_text = (
         "Хо-хо-хо! 🎅\n\n"
         "Вот и настало поиграть в Тайного Санту!\n\n"
@@ -54,8 +52,8 @@ async def create_user_or_enable(message: types.Message):
     return user, created
 
 
-@dp.callback_query_handler(Text(equals='root_menu'))
-@dp.message_handler(commands=['menu'], )
+@router.callback_query(F.data == 'root_menu')
+@router.message(Command(commands=['menu']))
 async def root_menu(
         data: types.Message | types.CallbackQuery,
         edit_message=True
@@ -94,8 +92,8 @@ async def root_menu(
         )
 
 
-@dp.callback_query_handler(Text(equals='menu_about_game'))
-@dp.message_handler(commands=['about'], )
+@router.callback_query(F.data == 'menu_about_game')
+@router.message(Command(commands=['about']))
 async def about_game(data: types.Message | types.CallbackQuery, ):
     message = data.message if isinstance(data, types.CallbackQuery) else data
     

@@ -15,6 +15,7 @@ from app.store.scheduler.operations import remove_task
 logger = logging.getLogger(__name__)
 
 
+# TODO перенести текст в языковой файл
 class Person:
     """
     Circular list for sending a random list of addresses
