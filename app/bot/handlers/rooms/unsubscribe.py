@@ -1,17 +1,15 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
+from aiogram import F, Router, types
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(startswith='room_exit'))
+@router.callback_query(F.data.startswith('room_exit'))
 async def left_room(callback: types.CallbackQuery):
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
@@ -22,13 +20,13 @@ async def left_room(callback: types.CallbackQuery):
             "Вернуться назад ◀️": "root_menu",
         }
     )
-
+    
     message_text = f'Вы вышли из комнаты <b>{room_number}</b>.'
     
     await callback.message.edit_text(
         text=message_text,
     )
-
+    
     message_text = (
         'Вы можете вернуться в комнату в любое время, '
         f'для этого используйте номер комнаты <b>{room_number}</b>.'
