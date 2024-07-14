@@ -1,21 +1,19 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message
+from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
 from app.bot.states.rooms import CreateRoom
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.config import load_config
 from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(equals='menu_create_new_room'))
-async def create_room(callback: types.CallbackQuery, ):
+@router.callback_query(F.data == 'menu_create_new_room')
+async def create_room(callback: types.CallbackQuery, state: FSMContext):
     count_user_rooms = await RoomRepo().get_count_user_rooms(
         callback.message.chat.id)
     logger.info(count_user_rooms)
@@ -35,8 +33,6 @@ async def create_room(callback: types.CallbackQuery, ):
             reply_markup=keyboard_inline
         )
     
-    await CreateRoom.waiting_for_room_name.set()
-    state = dp.get_current().current_state()
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     
     message_text = (
@@ -46,22 +42,23 @@ async def create_room(callback: types.CallbackQuery, ):
         'Имя комнаты не должно превышать 16 символов.\n'
     )
     
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(CreateRoom.waiting_for_room_name)
 
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_name)
+@router.message(CreateRoom.waiting_for_room_name)
 async def process_name(message: types.Message, state: FSMContext):
     room_name = message.text
     state_data = await state.get_data()
-    last_message = state_data['last_message']
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     await state.update_data(room_name=room_name)
     await state.update_data(budget_question_id=message.message_id)
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
-    await delete_user_message(message.from_user.id, message.message_id)
     
     if not len(room_name) < 17:
         keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
@@ -72,11 +69,11 @@ async def process_name(message: types.Message, state: FSMContext):
             'Имя комнаты не должно превышать 16 символов.\n'
         )
         
-        return await last_message.edit_text(
+        return await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline
         )
-    await CreateRoom.next()
+    await state.set_state(CreateRoom.waiting_for_room_budget)
     
     message_text = (
         f'Принято! Имя твоей комнаты <b>{room_name}</b>\n\n'
@@ -88,19 +85,20 @@ async def process_name(message: types.Message, state: FSMContext):
         'Длина сообщения не должна превышать 16 символов.'
     )
     
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )
 
 
-@dp.message_handler(lambda message:
-                    len(message.text.lower()) > 16,
-                    state=CreateRoom.waiting_for_room_budget)
-async def process_budget_invalid(message: types.Message):
-    state_data = await dp.get_current().current_state().get_data()
-    last_message = state_data['last_message']
-    await delete_user_message(message.from_user.id, message.message_id)
+@router.message(lambda message:
+                len(message.text.lower()) > 16,
+                StateFilter(CreateRoom.waiting_for_room_budget))
+async def process_budget_invalid(message: types.Message,state: FSMContext):
+    state_data = await state.get_data()
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
@@ -110,23 +108,24 @@ async def process_budget_invalid(message: types.Message):
         'Длина сообщения не может быть больше 16 символов\n'
         'Для изменения вашего бюджета, отправьте новое сообщение.\n'
     )
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
 
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_budget)
+@router.message(CreateRoom.waiting_for_room_budget)
 async def process_budget(message: types.Message, state: FSMContext):
     await state.update_data(wishes_question_message_id=message.message_id)
     state_data = await state.get_data()
-    last_message = state_data['last_message']
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
-    await delete_user_message(message.from_user.id, message.message_id)
     
-    await CreateRoom.next()
+    await state.set_state(CreateRoom.waiting_for_room_wishes)
     
     message_text = (
         f'Принято! Ваш бюджет будет составлять <b>{room_budget}</b>\n\n'
@@ -136,19 +135,21 @@ async def process_budget(message: types.Message, state: FSMContext):
         'ты хочешь получить что-то особое?\n'
     )
     
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )
 
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_wishes)
+@router.message(CreateRoom.waiting_for_room_wishes)
 async def process_wishes(message: types.Message, state: FSMContext):
     user_wishes = message.text
     state_data = await state.get_data()
-    last_message = state_data['last_message']
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard({"Меню ◀️": 'root_menu'})
-    await delete_user_message(message.from_user.id, message.message_id)
+    
     room = await RoomRepo().create(user_wish=user_wishes,
                                    owner=message.chat.id,
                                    name=state_data['room_name'],
@@ -166,13 +167,13 @@ async def process_wishes(message: types.Message, state: FSMContext):
         f'к твоей игре.\n\n'
     )
     
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
     )
     message_text = "А пока ты можешь вернуться назад и обновить свой профиль"
     
-    await last_message.answer(
+    await bot_message.answer(
         text=message_text,
         reply_markup=keyboard_inline,
     )
-    await state.finish()
+    await state.clear()
