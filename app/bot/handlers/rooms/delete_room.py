@@ -1,23 +1,20 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message, get_room_number
+from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from app.bot.handlers.operations import get_room_number
 from app.bot.states.rooms import DeleteRoom
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.store.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(startswith='room_delete'))
-async def delete_room(callback: types.CallbackQuery):
-    state = dp.get_current().current_state()
+@router.callback_query(F.data.startswith('room_delete'))
+async def delete_room(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)
-    await DeleteRoom.waiting_conformation.set()
     await state.update_data(room_number=room_number)
     await state.update_data(question_message_id=callback.message.message_id)
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
@@ -29,46 +26,44 @@ async def delete_room(callback: types.CallbackQuery):
         'введите в чат <b>подтверждаю</b>.\n\n '
     )
     
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline,
-        )
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(DeleteRoom.waiting_conformation)
 
 
-@dp.message_handler(lambda message:
-                    message.text.lower() != 'подтверждаю',
-                    state=DeleteRoom.waiting_conformation)
-async def process_delete_room_invalid(message: types.Message):
-    state_data = await dp.get_current().current_state().get_data()
-    last_message = state_data['last_message']
+@router.message(lambda message: message.text.lower() not in ['подтверждаю', 'confirm'],
+                StateFilter(DeleteRoom.waiting_conformation))
+async def process_delete_room_invalid(message: types.Message, state: FSMContext):
+    state_data = await state.get_data()
     room_number = state_data['room_number']
     keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
     logger.info('Incorrect confirmation'
                 f' command from [{message.from_user.id}] ')
-    
-    await delete_user_message(message.from_user.id, message.message_id)
-    
+    await message.delete()
+    bot_message = state_data['bot_message_id']
     message_text = (
         f'Вы ввели неверную команду "'
         f'<b>{message.text}</b>" для подтверждения.\n\n'
         f'Для подтверждения удаления комнаты <b>{room_number}</b>, '
         'введите в чат <b>подтверждаю</b>.\n\n '
     )
-    await last_message.edit_text(
+    await bot_message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,
     )
 
 
-@dp.message_handler(
-    state=DeleteRoom.waiting_conformation)
+@router.message(lambda message: message.text.lower() in ['подтверждаю', 'confirm'],
+                StateFilter(DeleteRoom.waiting_conformation))
 async def completed_process_delete_room(message: types.Message,
                                         state: FSMContext):
     state_data = await state.get_data()
-    last_message = state_data['last_message']
+    await message.delete()
+    
+    bot_message = state_data['bot_message_id']
     room_number = state_data['room_number']
-    await delete_user_message(message.from_user.id, message.message_id)
     
     keyboard_inline = generate_inline_keyboard(
         {
@@ -82,7 +77,7 @@ async def completed_process_delete_room(message: types.Message,
             'Комната успешно удалена\n\n '
             'Вы можете создать новую комнату в основном меню.'
         )
-        await last_message.edit_text(
+        await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
@@ -94,7 +89,7 @@ async def completed_process_delete_room(message: types.Message,
     else:
         message_text = 'Что-то пошло не так, комната не была удалена'
         
-        await last_message.edit_text(
+        await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline,
         )
@@ -104,4 +99,4 @@ async def completed_process_delete_room(message: types.Message,
             f' by[{message.from_user.id}] '
         )
     
-    await state.finish()
+    await state.clear()
