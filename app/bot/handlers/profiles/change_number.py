@@ -38,10 +38,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     phone_number = message.text
     user_id = message.chat.id
+    text = message.text
+    bot_message = state_data['bot_message_id']
     
     await message.delete()
     
-    bot_message = state_data['bot_message_id']
     cancel_keyboard_inline = generate_inline_keyboard(
         {"Отмена": 'cancel'}
     )
@@ -67,7 +68,9 @@ async def process_changing_owner(message: types.Message, state: FSMContext):
     else:
         
         message_text = (
-            '<b>❌Неверный формат номера❌, попробуйте ещё раз.</b>\n\n'
+            '<b>❌Неверный формат номера❌\n'
+            f'Ваше сообщение {text}.\n'
+            ' Попробуйте ещё раз.</b>\n\n'
             '<b>Укажи свой номер используя формат: +7|8(___)___-__-__ </b> \n'
             '<b>Например:</b> +7 700 111 11 11'
         )

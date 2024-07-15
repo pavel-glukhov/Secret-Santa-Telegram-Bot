@@ -4,7 +4,7 @@ import logging
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
 
-from app.cli import bot
+from app.bot.loader import bot
 
 # TODO ПЕПЕРИСАТЬ
 

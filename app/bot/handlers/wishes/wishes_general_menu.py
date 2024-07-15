@@ -38,7 +38,6 @@ async def show_wishes(callback: types.CallbackQuery):
 @router.callback_query(F.data.startswith('room_change-wish'))
 async def update_wishes(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)
-    await ChangeWish.waiting_for_wishes.set()
     await state.update_data(room_number=room_number)
     
     keyboard_inline = generate_inline_keyboard(

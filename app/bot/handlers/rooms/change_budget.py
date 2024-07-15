@@ -58,7 +58,7 @@ async def process_change_budget_invalid(message: types.Message, state: FSMContex
     )
 
 
-@router.message(state=ChangeBudget.waiting_for_budget)
+@router.message(ChangeBudget.waiting_for_budget)
 async def process_changing_budget(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
     room_number = state_data['room_number']

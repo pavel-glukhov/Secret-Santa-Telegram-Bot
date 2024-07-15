@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
 
-from app.bot import bot
+from app.bot.loader import bot, dp
+from app.bot.routers import register_routers
 from app.config import ROOT_PATH, load_config, setup_logging, webhook_settings
 from app.store.database import close_db, init_db
 from app.store.scheduler import scheduler
@@ -21,6 +22,25 @@ exception_handlers = {
     404: app_exceptions.not_found_error,
     500: app_exceptions.internal_error,
 }
+
+
+async def on_startup():
+    register_routers(dp)
+    setup_logging()
+    await init_db()
+    scheduler.start()
+    webhook_url = webhook_settings(load_config).get('webhook_url')
+    webhook_info = await bot.get_webhook_info()
+    
+    if webhook_info.url != webhook_url:
+        await bot.set_webhook(url=webhook_url)
+    logger.info("App has been started")
+
+
+async def on_shutdown():
+    await bot.session.close()
+    await close_db()
+    logger.info("App has been stopped")
 
 
 @AuthJWT.load_config
@@ -43,35 +63,13 @@ def init_fast_api_handlers(app: FastAPI) -> None:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(
-        debug=False,
-        exception_handlers=exception_handlers,
-        docs_url=None,
-        redoc_url=None
-    )
-    app.mount(
-        "/static",
-        StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
-        name="static"
-    )
+    app = FastAPI(debug=False,
+                  exception_handlers=exception_handlers,
+                  docs_url=None,
+                  redoc_url=None)
+    app.mount("/static",
+              StaticFiles(directory=os.path.join(ROOT_PATH, "static")),
+              name="static")
     init_fast_api_handlers(app)
     init_fast_api_routers(app)
     return app
-
-
-async def on_startup():
-    setup_logging()
-    await init_db()
-    scheduler.start()
-    webhook_url = webhook_settings(load_config).get('webhook_url')
-    webhook_info = await bot.get_webhook_info()
-    
-    if webhook_info.url != webhook_url:
-        await bot.set_webhook(url=webhook_url)
-    logger.info("App has been started")
-
-
-async def on_shutdown():
-    await bot.session.close()
-    await close_db()
-    logger.info("App has been stopped")
