@@ -6,9 +6,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
 
 from app.bot.loader import bot, dp
-from app.bot.routers import register_routers
+from app.bot.register_middlewares import register_middlewares
+from app.bot.register_routers import register_routers
 from app.config import ROOT_PATH, load_config, setup_logging, webhook_settings
-from app.store.database import close_db, init_db
 from app.store.scheduler import scheduler
 from app.web.exceptions import app_exceptions
 from app.web.routers import active_games, auth, main, rooms, users, webhooks
@@ -26,8 +26,8 @@ exception_handlers = {
 
 async def on_startup():
     register_routers(dp)
+    register_middlewares(dp)
     setup_logging()
-    await init_db()
     scheduler.start()
     webhook_url = webhook_settings(load_config).get('webhook_url')
     webhook_info = await bot.get_webhook_info()
@@ -39,7 +39,6 @@ async def on_startup():
 
 async def on_shutdown():
     await bot.session.close()
-    await close_db()
     logger.info("App has been stopped")
 
 
@@ -73,3 +72,5 @@ def create_app() -> FastAPI:
     init_fast_api_handlers(app)
     init_fast_api_routers(app)
     return app
+
+

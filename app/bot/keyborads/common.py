@@ -1,23 +1,23 @@
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from sqlalchemy.orm import Session
 
 from app.bot.keyborads.constants import MAIN_REPLY_BUTTONS
 from app.config import load_config
 from app.store.database.models import Room
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
 
 
-async def create_common_keyboards(
-        message: types.Message
-) -> types.InlineKeyboardMarkup:
+async def create_common_keyboards(message: types.Message, session: Session) -> types.InlineKeyboardMarkup:
     """
     Generating main buttons
     :param message:
+    :param session:
     :return:
     """
     # general buttons
-    count_user_rooms = await RoomRepo().get_count_user_rooms(
+    count_user_rooms = await RoomRepo(session).get_count_user_rooms(
         message.chat.id)
     keyboard_dict = {MAIN_REPLY_BUTTONS['join_room']: "menu_join_room"}
     if count_user_rooms < load_config().room.user_rooms_count:
@@ -25,11 +25,11 @@ async def create_common_keyboards(
             {MAIN_REPLY_BUTTONS['create_room']: "menu_create_new_room"}
         )
     user_id = message.chat.id
-    user_rooms = await RoomRepo().get_all_users_of_room(user_id)
+    user_rooms = await RoomRepo(session).get_all_users_of_room(user_id)
     
     if user_rooms:
         for room in user_rooms:
-            owner = await room.owner
+            owner = room.owner
             is_owner = owner.user_id == user_id
             # add all users rooms' buttons
             keyboard_dict.update(

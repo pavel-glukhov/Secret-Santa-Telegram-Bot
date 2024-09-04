@@ -3,11 +3,12 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.states.rooms import ChangeRoomName
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -23,9 +24,8 @@ async def update_room_name(callback: types.CallbackQuery, state: FSMContext):
         'Введите новое имя для вашей комнаты.\n'
         'Имя не должно превышать 16 символов\n'
     )
-    initial_bot_message = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeRoomName.waiting_for_room_name)
 
@@ -46,15 +46,12 @@ async def process_change_room_name_invalid(message: types.Message, state: FSMCon
         'пожалуйста придумайте другое.\n'
         'Имя комнаты не должно превышать 16 символов.\n'
     )
-    await bot_message.edit_text(
-        text=message_text,
-        reply_markup=cancel_keyboard_inline,
-    )
+    await bot_message.edit_text(text=message_text, reply_markup=cancel_keyboard_inline)
 
 
 @router.message(ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
-                                     state: FSMContext):
+                                     state: FSMContext, session: Session):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     new_room_name = message.text
@@ -62,8 +59,8 @@ async def update_room_name_get_value(message: types.Message,
     
     bot_message = state_data['bot_message_id']
     
-    await RoomRepo().update(room_number=room_number,
-                            name=new_room_name)
+    await RoomRepo(session).update(room_number=room_number,
+                                   name=new_room_name)
     
     keyboard_inline = generate_inline_keyboard(
         {
@@ -75,8 +72,5 @@ async def update_room_name_get_value(message: types.Message,
     
     message_text = f'Имя комнаты  изменено на <b>{new_room_name}</b>'
     
-    await bot_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
     await state.clear()

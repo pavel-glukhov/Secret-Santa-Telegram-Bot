@@ -1,10 +1,9 @@
-from fastapi import APIRouter
-from aiohttp import web
 from aiogram import types
-from app.bot.loader import bot
-from app.bot.loader import dp
+from aiohttp import web
+from fastapi import APIRouter, HTTPException, Request
+
+from app.bot.loader import bot, dp
 from app.config import load_config, webhook_settings
-from fastapi import Request, HTTPException
 
 router = APIRouter()
 webhook_path = webhook_settings(load_config)['webhook_path']

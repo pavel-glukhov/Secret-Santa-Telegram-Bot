@@ -1,9 +1,11 @@
 import logging
 
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy.orm import scoped_session
 from starlette.templating import Jinja2Templates
 
 from app.store.database.models import User
+from app.store.database.sessions import get_session
 from app.store.scheduler import operations as scheduler_operations
 from app.web.dependencies import get_current_user
 from app.web.permissions import is_admin
@@ -16,6 +18,7 @@ logger = logging.getLogger(__name__)
 @router.get("/active_games", name='active_games')
 async def active_games(request: Request,
                        current_user: User = Depends(get_current_user),
+                       session: scoped_session = Depends(get_session),
                        permissions=Depends(is_admin),
                        templates: Jinja2Templates = Depends(template)):
     """The endpoint provided list all active scheduler tasks from Redis."""

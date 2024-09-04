@@ -3,25 +3,26 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.config import load_config
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
 
 
 @router.callback_query(F.data == "cancel")
-async def cancel_handler(callback: types.CallbackQuery, state: FSMContext):
+async def cancel_handler(callback: types.CallbackQuery, state: FSMContext, session: Session):
     message = callback.message
     await state.clear()
-    await root_menu(message)
+    await root_menu(message, session)
 
 
 @router.message(Command(commands=["start"]))
-async def start(message: types.Message, state: FSMContext):
+async def start(message: types.Message, state: FSMContext, session: Session):
     await state.clear()
     message_text = (
         "Хо-хо-хо! 🎅\n\n"
@@ -29,15 +30,15 @@ async def start(message: types.Message, state: FSMContext):
         "Создай свою комнату для друзей, или подключись к существующей."
     )
     await message.answer(text=message_text)
-    await root_menu(message, edit_message=False)
+    await root_menu(message, session=session, edit_message=False)
 
 
-async def create_user_or_enable(message: types.Message):
+async def create_user_or_enable(message: types.Message, session: Session):
     user_id = message.chat.id
     username = message.chat.username
     first_name = message.chat.first_name
     last_name = message.chat.last_name
-    user, created = await UserRepo().get_or_create(
+    user, created = await UserRepo(session).get_or_create(
         user_id=user_id,
         username=username,
         first_name=first_name,
@@ -45,26 +46,20 @@ async def create_user_or_enable(message: types.Message):
     )
     if created:
         logger.info(f'The new user "{user_id}" has been created')
-    if not user.is_active:
-        await UserRepo().enable_user(message.chat.id)
-        logger.info(f'The new user "{user_id}" has been enabled')
     
-    return user, created
+    if not user.is_active:
+        await UserRepo(session).enable_user(message.chat.id)
+        logger.info(f'The new user "{user_id}" has been enabled')
+    return user
 
 
 @router.callback_query(F.data == 'root_menu')
 @router.message(Command(commands=['menu']))
-async def root_menu(
-        data: types.Message | types.CallbackQuery,
-        edit_message=True
-):
-    message = data.message if isinstance(
-        data,
-        types.CallbackQuery
-    ) else data
+async def root_menu(data: types.Message | types.CallbackQuery, session: Session, edit_message=True):
+    message = data.message if isinstance(data, types.CallbackQuery) else data
     
-    user, created = await create_user_or_enable(message)
-    keyboard = await create_common_keyboards(message)
+    user = await create_user_or_enable(message, session)
+    keyboard = await create_common_keyboards(message, session)
     
     is_profile_filled_out = all([user.encrypted_address, user.encrypted_number])
     
@@ -81,15 +76,9 @@ async def root_menu(
     )
     
     if edit_message:
-        await message.edit_text(
-            text=message_text,
-            reply_markup=keyboard,
-        )
+        await message.edit_text(text=message_text, reply_markup=keyboard)
     else:
-        await message.answer(
-            text=message_text,
-            reply_markup=keyboard,
-        )
+        await message.answer(text=message_text, reply_markup=keyboard)
 
 
 @router.callback_query(F.data == 'menu_about_game')
@@ -126,7 +115,4 @@ async def about_game(data: types.Message | types.CallbackQuery, ):
         f'вы можете связаться с @{load_config().support_account}\n\n'
     )
     
-    await message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+    await message.edit_text(text=message_text, reply_markup=keyboard_inline)

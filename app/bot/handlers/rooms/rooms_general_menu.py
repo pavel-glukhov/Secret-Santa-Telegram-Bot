@@ -1,12 +1,13 @@
 import logging
 
 from aiogram import F, Router, types
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.queries.game_result import GameResultRepo
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.game_result import GameResultRepo
+from app.store.database.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task
 
 logger = logging.getLogger(__name__)
@@ -14,16 +15,16 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_menu'))
-async def my_room(callback: types.CallbackQuery):
+async def my_room(callback: types.CallbackQuery, session: Session):
     room_number = get_room_number(callback)
     scheduler_task = get_task(room_number)
-    room = await RoomRepo().get(room_number)
+    room = await RoomRepo(session).get(room_number)
     user_id = callback.message.chat.id
-    is_room_owner = await RoomRepo().is_owner(user_id=user_id,
-                                              room_number=room_number)
+    is_room_owner = await RoomRepo(session).is_owner(user_id=user_id,
+                                                     room_number=room_number)
     
     if room.is_closed:
-        await _room_is_closed(callback, room.number, user_id)
+        await _room_is_closed(callback, room.number, user_id, session)
     
     else:
         keyboard_dict = {
@@ -77,12 +78,15 @@ async def my_room(callback: types.CallbackQuery):
 
 
 async def _room_is_closed(callback: types.CallbackQuery,
-                          room_number: int, user_id: int) -> None:
-    game_results = await GameResultRepo().get_all_recipients(
-        room_id=room_number)
-    room_owner = await RoomRepo().is_owner(user_id=user_id,
-                                           room_number=room_number)
-    if not game_results:
+                          room_number: int, user_id: int, session: Session) -> None:
+    game_result_repo = GameResultRepo(session)
+    
+    game_results = await game_result_repo.get_room_id_count(
+        room_id=int(room_number))
+    room_owner = await RoomRepo(session).is_owner(user_id=user_id,
+                                                  room_number=room_number)
+    
+    if game_results <= 0:
         keyboard_dict = {
             'Активировать комнату ✅': f'room_activate_{room_number}',
             'Настройки ⚒': f'room_config_{room_number}',
@@ -112,8 +116,8 @@ async def _room_is_closed(callback: types.CallbackQuery,
             'Связаться с получателем': f'room_closed-con-rec_{room_number}',
             'Вернуться в меню': 'root_menu'
         }
-        recipient = await GameResultRepo().get_recipient(room_id=room_number,
-                                                         user_id=user_id)
+        recipient = await game_result_repo.get_recipient(room_id=int(room_number),
+                                                         user_id=int(user_id))
         user_information = profile_information_formatter(recipient)
         
         message_text = (

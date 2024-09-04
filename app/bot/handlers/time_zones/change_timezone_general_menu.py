@@ -7,19 +7,20 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.handlers.pagination import Pagination
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.states.time_zones import TimeZoneStates
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
 router = Router()
 
 
-@router.callback_query(F.data == 'change_time_zone')
+@router.callback_query(F.data.startswith('change_time_zone'))
 async def get_letter(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(TimeZoneStates.selecting_letter)
     room_number = get_room_number(callback)
@@ -32,9 +33,7 @@ async def get_letter(callback: types.CallbackQuery, state: FSMContext):
         " на которую начинается страна:"
     )
     
-    initial_bot_message = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=_get_letter_keyboard())
+    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=_get_letter_keyboard())
     
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(TimeZoneStates.selecting_country)
@@ -81,7 +80,7 @@ async def process_country_callback(callback: types.CallbackQuery, state: FSMCont
 @router.callback_query(F.data.startswith('selected_timezone'),
                        StateFilter(TimeZoneStates.confirmation))
 async def process_timezone_callback(callback: types.CallbackQuery,
-                                    state: FSMContext):
+                                    state: FSMContext, session: Session):
     timezone = callback.data.split(':')[-1]
     state_data = await state.get_data()
     room_number = state_data.get('room_number')
@@ -96,8 +95,8 @@ async def process_timezone_callback(callback: types.CallbackQuery,
         "Вернуться назад ◀️": callback_query
     }
     keyboard_inline = generate_inline_keyboard(keyboard)
-    await UserRepo().update_user(user_id=callback.message.chat.id,
-                                 timezone=timezone)
+    await UserRepo(session).update_user(user_id=callback.message.chat.id,
+                                        timezone=timezone)
     await callback.message.edit_text(message_text, reply_markup=keyboard_inline)
     await state.clear()
 

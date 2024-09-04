@@ -4,7 +4,7 @@ from fastapi import Depends
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
 
-from app.store.database.models import User
+from app.store.database_old.models import User
 from app.store.queries.rooms import RoomRepo
 from app.web.dependencies import get_current_user
 

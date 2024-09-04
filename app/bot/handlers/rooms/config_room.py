@@ -1,17 +1,18 @@
 import logging
 
 from aiogram import F, Router, types
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
 
 
 @router.callback_query(F.data.startswith('room_config'))
-async def configuration_room(callback: types.CallbackQuery):
+async def configuration_room(callback: types.CallbackQuery, session: Session):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {
@@ -22,7 +23,7 @@ async def configuration_room(callback: types.CallbackQuery):
             "Вернуться назад ◀️": f"room_menu_{room_number}",
         }
     )
-    room = await RoomRepo().get(room_number)
+    room = await RoomRepo(session).get(room_number)
     
     message_text = (
         '"Настройки комнаты:" '

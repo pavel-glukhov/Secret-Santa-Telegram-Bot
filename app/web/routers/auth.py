@@ -2,12 +2,14 @@ import logging
 
 from fastapi import APIRouter, Depends, Request
 from fastapi_jwt_auth import AuthJWT
+from sqlalchemy.orm import scoped_session
 from starlette.exceptions import HTTPException
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from app.config import AppConfig, load_config
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
+from app.store.database.sessions import get_session
 from app.web.auth_widget.exceptions import (TelegramDataError,
                                             TelegramDataIsOutdated)
 from app.web.auth_widget.schemes import TelegramAuth
@@ -30,8 +32,9 @@ def get_config():
 async def login(request: Request,
                 params: TelegramAuth = Depends(TelegramAuth),
                 Authorize: AuthJWT = Depends(),
+                session: scoped_session = Depends(get_session),
                 config: AppConfig = Depends(load_config),
-                       templates: Jinja2Templates = Depends(template)):
+                templates: Jinja2Templates = Depends(template)):
     """
     Endpoint for authorization via Telegram.
     If the user is already logged in, returns it to the main page.
@@ -68,7 +71,7 @@ async def login(request: Request,
     try:
         result = validate_telegram_data(config.bot.token, params)
         if result:
-            await UserRepo().get_or_create(
+            await UserRepo(session).get_or_create(
                 user_id=params.id,
                 first_name=params.first_name,
                 last_name=params.last_name,

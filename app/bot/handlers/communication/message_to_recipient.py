@@ -2,13 +2,14 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.send_messages import send_message
 from app.bot.states.communication import MessageToRecipient
-from app.store.queries.game_result import GameResultRepo
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.game_result import GameResultRepo
+from app.store.database.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -28,25 +29,24 @@ async def message_to_recipient(callback: types.CallbackQuery, state: FSMContext)
     message_text = (
         'Напишите сообщение которое вы хотите отправить вашему получателю. 🙍‍♂️'
     )
-    initial_bot_message = await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(MessageToRecipient.waiting_message)
 
 
 @router.message(MessageToRecipient.waiting_message)
 async def completed_message_to_santa(message: types.Message,
-                                     state: FSMContext):
+                                     state: FSMContext, session: Session):
     state_data = await state.get_data()
-    room = await RoomRepo().get(state_data['room_number'])
+    room = await RoomRepo(session).get(state_data['room_number'])
     user_id = message.chat.id
     
     await message.delete()
     
     bot_message = state_data['bot_message_id']
-    recipient = await GameResultRepo().get_recipient(room_id=room.number,
-                                                     user_id=user_id)
+    recipient = await GameResultRepo(session).get_recipient(room_id=room.number,
+                                                            user_id=user_id)
     keyboard_inline = generate_inline_keyboard(
         {
             "Вернуться назад ◀️": "root_menu",
@@ -64,8 +64,5 @@ async def completed_message_to_santa(message: types.Message,
     
     second_message_text = 'Сообщение вашему получателю было отправлено.'
     
-    await bot_message.edit_text(
-        text=second_message_text,
-        reply_markup=keyboard_inline,
-    )
+    await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)
     await state.clear()

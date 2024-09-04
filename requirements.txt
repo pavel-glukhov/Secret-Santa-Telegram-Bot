@@ -2,7 +2,6 @@ aiogram==3.10.0
 aiogram-inline-paginations==0.1.12
 python-dotenv==0.20.0
 asyncpg==0.26.0
-tortoise_orm==0.21.4
 aerich==0.7.2
 Jinja2==3.1.2
 fastapi-jwt-auth-v2==0.1.0
@@ -14,8 +13,10 @@ python-multipart
 cryptography~=41.0.7
 requests~=2.31.0
 redis==5.0.1
-pytz~=2023.3.post1
+pytz
 pycountry==23.12.11
 starlette==0.37.2
 pydantic~=2.8.2
 pycountry==23.12.11
+sqlalchemy
+alembic

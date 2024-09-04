@@ -1,25 +1,26 @@
 import logging
 
 from aiogram import F, Router, types
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
 
 
 @router.callback_query(F.data == 'menu_user_profile')
-async def my_profile(callback: types.CallbackQuery):
-    message = callback.message
+async def my_profile(callback: types.CallbackQuery, session: Session):
+    chat_id = callback.message.chat.id
     keyboard_inline = generate_inline_keyboard(
         {
             "Изменить профиль 👋": "profile_edit",
             "Вернуться назад ◀️": "root_menu",
         }
     )
-    user = await UserRepo().get_user_or_none(message.chat.id)
+    user = await UserRepo(session).get_user_or_none(chat_id)
     user_information = profile_information_formatter(user)
     
     message_text = (
@@ -34,7 +35,7 @@ async def my_profile(callback: types.CallbackQuery):
         '<b>Изменить профиль</b>\n\n'
     )
     
-    await message.edit_text(
+    await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
     )

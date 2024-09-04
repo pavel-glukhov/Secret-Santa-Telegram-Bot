@@ -1,6 +1,6 @@
 import logging
 
-from aiogram import exceptions, types
+from aiogram import types
 
 logger = logging.getLogger(__name__)
 

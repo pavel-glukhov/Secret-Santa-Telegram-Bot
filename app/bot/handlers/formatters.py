@@ -11,21 +11,23 @@ def get_full_name(user: User) -> str | None:
         return user.first_name
 
 
+# TODO перенести текст
 def user_information_formatter(user: User) -> list:
-    address_value = user.get_address() or 'адрес не указан' # TODO перенести текст
-    number_value = user.get_number() or 'номер не указан' # TODO перенести текст
-    timezone = user.timezone or 'часовой пояс не указан' # TODO перенести текст
+    address_value = user.get_address() or 'адрес не указан'
+    number_value = user.get_number() or 'номер не указан'
+    timezone = user.timezone or 'часовой пояс не указан'
     
     full_name = get_full_name(user)
     return [full_name, address_value, number_value, timezone]
 
 
+# TODO перенести текст
 def profile_information_formatter(user: User) -> str:
     full_name, address, number, timezone = user_information_formatter(user)
     formatted_text = (
-        f"<b>Полное имя</b>: {full_name}\n" # TODO перенести текст
-        f"<b>Адрес</b>: {address}\n" # TODO перенести текст
-        f"<b>Номер телефона</b>: {number}\n" # TODO перенести текст
-        f"<b>Часовой пояс</b>: {timezone}\n" # TODO перенести текст
+        f"<b>Полное имя</b>: {full_name}\n"
+        f"<b>Адрес</b>: {address}\n"
+        f"<b>Номер телефона</b>: {number}\n"
+        f"<b>Часовой пояс</b>: {timezone}\n"
     )
     return formatted_text

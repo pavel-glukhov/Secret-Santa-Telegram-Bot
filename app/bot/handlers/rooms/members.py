@@ -1,10 +1,11 @@
 import logging
 
 from aiogram import F, Router, types
+from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 
@@ -12,15 +13,15 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_member-list'))
-async def members_list(callback: types.CallbackQuery):
+async def members_list(callback: types.CallbackQuery, session: Session):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {
             'Вернуться назад ◀️': f'room_menu_{room_number}'
         }
     )
-    room = await RoomRepo().get(room_number)
-    members = await room.members
+    room = await RoomRepo(session).get(room_number)
+    members = room.members
     member_string = ''
     for number, member in enumerate(members, start=1):
         if member.first_name:
