@@ -17,10 +17,10 @@ router = Router()
 @router.callback_query(F.data == 'profile_edit_delete_all')
 async def delete_user_information(callback: types.CallbackQuery, state: FSMContext):
     keyboard_inline = generate_inline_keyboard(
-        {"Отмена": 'cancel'}  # TODO перенести текст
+        {"Отмена": 'cancel'}
     )
     message_text = (
-        'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'  # TODO перенести текст
+        'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
     )
     initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
     
@@ -37,10 +37,10 @@ async def process_deleting_information_invalid(message: types.Message, state: FS
     
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
-        {"Отмена": 'cancel', }  # TODO перенести текст
+        {"Отмена": 'cancel', }
     )
     
-    message_text = (  # TODO перенести текст
+    message_text = (
         f'Вы ввели неверную "{command}" команду. Попробуйте снова.\n\n'
         'Для подтверждения, введите слово <b>"подтверждаю"</b>'
     )
@@ -68,11 +68,11 @@ async def process_deleting_information(message: types.Message,
                 )
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "menu_user_profile",  # TODO перенести текст
+            "Вернуться назад ◀️": "menu_user_profile",
         }
     )
     
-    message_text = 'Все данные о вас были удалены.\n\n'  # TODO перенести текст
+    message_text = 'Все данные о вас были удалены.\n\n'
     
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
     await state.clear()

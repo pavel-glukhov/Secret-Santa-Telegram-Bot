@@ -16,7 +16,6 @@ from app.store.scheduler.operations import remove_task
 logger = logging.getLogger(__name__)
 
 
-# TODO перенести текст в языковой файл
 class Person:
     """
     Circular list for sending a random list of addresses
@@ -36,7 +35,7 @@ async def creating_active_users_pool(room_number, session):
     verified_users_list = []
     
     for player in row_list_players:
-        is_active_user = await checking_user_is_active(player.user_id)
+        is_active_user = await checking_user_is_active(player.user_id, session)
         if is_active_user:
             wish = await WishRepo(session).get(player.user_id, room_number)
             player_information = {

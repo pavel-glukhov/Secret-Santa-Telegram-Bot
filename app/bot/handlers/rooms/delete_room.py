@@ -13,7 +13,7 @@ from app.store.database.queries.rooms import RoomRepo
 logger = logging.getLogger(__name__)
 router = Router()
 
-# tODO НУЖНО ПРОВЕРИТЬ!
+
 @router.callback_query(F.data.startswith('room_delete'))
 async def delete_room(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)

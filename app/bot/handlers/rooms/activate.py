@@ -10,6 +10,7 @@ from app.store.database.queries.rooms import RoomRepo
 logger = logging.getLogger(__name__)
 router = Router()
 
+
 # tODO НУЖНО ПРОВЕРИТЬ!
 @router.callback_query(F.data.startswith('room_activate'))
 async def members_list(callback: types.CallbackQuery, session: Session):

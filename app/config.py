@@ -48,6 +48,14 @@ class DataBaseConfig:
     password: str
     host: str
     port: str
+    
+    @property
+    def postgres_url(self):
+        return (f'postgresql://'
+                f'{self.user}:'
+                f'{self.password}'
+                f'@{self.host}/'
+                f'{self.name}')
 
 
 @dataclass
@@ -119,35 +127,6 @@ def load_config() -> AppConfig:
         support_account=os.getenv('SUPPORT_ACCOUNT')
     
     )
-
-
-@dataclass
-class DataBaseSettings:
-    db_name: str
-    db_user: str
-    db_pass: str
-    db_host: str
-    
-    @property
-    def postgres_url(self):
-        return (f'postgresql://'
-                f'{self.db_user}:'
-                f'{self.db_pass}'
-                f'@{self.db_host}/'
-                f'{self.db_name}')
-
-
-
-@lru_cache
-def get_postgres_settings() -> DataBaseSettings:
-    settings = DataBaseSettings(
-            db_user=os.getenv('DATABASE_USER'),
-            db_pass=os.getenv('DATABASE_PASSWORD'),
-            db_host=os.getenv('DATABASE_HOST'),
-            db_name=os.getenv('DATABASE_NAME')
-        )
-    return settings
-
 
 
 def webhook_settings(config) -> dict:

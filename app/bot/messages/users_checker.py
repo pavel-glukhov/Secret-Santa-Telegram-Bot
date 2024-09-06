@@ -5,12 +5,12 @@ from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
 
 from app.bot.loader import bot
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
 
-async def checking_user_is_active(user_id):
+async def checking_user_is_active(user_id, session):
     """
     Checking if a bot was blocked by user
     or user's chat is not existing by other reason.
@@ -20,7 +20,7 @@ async def checking_user_is_active(user_id):
     
     except TelegramForbiddenError:
         logger.error(f"The bot was blocked by user [ID:{user_id}]")
-        await UserRepo().disable_user(user_id)
+        await UserRepo(session).disable_user(user_id)
         return False
     
     except TelegramRetryAfter as e:

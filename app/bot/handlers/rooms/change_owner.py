@@ -14,7 +14,7 @@ from app.store.database.queries.users import UserRepo
 logger = logging.getLogger(__name__)
 router = Router()
 
-# tODO НУЖНО ПРОВЕРИТЬ!
+
 @router.callback_query(F.data.startswith('room_change-owner'))
 async def change_room_owner(callback: types.CallbackQuery, state: FSMContext):
     room_number = get_room_number(callback)

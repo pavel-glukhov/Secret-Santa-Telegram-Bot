@@ -6,8 +6,6 @@ from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
 
 from app.bot.loader import bot
 
-# TODO ПЕПЕРИСАТЬ
-
 logger = logging.getLogger(__name__)
 
 

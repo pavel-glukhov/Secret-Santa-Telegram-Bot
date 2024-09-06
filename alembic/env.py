@@ -6,19 +6,15 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.store.database.models import Base
-from app.config import get_postgres_settings
+from app.config import load_config
 
 config = context.config
-# TODO изменить на переменные окружения
 section = config.config_ini_section
-# config.set_section_option(section, "DB_USER", os.environ.get('DB_USER'))
-# config.set_section_option(section, "DB_PASS", os.environ.get('DB_PASS'))
-# config.set_section_option(section, "DB_HOST", os.environ.get('DB_HOST'))
-# config.set_section_option(section, "DB_NAME", os.environ.get('DB_NAME'))
-config.set_section_option(section, "DB_USER", get_postgres_settings().db_user)
-config.set_section_option(section, "DB_PASS", get_postgres_settings().db_pass)
-config.set_section_option(section, "DB_HOST", get_postgres_settings().db_host)
-config.set_section_option(section, "DB_NAME", get_postgres_settings().db_name)
+
+config.set_section_option(section, "DB_USER", load_config().db.user)
+config.set_section_option(section, "DB_PASS", load_config().db.password)
+config.set_section_option(section, "DB_HOST", load_config().db.host)
+config.set_section_option(section, "DB_NAME", load_config().db.name)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 

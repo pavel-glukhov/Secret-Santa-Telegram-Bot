@@ -1,6 +1,3 @@
-
-# TODO перенести текст в языковой файл
-
 def message_formatter(
         sender_name,
         receiver_first_name,

@@ -2,7 +2,7 @@ from fastapi import Depends, Request
 from starlette.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 
-from app.store.database_old.models import User
+from app.store.database.models import User
 from app.web.dependencies import get_current_user
 from app.web.templates import template
 

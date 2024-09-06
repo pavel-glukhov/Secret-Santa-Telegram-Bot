@@ -4,22 +4,22 @@ from typing import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from app.config import get_postgres_settings
+from app.config import load_config
 
-engine = create_engine(get_postgres_settings().postgres_url, pool_pre_ping=True)
+engine = create_engine(load_config().db.postgres_url, pool_pre_ping=True)
 
 
 @lru_cache
 def create_session() -> scoped_session:
-    Session = scoped_session(
+    session = scoped_session(
         sessionmaker(autocommit=False, autoflush=False, bind=engine)
     )
-    return Session
+    return session
 
 
 def get_session() -> Generator[scoped_session, None, None]:
-    Session = create_session()
+    session = create_session()
     try:
-        yield Session
+        yield session
     finally:
-        Session.remove()
+        session.remove()

@@ -11,7 +11,6 @@ def get_full_name(user: User) -> str | None:
         return user.first_name
 
 
-# TODO перенести текст
 def user_information_formatter(user: User) -> list:
     address_value = user.get_address() or 'адрес не указан'
     number_value = user.get_number() or 'номер не указан'
@@ -21,7 +20,6 @@ def user_information_formatter(user: User) -> list:
     return [full_name, address_value, number_value, timezone]
 
 
-# TODO перенести текст
 def profile_information_formatter(user: User) -> str:
     full_name, address, number, timezone = user_information_formatter(user)
     formatted_text = (
