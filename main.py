@@ -4,7 +4,8 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
-
+from app.store.redis import get_redis_client
+from app.bot.languages import load_language_files_to_redis, language_return_dataclass
 from app.bot.loader import bot, dp
 from app.bot.register_middlewares import register_middlewares
 from app.bot.register_routers import register_routers
@@ -25,10 +26,16 @@ exception_handlers = {
 
 
 async def on_startup():
+    languages_folder = load_config().bot.language_folder
+    await load_language_files_to_redis(languages_folder, get_redis_client())
+    logger.info("Data from languages folder have been loaded to Redis.")
+
     register_routers(dp)
     register_middlewares(dp)
+    
     setup_logging()
     scheduler.start()
+    
     webhook_url = webhook_settings(load_config).get('webhook_url')
     webhook_info = await bot.get_webhook_info()
     
@@ -72,5 +79,3 @@ def create_app() -> FastAPI:
     init_fast_api_handlers(app)
     init_fast_api_routers(app)
     return app
-
-

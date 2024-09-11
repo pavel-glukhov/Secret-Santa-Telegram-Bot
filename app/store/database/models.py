@@ -1,5 +1,5 @@
-from sqlalchemy import (LargeBinary, BigInteger, Boolean, Column, DateTime,
-                        ForeignKey, Integer, String, Table)
+from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey,
+                        Integer, LargeBinary, String, Table)
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.sql import func
 
@@ -30,7 +30,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     timezone = Column(String(32), nullable=True)
-    
+    language = Column(String(3), nullable=True)
     room_owner = relationship("Room", back_populates="owner")
     members = relationship("Room", secondary=rooms_users, back_populates="members")
     wishes_in_room = relationship("WishRoom", back_populates="user", overlaps="user_wishes")

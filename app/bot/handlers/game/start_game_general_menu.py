@@ -12,8 +12,8 @@ from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.messages.result_mailing import send_result_of_game
 from app.bot.states.game import StartGame
-from app.store.database.queries.users import UserRepo
 from app.store.database.queries.rooms import RoomRepo
+from app.store.database.queries.users import UserRepo
 from app.store.scheduler.operations import add_task, get_task
 
 logger = logging.getLogger(__name__)

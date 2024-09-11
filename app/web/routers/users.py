@@ -11,7 +11,6 @@ from app.store.database.models import User
 from app.store.database.queries.pagination import PaginatorRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.users import UserRepo
-
 from app.store.database.sessions import get_session
 from app.web.dependencies import get_current_user
 from app.web.permissions import is_admin, is_admin_or_owner

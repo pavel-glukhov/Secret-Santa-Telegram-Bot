@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 
 from sqlalchemy import func, select, update
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.store.database.models import Room, User
 
@@ -10,7 +10,6 @@ class UserRepo:
     def __init__(self, session: Session):
         self.session = session
     
-    # DONE
     async def get_or_create(self, user_id, **kwargs) -> Tuple[User, bool]:
         """
         Get or create user's record in database
@@ -39,7 +38,6 @@ class UserRepo:
         user = result.scalars().first()
         return user
     
-    # DONE
     async def update_user(self, user_id: int, **kwargs) -> None:
         """
         Update any field of user instance
@@ -63,14 +61,12 @@ class UserRepo:
         room = room.scalars().first()
         return room in user_rooms
     
-    # DONE
     async def disable_user(self, user_id: int) -> None:
         """
         Disable user
         """
         await self.update_user(user_id, is_active=False)
     
-    # DONE
     async def enable_user(self, user_id: int) -> None:
         """
         Enable user
@@ -95,3 +91,10 @@ class UserRepo:
         """Get count of all users"""
         result = self.session.execute(select([func.count()]).select_from(User))
         return result.scalar()
+
+    async def get_user_language(self, user_id):
+        language = self.session.query(User). \
+            filter(User.user_id == user_id). \
+            options(load_only(User.language)). \
+            one()
+        return language.language
