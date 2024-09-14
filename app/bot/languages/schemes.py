@@ -3,6 +3,8 @@ from pydantic import BaseModel
 
 class MainMenu(BaseModel):
     menu: str
+    language_selection: str
+    select_language_answer: str
     start_message: str
     menu_reminder: str
     about_message: str
@@ -232,8 +234,9 @@ class WishesMenuButtons(BaseModel):
 
 
 class Buttons(BaseModel):
-    return_back: str
-    cancel: str
+    return_back_button: str
+    cancel_button: str
+    continue_button: str
     profile_menu: ButtonsProfileMenu
     room_menu: RoomMenuButtons
     game_menu: GameMenuButtons
@@ -270,13 +273,9 @@ class Messages(BaseModel):
     communication_menu: CommunicationMenu
 
 
-class MainSchema(BaseModel):
+class TranslationMainSchema(BaseModel):
     messages: Messages
     buttons: Buttons
     formatter: Formatter
     message_formatter: MessageFormatter
     result_mailing: ResultMailing
-
-
-class RootSchema(BaseModel):
-    languages: dict[str, MainSchema]

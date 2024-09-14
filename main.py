@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_jwt_auth import AuthJWT
 from app.store.redis import get_redis_client
-from app.bot.languages import load_language_files_to_redis, language_return_dataclass
+from app.bot.languages import load_language_files_to_redis
 from app.bot.loader import bot, dp
 from app.bot.register_middlewares import register_middlewares
 from app.bot.register_routers import register_routers

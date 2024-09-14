@@ -3,40 +3,39 @@ import logging
 import os
 from functools import lru_cache
 
-from aioredis import Redis
+from redis import Redis
+from pydantic import ValidationError
 
-from app.bot.languages.schemes import MainSchema, RootSchema
+from app.bot.languages.schemes import TranslationMainSchema
 
 logger = logging.getLogger(__name__)
 
 
 async def load_language_files_to_redis(directory: str, redis_client: Redis) -> None:
-    await redis_client.delete('list_languages')
-    await redis_client.delete('translations')
+    redis_client.delete('list_languages')
+    language_selection_message = ''
     
-    translation_dict = {}
     for filename in os.listdir(directory):
         if filename.endswith('.json'):
             file_path = os.path.join(directory, filename)
+            
             with open(file_path, 'r', encoding='utf-8') as f:
                 lang: dict = json.load(f)
-                translation_dict.update(lang)
-                await redis_client.rpush('list_languages', list(lang.keys())[0])
-    
-    await redis_client.set('translations', json.dumps(translation_dict, ensure_ascii=False))
+                lang_name = list(lang.keys())[0]
+                language_selection_message = language_selection_message + lang.get(
+                    lang_name).get('messages').get('main_menu').get('language_selection')
+                
+                redis_client.set('language_selection_message', language_selection_message)
+                redis_client.set(f'lang_{lang_name}', json.dumps(lang.get(lang_name), ensure_ascii=False))
+                redis_client.rpush('list_languages', list(lang.keys())[0])
     return None
 
 
-@lru_cache
-async def language_return_dataclass(redis_client: Redis) -> RootSchema:
-    languages = await redis_client.get('translations')
-    languages: dict = json.loads(languages.encode('utf-8'))
+async def language_return_dataclass(redis_client: Redis, user_language: str) -> TranslationMainSchema:
+    try:
+        translation_str = redis_client.get(f'lang_{user_language}')
+        translation: dict = json.loads(translation_str.encode('utf-8'))
+        return TranslationMainSchema(**translation)
     
-    languages_temp_dict = {}
-    
-    for key, value in languages.items():
-        languages_temp_dict[key] = MainSchema(**value)
-    
-    root_scheme = RootSchema(languages=languages_temp_dict)
-    
-    return root_scheme
+    except ValidationError as e:
+        logger.error(e)

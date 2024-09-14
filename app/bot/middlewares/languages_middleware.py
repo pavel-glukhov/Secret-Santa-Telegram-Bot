@@ -19,8 +19,7 @@ class LanguageMiddleware(BaseMiddleware):
     
     async def __call__(self, handler, event: Update, data: dict):
         session = next(self.session_factory())
-        app_languages = await language_return_dataclass(self.redis_client())
-        language_list = await self.redis_client().lrange("list_languages", 0, -1)
+        available_languages = self.redis_client().lrange("list_languages", 0, -1)
         
         if event.message and event.message.chat:
             chat_id = event.message.chat.id
@@ -30,17 +29,17 @@ class LanguageMiddleware(BaseMiddleware):
             chat_id = None
         
         if chat_id is not None:
-            
             user_language = await UserRepo(session).get_user_language(chat_id)
+            app_language = await language_return_dataclass(self.redis_client(), user_language)
             if not user_language:
                 data['language'] = None
-                data['list_languages'] = language_list
+                data['list_languages'] = available_languages
                 return await handler(event, data)
             
-            data['language'] = app_languages.languages.get(user_language)
-            data['list_languages'] = language_list
+            data['language'] = app_language
+            data['available_languages'] = available_languages
             return await handler(event, data)
         else:
             data['language'] = None
-            data['list_languages'] = language_list
+            data['available_languages'] = available_languages
             return await handler(event, data)
