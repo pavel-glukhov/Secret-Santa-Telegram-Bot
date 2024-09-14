@@ -5,6 +5,13 @@
 
 Схема: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 
+Поддержка 4х языков, перевод был осуществлен машинным способом.
+Включенные языки: 
+1. RU
+2. ENG
+3. KAZ
+4. UK
+
 1. #### Создание персональных комнат
 
    - Каждый желающий может создать комнату для неограниченного количества людей.
@@ -83,11 +90,11 @@
    3. Переписать шаблон админки с адаптивной версткой. 
   
 ### Стек
-1. Aiogram 2
+1. Aiogram 3
 2. FastAPI
 3. Jinja2
-4. Tortoise ORM
-5. Aerich
+4. SQLAlchemy 2
+5. Alemnic
 6. PostgreSQL
 7. Redis
 
@@ -101,9 +108,7 @@
      ```
    - Создать свой .env файл по шаблону .env.example
    - pip install -r requirements
-   - aerich init-db
-   - aerich migrate
-   - aerich upgrade
+   - alembic upgrade head
    - uvicorn main:create_app --reload
 
 #### В Docker контейнере:
@@ -114,9 +119,7 @@
 
     Миграции
       ```console
-        docker exec -t <backend container> aerich init-db
-        docker exec -t <backend container> aerich migrate
-        docker exec -t <backend container> aerich upgrade
+        docker exec -t <backend container> alembic upgrade head
       ```
 ### Права доступа:
  - Что бы добавить Superuser права пользователю, выполните: 
@@ -141,5 +144,6 @@
 - Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя команду **/setdomain**
 
 ### Бекапы
-Бекапить базу данных можно с помощью команды ниже, добавленной в крон:  
-docker exec -t <имя_контейнера> pg_dump -U <имя_пользователя> <имя_базы_данных> > <имя_файла>.sql
+Бекапить базу данных можно с помощью команды ниже, добавленной в крон:
+``docker exec -t <имя_контейнера> pg_dump -U <имя_пользователя> <имя_базы_данных> > <имя_файла>.sql
+``
