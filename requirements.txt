@@ -2,8 +2,7 @@ aiogram==3.10.0
 aiogram-inline-paginations==0.1.12
 python-dotenv==0.20.0
 asyncpg==0.26.0
-aerich==0.7.2
-Jinja2==3.1.2
+Jinja2
 fastapi-jwt-auth-v2==0.1.0
 fastapi==0.111.1
 PyYAML~=6.0.1
@@ -12,9 +11,8 @@ APScheduler==3.9.1
 python-multipart
 cryptography~=41.0.7
 requests~=2.31.0
-redis==5.0.1
+redis
 pytz
-pycountry==23.12.11
 starlette==0.37.2
 pydantic~=2.8.2
 pycountry==23.12.11
