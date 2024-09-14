@@ -67,7 +67,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - TZ=Asia/Almaty
+      - TZ=${SERVER_TIMEZONE}
     depends_on:
       - db
       - redis
