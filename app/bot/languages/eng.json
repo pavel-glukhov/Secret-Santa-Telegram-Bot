@@ -1,0 +1,203 @@
+{
+  "eng": {
+    "messages": {
+      "main_menu": {
+        "menu": "<b>Menu</b>",
+        "language_selection": "\uD83C\uDDEC\uD83C\uDDE7 First, choose the bot's language.\n\n",
+        "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
+        "start_message": "Ho-ho-ho! It's time to play Secret Santa!\n\nCreate your room for friends, or join an existing one.",
+        "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile settings</b>.\n\n❗ <b>Otherwise, Santa won't be able to send you a gift.</b>\n\n",
+        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room.user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
+      },
+      "profile_menu": {
+        "main_menu": {
+          "menu_message": "The data you provide is necessary for your Secret Santa to send you a gift.\n\n<b>Your profile</b>:\n\n{user_information}\n\nTo ensure security, we encrypt the address and phone number in the database.\n\nIf you want to change or delete your personal data, press <b>Edit Profile</b>\n\n",
+          "profile_edit_message": "Choose what you want to change:"
+        },
+        "change_address": {
+          "change_address_first_msg": "For your Secret Santa to send you a package, please provide the address where the package should be sent and don't forget to include:\n\n<b>— Country</b>\n<b>— Region</b>\n<b>— City</b>\n<b>— Street</b>\n<b>— House</b>\n<b>— Apartment</b>\n<b>— Floor</b>*\n<b>— Intercom number if different from the apartment</b>\n<b>— Postal code</b>\n\n<b>For example: Russia, Moscow Region, Fryazino, Pulkina St., House 99, Apt. 999, Floor 25, Postal code 123987.</b>\n",
+          "change_address_second_msg": "Address changed.",
+          "error": "Address data cannot exceed 150 characters. Try again."
+        },
+        "change_name": {
+          "change_name_first_msg": "Hohoho, it's time to provide your details for Santa \uD83C\uDF85\nKeep in mind it will be used to send a gift by Santa.\n\n<b>First, write your first name</b>\n\n",
+          "change_name_second_msg": "<b>Now, provide your last name</b>\n\n",
+          "change_name_third_msg": "First name and last name changed."
+        },
+        "change_number": {
+          "change_number_first_msg": "Provide your phone number so that postal services can notify you about the gift.\n\n<b>Enter your number using the format: +7|8(___)___-__-__ </b> \n<b>For example:</b> +7 700 111 11 11",
+          "change_number_second_msg": "Number changed.",
+          "error": "<b>❌Invalid number format❌\n</b>Your message: {text}, try again.\nTry again.\n\n<b>Enter your number using the format: +7|8(___)___-__-__ </b> \n<b>For example:</b> +7 700 111 11 11"
+        },
+        "delete_information": {
+          "delete_information_first_msg": "Write <b>confirm</b> to delete your profile data.\n\n",
+          "delete_information_second_msg": "All your data has been deleted.\n\n",
+          "error": "You entered the wrong command. Try again.\n\nTo confirm, enter the word <b>\"confirm\"</b>"
+        }
+      },
+      "rooms_menu": {
+        "main": {
+          "text_control_room": "<b>Room management {room_name} ({room_number})</b>\n\n<b>Budget</b>: {room_budget}\n\n",
+          "text_control_room_not_scheduler": "<b>The draw time has not yet been set.</b>",
+          "text_control_room_scheduler": "<b>\uD83D\uDD53 The game in the current room is scheduled for {next_time_run}</b>\n\n",
+          "room_closed_uns": "<b>The game in room {room_number} has ended!</b>\n\nUnfortunately, the number of players was insufficient for a full draw.\n",
+          "room_closed_uns_for_own": "\nTo reactivate the room, click <b>Activate Room</b>, invite more people, and set a new draw time.",
+          "room_closed_suc": "<b>The game in your room has ended!</b>\n\nYou became Secret Santa for:\n{user_information}\nYou can send a message to your Secret Santa, or send a message to your recipient.\n"
+        },
+        "activate": {
+          "activate_msg": "The room has been reactivated."
+        },
+        "change_budget": {
+          "long_budget": "You entered a message that is too long for the budget.\nThe message cannot exceed 16 characters\nTo change your budget, send a new message.\n",
+          "change_budget_first_msg": "Specify a new budget for the players in your room for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
+          "change_budget_second_msg": "The budget for room {room_number} has been updated.\n\n<b>New value</b>: {new_budget}"
+        },
+        "change_owner": {
+          "user_is_not_exist": "This participant was not found.",
+          "error": "This participant cannot be appointed as the room owner.",
+          "change_owner_room_first_msg": "Want to change the room owner?\nThe new owner must be a participant in the room.\n<b>Keep in mind, you will lose control of the room.</b>\n\n<b>To change the owner, write their nickname.</b>\n",
+          "change_owner_room_second_msg": "Ho-ho-ho! \uD83C\uDF85\n\nI changed the owner, now it's <b>{new_owner}</b>"
+        },
+        "config_room": {
+          "main_menu": "<b>Room settings:</b> <b>{room_name}</b> (<b>{room_number}</b>)"
+        },
+        "create_new_room": {
+          "limit": "<b>A new room cannot be created, as you have reached the limit.</b>\n\nYou can own up to 10 rooms.",
+          "long_room_name": "You entered a name that is too long, please come up with another one.\nThe room name must not exceed 16 characters.\n",
+          "long_budget": "You entered a message that is too long for the budget.\nThe message cannot exceed 16 characters\nTo change your budget, send a new message.\n",
+          "create_new_room_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nWhat would you like to name your room?\nWrite its name, and we'll proceed\n\nThe name must not exceed 16 characters.\n",
+          "create_new_room_second_msg": "Accepted! Your room name is <b>{room_name}</b>\n\nNow specify the maximum budget for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
+          "create_new_room_third_msg": "Accepted! Your budget is <b>{room_budget}</b>\n\nAnd the last question.\nWrite your gift preferences. Perhaps you have a hobby, and you'd like something special?\n",
+          "create_new_room_forth_msg": "Ho-ho-ho! \uD83C\uDF85\n\nThe room <b>\"{room_name}\"</b> has been created.\nHere is the room number <b>{room.number}</b>\nShare this code with your friends so they can join your game.\n\n",
+          "create_new_room_additional_msg": "In the meantime, you can go back and update your profile."
+        },
+        "delete_room": {
+          "delete_room_first_msg": "❌<b>The room will be deleted without the possibility of recovery</b>.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n ",
+          "delete_room_second_msg": "The room has been successfully deleted\n\n You can create a new room in the main menu.",
+          "error_command_verif": "You entered the wrong command <b>{text}</b> for confirmation.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n",
+          "error": "Something went wrong, the room was not deleted."
+        },
+        "members": {
+          "menu_msg": "Room participants list: <b>{room_name} ({room_number})</b>:\n\n{member_string}"
+        },
+        "subscribe": {
+          "already_joined": "You are already in this room.",
+          "number_error": "The room number can contain only digits, try again.",
+          "room_is_not_exist_or_closed": "The room you entered does not exist, or the game is over.\nEnter a valid room number.",
+          "subscribe_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nEnter the room number you want to join.\n",
+          "subscribe_second_msg": "Now write your gift preferences. Perhaps you have a hobby, and you'd like something special?\nYour comments will help Secret Santa choose a gift for you.\n",
+          "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room <b>{room_number}</b>.\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B"
+        },
+        "unsubscribe": {
+          "unsubscribe_first_msg": "You left the room <b>{room_number}</b>.",
+          "unsubscribe_second_msg": "You can return to the room at any time by using room number <b>{room_number}</b>."
+        },
+        "update_room": {
+          "long_name": "You entered a name that is too long, please come up with another one.\nThe room name must not exceed 16 characters.\n",
+          "unsubscribe_first_msg": "'Enter a new name for your room.\nThe name must not exceed 16 characters\n",
+          "unsubscribe_second_msg": "The room name has been changed to <b>{new_room_name}</b>"
+        }
+      },
+      "game_menu": {
+        "start_game": {
+          "time_zone_inf": "⚠️ Your time zone is not set. To set the correct time, you need to specify your time zone, otherwise the server time will be used.",
+          "count_players": "<b>At least 3 participants are required to start the game</b>",
+          "time_not_set": "<b>Time is not set</b>\n\n<b>At least 3 participants are required to start the game</b>\n\n<b>Your time zone</b>: {timezone}",
+          "time_set_to": "The mailing date is set for {datetime_set_to}",
+          "expired_datetime": "You entered a past date. Try again and enter the correct draw date. \n\n<b>Server time:</b> {current_time_str}\n<b>Your specified time:</b> {datetime_obj_str}",
+          "incorrect_datetime": "You entered an incorrect date.\n\n Try again and enter the correct draw date.",
+          "info_will_be_sent_msg": "<b>The mailing will be sent:</b> {time_to_send}",
+          "start_game_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nTo set the mailing time, send a message in the format\n<b>yyyy.mm.dd h:m</b> - <b>year.month.day hour:minutes</b>\n\n<b>Example: 2023.12.01 12:00</b>"
+        }
+      },
+      "wishes_menu": {
+        "your_wishes": "Your secret wishes \uD83D\uDE4A: \n: {wishes}\n",
+        "new_wishes": "<b>Write a new wish:</b>\n",
+        "changed_wishes": "Your wishes in the room <b>{room_name}</b> have been changed to:\n\n{wish}\n\nSanta will definitely take your wishes into account! \uD83C\uDF85"
+      },
+      "time_zone_menu": {
+        "letter_of_country": "To change the time zone, select the letter that your country starts with:",
+        "select_country": "Select a country:",
+        "select_timezone": "Select a timezone:",
+        "selected_timezone": "The time zone {timezone} is selected",
+        "timezone": "Time zone"
+      },
+      "communication_menu": {
+        "message_to_recipient": {
+          "first_msg": "Write the message you want to send to your recipient. \uD83D\uDE4D\u200D♂",
+          "msg_was_sent": "Your message to the recipient has been sent.",
+          "msg_text": "<b>Message from Secret Santa:</b>\nRoom: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+        },
+        "message_to_sender": {
+          "first_msg": "Write the message you want to send to your Secret Santa. \uD83C\uDF85",
+          "msg_was_sent": "Your message to Santa has been sent",
+          "msg_text": "<b>Message from your recipient:</b>\nRoom: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+        }
+      }
+    },
+    "buttons": {
+      "return_back_button": "Return back ◀️",
+      "cancel_button": "Cancel",
+      "continue_button": "Continue",
+      "profile_menu": {
+        "change_profile": "Edit profile \uD83D\uDC4B",
+        "profile_edit_name": "Edit name",
+        "profile_edit_address": "Edit address",
+        "profile_edit_number": "Edit phone number",
+        "change_time_zone": "Change time zone",
+        "profile_edit_delete_all": "Delete all information ❌"
+      },
+      "room_menu": {
+        "main_buttons": {
+          "menu": "Menu ◀️",
+          "return_to_room_menu": "Return to room menu",
+          "root_menu": "Return to main menu"
+        },
+        "user_room_buttons": {
+          "room_show_wish": "Your wishes \uD83C\uDF81",
+          "room_exit": "Exit room 🚪",
+          "start_game": "Start game \uD83C\uDFB2",
+          "started_game": "Game started ✅",
+          "room_member_list": "Participant list \uD83D\uDC65",
+          "configuration": "Settings ⚒",
+          "room_activate": "Activate room ✅",
+          "room_closed_con_san": "Contact Santa",
+          "room_closed_con_rec": "Contact recipient"
+        },
+        "config_menu": {
+          "room_change_name": "Change room name ⚒",
+          "room_change_budget": "Change budget \uD83D\uDCB6",
+          "room_change_owner": "Change owner \uD83D\uDC64",
+          "room_delete": "Delete room ❌"
+        },
+        "subscribe": {
+          "to_room": "Join room ➡️"
+        }
+      },
+      "game_menu": {
+        "room_change_game_dt": "Change time \uD83D\uDD58",
+        "change_time_zone": "Change time zone \uD83D\uDD58"
+      },
+      "wishes_menu": {
+        "change_wish": "Edit wish ✒️"
+      }
+    },
+    "formatter": {
+      "address_is_not_specified": "address not provided",
+      "number_is_not_specified": "number not provided",
+      "timezone_is_not_specified": "timezone not provided",
+      "full_name": "<b>Full name</b>",
+      "address": "<b>Address</b>",
+      "number": "<b>Phone number</b>",
+      "timezone": "<b>Time zone</b>"
+    },
+    "message_formatter": {
+      "address_is_not_specified": "The player did not provide their address, contact the participant via chat to clarify the information",
+      "number_is_not_specified": "The player did not provide their contact number, contact the participant via chat to clarify the information",
+      "message_text": "------------\n<b>Hello {sender_name}!</b>\n<b>Congratulations, you have become a Secret Santa!!!!!</b> \uD83D\uDCA5\uD83D\uDCA5\n\n<b>Your recipient:</b>\n<b>Name:</b> {full_name}\n\n<b>Address:</b> {address}\n\n<b>Phone:</b> {number}\n\n<b>Gift wishes:</b> {receiver_wish}\n\n<b>Quickly run to the post office and send your gift!</b> \uD83C\uDFC3 \n------------\n"
+    },
+    "result_mailing": {
+      "message_text": "You received this message because the mailing for your room [<b>{room_name}</b>] was set for this date.\n\n Unfortunately, there are not enough active players in your room.\n\nThere should be 3 or more active players.\n\n<b>Invite more players and set a new draw date</b>"
+    }
+  }
+}
