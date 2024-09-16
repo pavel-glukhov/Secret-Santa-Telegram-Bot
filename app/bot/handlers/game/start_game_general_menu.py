@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema
 from app.bot.messages.result_mailing import send_result_of_game
 from app.bot.states.game import StartGame
 from app.store.database.queries.rooms import RoomRepo
@@ -22,7 +23,9 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_start-game'))
-async def start_game(callback: types.CallbackQuery, session: Session):
+async def start_game(callback: types.CallbackQuery,
+                     session: Session,
+                     app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     room_repo = RoomRepo(session)
     user_repo = UserRepo(session)
@@ -31,37 +34,25 @@ async def start_game(callback: types.CallbackQuery, session: Session):
     task = get_task(task_id=room_number)
     user = await user_repo.get_user_or_none(callback.message.chat.id)
     
-    timezone = user.timezone or (
-        '⚠️ Ваш часовой пояс не задан. '
-        'Для того, чтобы задать корректное время,'
-        ' вам нужно указать свой часовой пояс,'
-        ' иначе будет использоваться время сервера.'
-    )
+    timezone = user.timezone or app_text_msg.messages.game_menu.start_game.time_zone_inf
     
     keyboard = {
-        "Изменить время 🕘": f"room_change-game-dt_{room_number}",
-        "Изменить часовой пояс 🕘": f"change_time_zone_{room_number}",
-        "Вернуться назад ◀️": f"room_menu_{room_number}"
+        app_text_msg.buttons.game_menu.room_change_game_dt: f"room_change-game-dt_{room_number}",
+        app_text_msg.buttons.game_menu.change_time_zone: f"change_time_zone_{room_number}",
+        app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
     }
     
     if len(room_members) < 3:
-        message_text = (
-            '<b>Для запуска игры требуется минимум '
-            '3 участника игры</b>'
-        )
-        keyboard.pop("Изменить время 🕘")
+        message_text = app_text_msg.messages.game_menu.start_game.count_players
+        keyboard.pop(app_text_msg.buttons.game_menu.change_time_zone)
     else:
         if task:
             time_to_send = task.next_run_time.strftime("%b-%d-%Y %H:%M")
-            message_text = (
-                f'<b>Рассылка будет выполнена:</b> {time_to_send}'
-            )
+            message_text = app_text_msg.messages.game_menu.start_game.info_will_be_sent_msg.format(
+                time_to_send=time_to_send)
         else:
-            message_text = (
-                '<b>Время не назначено</b>\n\n'
-                '<b>Для запуска игры требуется минимум 3 участника игры</b>\n\n'
-                f'<b>Ваш часовой пояс</b>: {timezone}'
-            )
+            message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
+                timezone=timezone)
     
     keyboard_inline = generate_inline_keyboard(keyboard)
     await callback.message.edit_text(
@@ -71,27 +62,30 @@ async def start_game(callback: types.CallbackQuery, session: Session):
 
 
 @router.callback_query(F.data.startswith('room_change-game-dt'))
-async def change_game_datetime(callback: types.CallbackQuery, state: FSMContext):
+async def change_game_datetime(callback: types.CallbackQuery,
+                               state: FSMContext,
+                               app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
     
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
-    
-    message_text = (
-        'Хо-хо-хо! 🎅\n\n'
-        'Для того, что-бы назначить время рассылки, '
-        'отправь сообщение в формате\n'
-        '<b>yyyy.mm.dd h:m</b> - <b>год.месяц.день час:минуты</b>\n\n'
-        '<b>Пример: 2023.12.01 12:00</b>'
+    keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.cancel_button: 'cancel'}
     )
-    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    
+    message_text = app_text_msg.messages.game_menu.start_game.start_game_first_msg
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
     
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(StartGame.waiting_for_datetime)
 
 
 @router.message(StartGame.waiting_for_datetime)
-async def process_waiting_datetime(message: types.Message, state: FSMContext, session: Session):
+async def process_waiting_datetime(message: types.Message,
+                                   state: FSMContext,
+                                   session: Session,
+                                   app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     bot_message = state_data['bot_message_id']
@@ -102,10 +96,12 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext, se
     user = await UserRepo(session).get_user_or_none(message.chat.id)
     timezone = user.timezone
     semaphore = asyncio.Semaphore(1)
-    cancel_keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    cancel_keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.cancel_button: 'cancel'}
+    )
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": f"room_menu_{room_number}"
+            app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
         }
     )
     if timezone:
@@ -125,31 +121,27 @@ async def process_waiting_datetime(message: types.Message, state: FSMContext, se
             add_task(task_func=send_result_of_game, date_time=datetime_obj,
                      task_id=room_number, room_number=room_number,
                      semaphore=semaphore)
+            
             await RoomRepo(session).update(room_number, started_at=datetime.now(),
                                            closed_at=None, is_closed=False)
+            
             datetime_set_to = datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")
-            message_text = (
-                f'Дата рассылки установлена на {datetime_set_to}'
-            )
+            message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
+                datetime_set_to=datetime_set_to)
+            
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()
         else:
             current_time_str = current_time.strftime('%Y-%b-%d, %H:%M:%S')
             datetime_obj_str = datetime_obj.strftime('%Y-%b-%d, %H:%M:%S')
-            message_text = (
-                'Вы указали прошедшую дату. Попробуте снова и укажите '
-                'правильную дату для жеребьевки. \n\n'
-                f'<b>Время на сервере:</b> {current_time_str}\n'
-                f'<b>Ваше указанное время:</b> {datetime_obj_str}'
-            )
+            message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
+                current_time_str=current_time_str,
+                datetime_obj_str=datetime_obj_str)
             
             await _incorrect_data_format(bot_message, message_text,
                                          cancel_keyboard_inline)
     else:
-        message_text = (
-            'Вы указали неверную дату.\n\n Попробуте снова и укажите '
-            'правильную дату для жеребьевки.'
-        )
+        message_text = app_text_msg.messages.game_menu.start_game.incorrect_datetime
         await _incorrect_data_format(bot_message, message_text,
                                      cancel_keyboard_inline)
 
