@@ -15,7 +15,7 @@
           "profile_edit_message": "Choose what you want to change:"
         },
         "change_address": {
-          "change_address_first_msg": "For your Secret Santa to send you a package, please provide the address where the package should be sent and don't forget to include:\n\n<b>— Country</b>\n<b>— Region</b>\n<b>— City</b>\n<b>— Street</b>\n<b>— House</b>\n<b>— Apartment</b>\n<b>— Floor</b>*\n<b>— Intercom number if different from the apartment</b>\n<b>— Postal code</b>\n\n<b>For example: Russia, Moscow Region, Fryazino, Pulkina St., House 99, Apt. 999, Floor 25, Postal code 123987.</b>\n",
+          "change_address_first_msg": "For your Secret Santa to send you a package, please provide the address where the package should be sent and don't forget to include:\n\n<b>— Country</b>\n<b>— Region</b>\n<b>— City</b>\n<b>— Street</b>\n<b>— House</b>\n<b>— Apartment</b>\n<b>— Floor</b>*\n<b>— Intercom number if different from the apartment</b>\n<b>— Postal code</b>\n\n<b>For example: United Kingdom, Greater London, Westminster, Downing Street, House 10, Apt. 5, Floor 3, Postal code SW1A 2AA.</b>\n",
           "change_address_second_msg": "Address changed.",
           "error": "Address data cannot exceed 150 characters. Try again."
         },
