@@ -72,9 +72,7 @@ async def process_changing_owner(message: types.Message,
             logger.info(f'The owner [{previous_owner}] of room '
                         f'[{room_number}] has been changed to [{user.user_id}]')
         else:
-
-            message_text = ('Данный участник не может '
-                            'быть назначен владельцем комнаты.')
+            message_text = app_text_msg.messages.rooms_menu.change_owner.error
 
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()

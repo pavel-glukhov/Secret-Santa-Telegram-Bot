@@ -24,7 +24,7 @@ async def my_profile(callback: types.CallbackQuery,
         }
     )
     user = await UserRepo(session).get_user_or_none(chat_id)
-    user_information = profile_information_formatter(user)
+    user_information = profile_information_formatter(user, app_text_msg)
 
     message_text = app_text_msg.messages.profile_menu.main_menu.menu_message.format(
         user_information=user_information)

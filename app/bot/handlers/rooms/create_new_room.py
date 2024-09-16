@@ -125,7 +125,9 @@ async def process_wishes(message: types.Message, state: FSMContext, session: Ses
     await message.delete()
 
     bot_message = state_data['bot_message_id']
-    keyboard_inline = generate_inline_keyboard({"Меню ◀️": 'root_menu'})
+    keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.room_menu.main_buttons.menu: 'root_menu'}
+    )
 
     room = await RoomRepo(session).create(user_wish=user_wishes,
                                           owner_id=message.chat.id,

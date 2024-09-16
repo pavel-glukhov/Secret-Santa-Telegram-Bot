@@ -1,3 +1,4 @@
+from app.bot.languages import TranslationMainSchema
 from app.store.database.models import User
 
 
@@ -11,21 +12,21 @@ def get_full_name(user: User) -> str | None:
         return user.first_name
 
 
-def user_information_formatter(user: User) -> list:
-    address_value = user.get_address() or 'адрес не указан'
-    number_value = user.get_number() or 'номер не указан'
-    timezone = user.timezone or 'часовой пояс не указан'
+def user_information_formatter(user: User, app_text_msg: TranslationMainSchema) -> list:
+    address_value = user.get_address() or app_text_msg.formatter.address_is_not_specified
+    number_value = user.get_number() or app_text_msg.formatter.number_is_not_specified
+    timezone = user.timezone or app_text_msg.formatter.timezone_is_not_specified
 
     full_name = get_full_name(user)
     return [full_name, address_value, number_value, timezone]
 
 
-def profile_information_formatter(user: User) -> str:
-    full_name, address, number, timezone = user_information_formatter(user)
+def profile_information_formatter(user: User, app_text_msg: TranslationMainSchema) -> str:
+    full_name, address, number, timezone = user_information_formatter(user, app_text_msg)
     formatted_text = (
-        f"<b>Полное имя</b>: {full_name}\n"
-        f"<b>Адрес</b>: {address}\n"
-        f"<b>Номер телефона</b>: {number}\n"
-        f"<b>Часовой пояс</b>: {timezone}\n"
+        f"{app_text_msg.formatter.full_name}: {full_name}\n"
+        f"{app_text_msg.formatter.address}: {address}\n"
+        f"{app_text_msg.formatter.number}: {number}\n"
+        f"{app_text_msg.formatter.timezone}: {timezone}\n"
     )
     return formatted_text

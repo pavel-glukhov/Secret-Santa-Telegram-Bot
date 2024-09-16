@@ -138,7 +138,7 @@ def _generate_active_room_response(room_number: int,
         app_text_msg.buttons.return_back_button: 'root_menu'
     }
 
-    user_information = profile_information_formatter(recipient)
+    user_information = profile_information_formatter(recipient, app_text_msg)
 
     message_text = app_text_msg.messages.rooms_menu.main.room_closed_suc.format(
         user_information=user_information

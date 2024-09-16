@@ -120,7 +120,8 @@
         "select_country": "Select a country:",
         "select_timezone": "Select a timezone:",
         "selected_timezone": "The time zone {timezone} is selected",
-        "timezone": "Time zone"
+        "timezone": "Time zone",
+        "country": "Country"
       },
       "communication_menu": {
         "message_to_recipient": {

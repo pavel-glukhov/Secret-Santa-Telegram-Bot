@@ -120,7 +120,8 @@
         "select_country": "Виберіть країну:",
         "select_timezone": "Виберіть часовий пояс:",
         "selected_timezone": "Вибрано часовий пояс {timezone}",
-        "timezone": "Часовий пояс"
+        "timezone": "Часовий пояс",
+        "country": "Країна"
       },
       "communication_menu": {
         "message_to_recipient": {

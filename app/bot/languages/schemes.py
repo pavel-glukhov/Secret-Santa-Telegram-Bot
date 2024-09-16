@@ -160,6 +160,7 @@ class TimeZoneMenu(BaseModel):
     select_timezone: str
     selected_timezone: str
     timezone: str
+    country: str
 
 
 class MessageToRecipient(BaseModel):
