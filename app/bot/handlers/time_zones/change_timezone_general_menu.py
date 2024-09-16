@@ -27,17 +27,17 @@ async def get_letter(callback: types.CallbackQuery,
                      app_text_msg: TranslationMainSchema):
     await state.set_state(TimeZoneStates.selecting_letter)
     room_number = get_room_number(callback)
-    
+
     if room_number:
         await state.update_data(room_number=room_number)
-    
+
     message_text = app_text_msg.messages.time_zone_menu.letter_of_country
-    
+
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=_get_letter_keyboard()
     )
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(TimeZoneStates.selecting_country)
 
@@ -95,12 +95,12 @@ async def process_timezone_callback(callback: types.CallbackQuery,
     timezone = callback.data.split(':')[-1]
     state_data = await state.get_data()
     room_number = state_data.get('room_number')
-    
+
     if room_number:
         callback_query = f"room_start-game_{room_number}"
     else:
         callback_query = "profile_edit"
-    
+
     message_text = app_text_msg.messages.time_zone_menu.selected_timezone.format(
         timezone=timezone
     )

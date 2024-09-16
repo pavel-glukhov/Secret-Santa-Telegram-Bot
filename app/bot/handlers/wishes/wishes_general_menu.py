@@ -25,13 +25,13 @@ async def show_wishes(callback: types.CallbackQuery,
         {
             app_text_msg.buttons.wishes_menu.change_wish: f"room_change-wish_{room_number}",
             app_text_msg.buttons.return_back_button: f"room_menu_{room_number}",
-            
+
         }
     )
-    
+
     user_id = message.chat.id
     wishes = await WishRepo(session).get(user_id, room_number)
-    
+
     message_text = app_text_msg.messages.wishes_menu.your_wishes.format(
         wishes=wishes
     )
@@ -45,16 +45,16 @@ async def update_wishes(callback: types.CallbackQuery,
                         app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.wishes_menu.new_wishes
-    
+
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeWish.waiting_for_wishes)
 
@@ -70,9 +70,9 @@ async def process_updating_wishes(
     bot_message = state_data['bot_message_id']
     wish = message.text
     user_id = message.chat.id
-    
+
     await message.delete()
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             app_text_msg.buttons.return_back_button: f"room_menu_{room_number}",
@@ -83,10 +83,10 @@ async def process_updating_wishes(
         user_id=user_id,
         room_id=room_number
     )
-    
+
     room = await RoomRepo(session).get(room_number)
     await state.clear()
-    
+
     message_text = app_text_msg.messages.wishes_menu.changed_wishes.format(
         room_name=room.name, wish=wish
     )
