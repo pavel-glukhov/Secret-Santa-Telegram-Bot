@@ -2,6 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from sqlalchemy.orm import Session
+from app.bot.languages import TranslationMainSchema
 
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -13,11 +14,13 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_member-list'))
-async def members_list(callback: types.CallbackQuery, session: Session):
+async def members_list(callback: types.CallbackQuery,
+                       session: Session,
+                       app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {
-            'Вернуться назад ◀️': f'room_menu_{room_number}'
+            app_text_msg.buttons.return_back_button: f'room_menu_{room_number}'
         }
     )
     room = await RoomRepo(session).get(room_number)
@@ -41,9 +44,10 @@ async def members_list(callback: types.CallbackQuery, session: Session):
         member_string += (
             f'{number}) {user_name}\n')
     
-    message_text = (
-        'Список участников комнаты: '
-        f'<b>{room.name} ({room_number})</b>:\n\n{member_string}'
+    message_text = app_text_msg.messages.rooms_menu.members.menu_msg.format(
+        room_name=room.name,
+        room_number=room_number,
+        member_string=member_string
     )
     
     await callback.message.edit_text(

@@ -33,7 +33,7 @@ async def start(message: types.Message, state: FSMContext,
     message_text = app_text_msg.messages.main_menu.start_message
     
     await message.answer(text=message_text)
-    await root_menu(message, session=session, language=app_text_msg, edit_message=False)
+    await root_menu(message, session=session, app_text_msg=app_text_msg, edit_message=False)
 
 
 @router.callback_query(F.data == 'root_menu')
