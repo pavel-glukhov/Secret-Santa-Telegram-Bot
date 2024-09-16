@@ -25,16 +25,10 @@ async def change_room_budget(callback: types.CallbackQuery,
     keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
+    message_text = app_text_msg.messages.rooms_menu.change_budget.change_budget_first_msg
     
-    message_text = (
-        'Укажите новый бюджет для игроков вашей комнаты '
-        'на подарок Тайного Санты.\n'
-        'Напиши в чат сумму в любом формате, '
-        'например 2000 тенге,'
-        '200 рублей или 20$\n\n'
-        'Длина сообщения не должна превышать 16 символов.'
-    )
-    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(text=message_text,
+                                                           reply_markup=keyboard_inline)
     
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeBudget.waiting_for_budget)
@@ -43,20 +37,21 @@ async def change_room_budget(callback: types.CallbackQuery,
 @router.message(lambda message:
                 len(message.text.lower()) > 16,
                 StateFilter(ChangeBudget.waiting_for_budget))
-async def process_change_budget_invalid(message: types.Message, state: FSMContext, app_text_msg: TranslationMainSchema):
+async def process_change_budget_invalid(message: types.Message,
+                                        state: FSMContext,
+                                        app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     await message.delete()
     
     bot_message = state_data['bot_message_id']
-    keyboard_inline = generate_inline_keyboard({app_text_msg.buttons.cancel_button: 'cancel'})
+    keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.cancel_button: 'cancel'}
+    )
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
     
-    message_text = (
-        'Вы введи слишком длинное сообщение для бюджета.\n '
-        'Длина сообщения не может быть больше 16 символов\n'
-        'Для изменения вашего бюджета, отправьте новое сообщение.\n'
-    )
+    message_text = app_text_msg.messages.rooms_menu.change_budget.long_budget
+    
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
 
@@ -79,9 +74,9 @@ async def process_changing_budget(message: types.Message,
     )
     await RoomRepo(session).update(room_number, budget=new_budget)
     
-    message_text = (
-        f'Бюджет для комнаты {room_number} был обновлен.\n\n'
-        f'<b>Новое значение</b>: {new_budget}'
+    message_text = app_text_msg.messages.rooms_menu.change_budget.long_budget.format(
+        room_number=room_number,
+        new_budget=new_budget
     )
     
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
