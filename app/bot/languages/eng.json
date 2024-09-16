@@ -68,7 +68,7 @@
           "create_new_room_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nWhat would you like to name your room?\nWrite its name, and we'll proceed\n\nThe name must not exceed 16 characters.\n",
           "create_new_room_second_msg": "Accepted! Your room name is <b>{room_name}</b>\n\nNow specify the maximum budget for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
           "create_new_room_third_msg": "Accepted! Your budget is <b>{room_budget}</b>\n\nAnd the last question.\nWrite your gift preferences. Perhaps you have a hobby, and you'd like something special?\n",
-          "create_new_room_forth_msg": "Ho-ho-ho! \uD83C\uDF85\n\nThe room <b>\"{room_name}\"</b> has been created.\nHere is the room number <b>{room.number}</b>\nShare this code with your friends so they can join your game.\n\n",
+          "create_new_room_forth_msg": "Ho-ho-ho! \uD83C\uDF85\n\nThe room <b>\"{room_name}\"</b> has been created.\nHere is the room number <b>{room_number}</b>\nShare this code with your friends so they can join your game.\n\n",
           "create_new_room_additional_msg": "In the meantime, you can go back and update your profile."
         },
         "delete_room": {
