@@ -115,8 +115,8 @@ class Unsubscribe(BaseModel):
 
 class UpdateRoom(BaseModel):
     long_name: str
-    unsubscribe_first_msg: str
-    unsubscribe_second_msg: str
+    update_room_first_msg: str
+    update_room_second_msg: str
 
 
 class RoomsMenu(BaseModel):

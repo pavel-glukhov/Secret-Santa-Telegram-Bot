@@ -7,7 +7,7 @@
         "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
         "start_message": "Ho-ho-ho! It's time to play Secret Santa!\n\nCreate your room for friends, or join an existing one.",
         "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile settings</b>.\n\n❗ <b>Otherwise, Santa won't be able to send you a gift.</b>\n\n",
-        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room.user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
+        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room_user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
       },
       "profile_menu": {
         "main_menu": {
@@ -62,7 +62,7 @@
           "main_menu": "<b>Room settings:</b> <b>{room_name}</b> (<b>{room_number}</b>)"
         },
         "create_new_room": {
-          "limit": "<b>A new room cannot be created, as you have reached the limit.</b>\n\nYou can own up to 10 rooms.",
+          "limit": "<b>A new room cannot be created, as you have reached the limit.</b>\n\nYou can own up to {maximal_count_rooms} rooms.",
           "long_room_name": "You entered a name that is too long, please come up with another one.\nThe room name must not exceed 16 characters.\n",
           "long_budget": "You entered a message that is too long for the budget.\nThe message cannot exceed 16 characters\nTo change your budget, send a new message.\n",
           "create_new_room_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nWhat would you like to name your room?\nWrite its name, and we'll proceed\n\nThe name must not exceed 16 characters.\n",
@@ -74,7 +74,7 @@
         "delete_room": {
           "delete_room_first_msg": "❌<b>The room will be deleted without the possibility of recovery</b>.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n ",
           "delete_room_second_msg": "The room has been successfully deleted\n\n You can create a new room in the main menu.",
-          "error_command_verif": "You entered the wrong command <b>{text}</b> for confirmation.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n",
+          "error_command_verif": "You entered the wrong command for confirmation.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n",
           "error": "Something went wrong, the room was not deleted."
         },
         "members": {
@@ -94,8 +94,8 @@
         },
         "update_room": {
           "long_name": "You entered a name that is too long, please come up with another one.\nThe room name must not exceed 16 characters.\n",
-          "unsubscribe_first_msg": "'Enter a new name for your room.\nThe name must not exceed 16 characters\n",
-          "unsubscribe_second_msg": "The room name has been changed to <b>{new_room_name}</b>"
+          "update_room_first_msg": "'Enter a new name for your room.\nThe name must not exceed 16 characters\n",
+          "update_room_second_msg": "The room name has been changed to <b>{new_room_name}</b>"
         }
       },
       "game_menu": {
