@@ -13,7 +13,8 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_config'))
-async def configuration_room(callback: types.CallbackQuery, session: Session, app_text_msg: TranslationMainSchema):
+async def configuration_room(callback: types.CallbackQuery,
+                             session: Session, app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     keyboard_inline = generate_inline_keyboard(
         {

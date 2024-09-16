@@ -22,7 +22,7 @@ class Pagination:
         self.callback_prefix = callback_prefix
         self.object_attribute_for_keyboard_name = keyboard_name_or_method
         self.object_attribute_for_callback = callback_name_or_method
-    
+
     def inline_pagination(self, page: int):
         data = self._data_splitter(page, self.objects)
         collection = data.get('collection')
@@ -35,13 +35,13 @@ class Pagination:
                                         self.object_attribute_for_keyboard_name)
             else:
                 keyboard_text = item
-            
+
             if self.object_attribute_for_callback:
                 callback_query = getattr(item,
                                          self.object_attribute_for_callback)
             else:
                 callback_query = item
-            
+
             button = InlineKeyboardButton(
                 text=keyboard_text,
                 callback_data=(
@@ -49,15 +49,15 @@ class Pagination:
                 )
             )
             builder.row(button)
-        
+
         pagination_keyboard = self._pagination_keyboard_generator(
             builder,
             page,
             total_pages,
             end_index)
-        
+
         return pagination_keyboard
-    
+
     def _data_splitter(self, page: int, objects: list[Any]) -> dict:
         start_index = (page - 1) * self.page_size
         end_index = start_index + self.page_size
@@ -68,7 +68,7 @@ class Pagination:
             'start_index': start_index,
             'end_index': end_index
         }
-    
+
     def _pagination_keyboard_generator(self,
                                        keyboard_builder,
                                        page,
@@ -89,11 +89,11 @@ class Pagination:
         if len(self.objects) > self.page_size:
             if page == 1 and page < end_index < len(self.objects):
                 keyboard_builder.row(empty_button, count_button, next_button)
-            
+
             if 1 < page < end_index < len(self.objects):
                 keyboard_builder.row(prev_button, count_button, next_button)
-            
+
             if page > 1 and page == total_pages:
                 keyboard_builder.row(prev_button, count_button, empty_button)
-        
+
         return keyboard_builder.as_markup()

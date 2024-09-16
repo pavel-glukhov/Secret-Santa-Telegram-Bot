@@ -19,7 +19,7 @@ async def left_room(callback: types.CallbackQuery,
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
     await RoomRepo(session).remove_member(user_id, room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             app_text_msg.buttons.return_back_button: "root_menu",
@@ -28,7 +28,7 @@ async def left_room(callback: types.CallbackQuery,
     message_text = app_text_msg.messages.rooms_menu.unsubscribe.unsubscribe_first_msg.format(
         room_number=room_number
     )
-    
+
     await callback.message.edit_text(
         text=message_text,
     )

@@ -23,10 +23,10 @@ async def delete_user_information(callback: types.CallbackQuery,
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.profile_menu.delete_information.delete_information_first_msg
-    
+
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(DeleteUserInformation.waiting_for_conformation)
 
@@ -38,13 +38,13 @@ async def process_deleting_information_invalid(message: types.Message,
                                                app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     await message.delete()
-    
+
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.profile_menu.delete_information.error
-    
+
     return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
 
@@ -56,7 +56,7 @@ async def process_deleting_information(message: types.Message,
                                        app_text_msg: TranslationMainSchema):
     user_id = message.chat.id
     state_data = await state.get_data()
-    
+
     await message.delete()
     bot_message = state_data['bot_message_id']
     data = {
@@ -75,6 +75,6 @@ async def process_deleting_information(message: types.Message,
         }
     )
     message_text = app_text_msg.messages.profile_menu.delete_information.delete_information_second_msg
-    
+
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
     await state.clear()

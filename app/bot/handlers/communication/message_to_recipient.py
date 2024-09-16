@@ -32,7 +32,7 @@ async def message_to_recipient(callback: types.CallbackQuery,
     message_text = app_text_msg.messages.communication_menu.message_to_recipient.first_msg
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(MessageToRecipient.waiting_message)
 
@@ -45,9 +45,9 @@ async def completed_message_to_santa(message: types.Message,
     state_data = await state.get_data()
     room = await RoomRepo(session).get(state_data['room_number'])
     user_id = message.chat.id
-    
+
     await message.delete()
-    
+
     bot_message = state_data['bot_message_id']
     recipient = await GameResultRepo(session).get_recipient(room_id=room.number,
                                                             user_id=user_id)
@@ -64,6 +64,6 @@ async def completed_message_to_santa(message: types.Message,
     await send_message(user_id=recipient.user_id,
                        text=first_message_text)
     second_message_text = app_text_msg.messages.communication_menu.message_to_recipient.msg_was_sent
-    
+
     await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)
     await state.clear()

@@ -35,21 +35,21 @@ async def members_list(callback: types.CallbackQuery,
                 user_name = f'@{member.username} - {member.first_name}'
             elif not member.username and member.last_name:
                 user_name = f'{member.first_name} {member.last_name}'
-            
+
             else:
                 user_name = member.first_name
         else:
             user_name = None
-        
+
         member_string += (
             f'{number}) {user_name}\n')
-    
+
     message_text = app_text_msg.messages.rooms_menu.members.menu_msg.format(
         room_name=room.name,
         room_number=room_number,
         member_string=member_string
     )
-    
+
     await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,

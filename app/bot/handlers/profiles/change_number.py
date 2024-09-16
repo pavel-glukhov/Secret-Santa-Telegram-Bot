@@ -24,12 +24,12 @@ async def change_phone_number(callback: types.CallbackQuery,
     keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
-    
+
     message_text = app_text_msg.messages.profile_menu.change_number.change_number_first_msg
-   
+
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangePhoneNuber.waiting_for_phone_number)
 
@@ -44,9 +44,9 @@ async def process_changing_owner(message: types.Message,
     user_id = message.chat.id
     text = message.text
     bot_message = state_data['bot_message_id']
-    
+
     await message.delete()
-    
+
     cancel_keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
@@ -55,7 +55,7 @@ async def process_changing_owner(message: types.Message,
             app_text_msg.buttons.return_back_button: "profile_edit",
         }
     )
-    
+
     pattern = r'(\+7|\+?7|8|\+?\d{3})\D*\d{3}[\s-]*\d{2}[\s-]*\d{2}|\+?\d{11}'
     if re.search(pattern, phone_number):
         crypt = CryptData(key=load_config().encryption.key)

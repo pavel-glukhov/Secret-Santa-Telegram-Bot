@@ -16,5 +16,3 @@ def get_room_number(callback: types.CallbackQuery) -> int:
         return room_number
     except ValueError:
         return False
-
-

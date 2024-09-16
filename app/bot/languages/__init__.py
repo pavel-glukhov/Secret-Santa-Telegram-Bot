@@ -18,16 +18,18 @@ async def load_language_files_to_redis(directory: str, redis_client: Redis) -> N
     for filename in os.listdir(directory):
         if filename.endswith('.json'):
             file_path = os.path.join(directory, filename)
-            
-            with open(file_path, 'r', encoding='utf-8') as f:
-                lang: dict = json.load(f)
-                lang_name = list(lang.keys())[0]
-                language_selection_message = language_selection_message + lang.get(
-                    lang_name).get('messages').get('main_menu').get('language_selection')
-                
-                redis_client.set('language_selection_message', language_selection_message)
-                redis_client.set(f'lang_{lang_name}', json.dumps(lang.get(lang_name), ensure_ascii=False))
-                redis_client.rpush('list_languages', list(lang.keys())[0])
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lang: dict = json.load(f)
+                    lang_name = list(lang.keys())[0]
+                    language_selection_message = language_selection_message + lang.get(
+                        lang_name).get('messages').get('main_menu').get('language_selection')
+                    
+                    redis_client.set('language_selection_message', language_selection_message)
+                    redis_client.set(f'lang_{lang_name}', json.dumps(lang.get(lang_name), ensure_ascii=False))
+                    redis_client.rpush('list_languages', list(lang.keys())[0])
+            except json.decoder.JSONDecodeError as ex:
+                logger.error(f'{filename}: {ex.msg}')
     return None
 
 

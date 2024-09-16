@@ -28,7 +28,7 @@ async def my_profile(callback: types.CallbackQuery,
 
     message_text = app_text_msg.messages.profile_menu.main_menu.menu_message.format(
         user_information=user_information)
-        
+
     await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline

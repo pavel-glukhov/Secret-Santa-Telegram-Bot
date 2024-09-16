@@ -22,15 +22,16 @@ async def change_room_owner(callback: types.CallbackQuery,
                             app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
-    
-    keyboard_inline = generate_inline_keyboard({app_text_msg.buttons.cancel_button: 'cancel'})
-    
+
+    keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.cancel_button: 'cancel'})
+
     message_text = app_text_msg.messages.rooms_menu.change_owner.change_owner_room_first_msg
-    
+
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeOwner.waiting_for_owner_name)
 
@@ -44,42 +45,42 @@ async def process_changing_owner(message: types.Message,
     previous_owner = message.chat.id
     new_owner = message.text
     await message.delete()
-    
+
     bot_message = state_data['bot_message_id']
-    
+
     keyboard_inline = generate_inline_keyboard(
         {
             app_text_msg.buttons.return_back_button: f"room_menu_{room_number}",
         }
     )
     user = await UserRepo(session).get_user_or_none(new_owner)
-    
+
     if user:
         count_rooms = await RoomRepo(session).get_count_user_rooms(user.user_id)
         if count_rooms < load_config().room.user_rooms_count:
             await RoomRepo(session).change_owner(new_owner, room_number)
-            
+
             message_text = app_text_msg.messages.rooms_menu.change_owner.change_owner_room_first_msg.format(
                 new_owner=new_owner
             )
-            
+
             await bot_message.edit_text(
                 text=message_text,
                 reply_markup=keyboard_inline)
-            
+
             await state.clear()
             logger.info(f'The owner [{previous_owner}] of room '
                         f'[{room_number}] has been changed to [{user.user_id}]')
         else:
-            
+
             message_text = ('Данный участник не может '
                             'быть назначен владельцем комнаты.')
-            
+
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()
     else:
         message_text = app_text_msg.messages.rooms_menu.change_owner.user_is_not_exist
-        
+
         await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline)

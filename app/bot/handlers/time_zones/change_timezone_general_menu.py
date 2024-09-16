@@ -24,17 +24,17 @@ router = Router()
 async def get_letter(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(TimeZoneStates.selecting_letter)
     room_number = get_room_number(callback)
-    
+
     if room_number:
         await state.update_data(room_number=room_number)
-    
+
     message_text = (
         "Для смены часового пояса, выберите букву,"
         " на которую начинается страна:"
     )
-    
+
     initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=_get_letter_keyboard())
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(TimeZoneStates.selecting_country)
 
@@ -55,9 +55,10 @@ def _get_letter_keyboard():
     return builder.as_markup()
 
 
-@router.callback_query(F.data.startswith('selected_letter')
-    , StateFilter(TimeZoneStates.selecting_country))
-async def process_letter_callback(callback: types.CallbackQuery, state: FSMContext):
+@router.callback_query(F.data.startswith('selected_letter'),
+                       StateFilter(TimeZoneStates.selecting_country))
+async def process_letter_callback(
+        callback: types.CallbackQuery, state: FSMContext):
     letter = callback.data.split(':')[-1]
     message_text = "Выберите страну:"
     await callback.message.edit_text(message_text,
@@ -68,7 +69,8 @@ async def process_letter_callback(callback: types.CallbackQuery, state: FSMConte
 
 @router.callback_query(F.data.startswith('selected_country'),
                        StateFilter(TimeZoneStates.selecting_timezone))
-async def process_country_callback(callback: types.CallbackQuery, state: FSMContext):
+async def process_country_callback(
+        callback: types.CallbackQuery, state: FSMContext):
     country_code = callback.data.split(':')[-1]
     message_text = 'Выберите таймзону:'
     await callback.message.edit_text(text=message_text,
@@ -84,12 +86,12 @@ async def process_timezone_callback(callback: types.CallbackQuery,
     timezone = callback.data.split(':')[-1]
     state_data = await state.get_data()
     room_number = state_data.get('room_number')
-    
+
     if room_number:
         callback_query = f"room_start-game_{room_number}"
     else:
         callback_query = "profile_edit"
-    
+
     message_text = f"Выбран часовой пояс {timezone}"
     keyboard = {
         "Вернуться назад ◀️": callback_query
@@ -113,8 +115,8 @@ def get_country_keyboard(letter, page=1):
                       ).inline_pagination(page)
 
 
-@router.callback_query(F.data.regexp(r'prev_country:[A-Z]:\d+')
-    , StateFilter(TimeZoneStates.selecting_timezone))
+@router.callback_query(F.data.regexp(r'prev_country:[A-Z]:\d+'), StateFilter(
+    TimeZoneStates.selecting_timezone))
 async def process_prev_country_callback(callback: types.CallbackQuery):
     data = callback.data.split(':')
     letter = data[1]

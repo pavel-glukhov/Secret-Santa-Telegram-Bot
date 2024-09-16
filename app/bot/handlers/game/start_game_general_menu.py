@@ -29,19 +29,19 @@ async def start_game(callback: types.CallbackQuery,
     room_number = get_room_number(callback)
     room_repo = RoomRepo(session)
     user_repo = UserRepo(session)
-    
+
     room_members = await room_repo.get_list_members(room_number)
     task = get_task(task_id=room_number)
     user = await user_repo.get_user_or_none(callback.message.chat.id)
-    
+
     timezone = user.timezone or app_text_msg.messages.game_menu.start_game.time_zone_inf
-    
+
     keyboard = {
         app_text_msg.buttons.game_menu.room_change_game_dt: f"room_change-game-dt_{room_number}",
         app_text_msg.buttons.game_menu.change_time_zone: f"change_time_zone_{room_number}",
         app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
     }
-    
+
     if len(room_members) < 3:
         message_text = app_text_msg.messages.game_menu.start_game.count_players
         keyboard.pop(app_text_msg.buttons.game_menu.change_time_zone)
@@ -53,7 +53,7 @@ async def start_game(callback: types.CallbackQuery,
         else:
             message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
                 timezone=timezone)
-    
+
     keyboard_inline = generate_inline_keyboard(keyboard)
     await callback.message.edit_text(
         text=message_text,
@@ -67,16 +67,16 @@ async def change_game_datetime(callback: types.CallbackQuery,
                                app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
-    
+
     keyboard_inline = generate_inline_keyboard(
         {app_text_msg.buttons.cancel_button: 'cancel'}
     )
-    
+
     message_text = app_text_msg.messages.game_menu.start_game.start_game_first_msg
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline)
-    
+
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(StartGame.waiting_for_datetime)
 
@@ -90,9 +90,9 @@ async def process_waiting_datetime(message: types.Message,
     room_number = state_data['room_number']
     bot_message = state_data['bot_message_id']
     text = message.text
-    
+
     await message.delete()
-    
+
     user = await UserRepo(session).get_user_or_none(message.chat.id)
     timezone = user.timezone
     semaphore = asyncio.Semaphore(1)
@@ -112,23 +112,23 @@ async def process_waiting_datetime(message: types.Message,
     else:
         datetime_obj = _parse_date(text)
         current_time = datetime.now()
-    
+
     if datetime_obj:
         if datetime_obj > current_time:
             if task := get_task(task_id=room_number):
                 task.remove()
-            
+
             add_task(task_func=send_result_of_game, date_time=datetime_obj,
                      task_id=room_number, room_number=room_number,
                      semaphore=semaphore)
-            
+
             await RoomRepo(session).update(room_number, started_at=datetime.now(),
                                            closed_at=None, is_closed=False)
-            
+
             datetime_set_to = datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")
             message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
                 datetime_set_to=datetime_set_to)
-            
+
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()
         else:
@@ -137,7 +137,7 @@ async def process_waiting_datetime(message: types.Message,
             message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
                 current_time_str=current_time_str,
                 datetime_obj_str=datetime_obj_str)
-            
+
             await _incorrect_data_format(bot_message, message_text,
                                          cancel_keyboard_inline)
     else:
@@ -155,21 +155,21 @@ def _parse_date(text) -> datetime | bool:
     time_format_variants = ['%Y,%m,%d,%H,%M', '%Y %m %d %H:%M',
                             '%Y.%m.%d %H:%M', '%Y\\%m\\%d %H:%M',
                             '%Y/%m/%d %H:%M', '%Y %m %d %H %M']
-    
+
     pattern = (r'\d{4}[\s.,/\\]?\d{1,2}[\s.,/\\]?\d{1,2}'
                r'[\s.,/\\]?\d{1,2}[\s.,:/]?\d{1,2}')
     matches = re.findall(pattern, text)
-    
+
     if matches:
         for time_str in matches:
             for fmt in time_format_variants:
                 try:
                     date_time = datetime.strptime(time_str, fmt)
                     return date_time
-                
+
                 except ValueError:
                     pass
-    
+
     return False
 
 

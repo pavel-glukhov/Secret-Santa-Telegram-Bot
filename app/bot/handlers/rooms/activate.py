@@ -22,9 +22,9 @@ async def members_list(callback: types.CallbackQuery,
         {app_text_msg.buttons.room_menu.main_buttons.return_to_room_menu: f"room_menu_{room_number}"}
     )
     await RoomRepo(session).update(room_number, closed_at=None, is_closed=False)
-    
+
     message_text = app_text_msg.messages.rooms_menu.activate.activate_msg
-    
+
     await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline,

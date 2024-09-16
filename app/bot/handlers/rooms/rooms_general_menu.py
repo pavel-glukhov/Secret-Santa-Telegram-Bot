@@ -21,20 +21,21 @@ async def my_room(callback: types.CallbackQuery,
                   app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
-    
+
     room_repo = RoomRepo(session)
     room = await room_repo.get(room_number)
     is_room_owner = await room_repo.is_owner(user_id=user_id, room_number=room_number)
-    
+
     if room.is_closed:
         await _room_is_closed(callback, room.number, user_id, session, app_text_msg)
         return
-    
+
     scheduler_task = get_task(room_number)
-    keyboard_dict = _generate_keyboard_dict(room_number, is_room_owner, scheduler_task, app_text_msg)
-    
+    keyboard_dict = _generate_keyboard_dict(
+        room_number, is_room_owner, scheduler_task, app_text_msg)
+
     message_text = _generate_message_text(room, scheduler_task, app_text_msg)
-    
+
     await callback.message.edit_text(text=message_text, reply_markup=generate_inline_keyboard(keyboard_dict))
 
 
@@ -47,13 +48,14 @@ def _generate_keyboard_dict(room_number: int,
         app_text_msg.buttons.room_menu.user_room_buttons.room_exit: f'room_exit_{room_number}',
         app_text_msg.buttons.return_back_button: 'root_menu',
     }
-    
+
     if is_room_owner:
         start_game_button_name = (app_text_msg.buttons.room_menu.user_room_buttons.started_game
                                   if scheduler_task
                                   else app_text_msg.buttons.room_menu.user_room_buttons.start_game)
-        is_not_owner_keyboard.pop(app_text_msg.buttons.room_menu.user_room_buttons.room_exit)
-        
+        is_not_owner_keyboard.pop(
+            app_text_msg.buttons.room_menu.user_room_buttons.room_exit)
+
         owner_keyboard = {
             start_game_button_name: f'room_start-game_{room_number}',
             app_text_msg.buttons.room_menu.user_room_buttons.room_member_list: f'room_member-list_{room_number}',
@@ -70,7 +72,7 @@ def _generate_message_text(room, scheduler_task, app_text_msg) -> str:
         room_number=room.number,
         room_budget=room.budget
     )
-    
+
     if scheduler_task:
         next_time_run = scheduler_task.next_run_time.strftime("%Y-%b-%d")
         text_control_room += app_text_msg.messages.rooms_menu.main.text_control_room_scheduler.format(
@@ -78,7 +80,7 @@ def _generate_message_text(room, scheduler_task, app_text_msg) -> str:
         )
     else:
         text_control_room += app_text_msg.messages.rooms_menu.main.text_control_room_not_scheduler
-    
+
     return text_control_room
 
 
@@ -89,16 +91,18 @@ async def _room_is_closed(callback: types.CallbackQuery,
                           app_text_msg: TranslationMainSchema) -> None:
     game_result_repo = GameResultRepo(session)
     room_repo = RoomRepo(session)
-    
+
     game_results = await game_result_repo.get_room_id_count(room_id=room_number)
     room_owner = await room_repo.is_owner(user_id=user_id, room_number=room_number)
-    
+
     if game_results <= 0:
-        message_text, keyboard_dict = _generate_inactive_room_response(room_number, room_owner, app_text_msg)
+        message_text, keyboard_dict = _generate_inactive_room_response(
+            room_number, room_owner, app_text_msg)
     else:
         recipient = await game_result_repo.get_recipient(room_id=room_number, user_id=user_id)
-        message_text, keyboard_dict = _generate_active_room_response(room_number, recipient, app_text_msg)
-    
+        message_text, keyboard_dict = _generate_active_room_response(
+            room_number, recipient, app_text_msg)
+
     await callback.message.edit_text(text=message_text, reply_markup=generate_inline_keyboard(keyboard_dict))
 
 
@@ -110,18 +114,18 @@ def _generate_inactive_room_response(room_number: int,
         app_text_msg.buttons.room_menu.user_room_buttons.configuration: f'room_config_{room_number}',
         app_text_msg.buttons.return_back_button: 'root_menu',
     }
-    
+
     if not room_owner:
         del keyboard_dict[app_text_msg.buttons.room_menu.user_room_buttons.room_activate]
         del keyboard_dict[app_text_msg.buttons.room_menu.user_room_buttons.configuration]
-    
+
     message_text = app_text_msg.messages.rooms_menu.main.room_closed_uns.format(
         room_number=room_number
     )
-    
+
     if room_owner:
         message_text += app_text_msg.messages.rooms_menu.main.room_closed_uns_for_own
-    
+
     return message_text, keyboard_dict
 
 
@@ -133,9 +137,9 @@ def _generate_active_room_response(room_number: int,
         app_text_msg.buttons.room_menu.user_room_buttons.room_closed_con_rec: f'room_closed-con-rec_{room_number}',
         app_text_msg.buttons.return_back_button: 'root_menu'
     }
-    
+
     user_information = profile_information_formatter(recipient)
-    
+
     message_text = app_text_msg.messages.rooms_menu.main.room_closed_suc.format(
         user_information=user_information
     )
