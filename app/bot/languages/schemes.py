@@ -233,6 +233,13 @@ class WishesMenuButtons(BaseModel):
     change_wish: str
 
 
+class MainAppMenu(BaseModel):
+    create_room: str
+    join_room: str
+    about: str
+    user_profile: str
+
+
 class Buttons(BaseModel):
     return_back_button: str
     cancel_button: str
@@ -241,6 +248,7 @@ class Buttons(BaseModel):
     room_menu: RoomMenuButtons
     game_menu: GameMenuButtons
     wishes_menu: WishesMenuButtons
+    main_menu: MainAppMenu
 
 
 class Formatter(BaseModel):
@@ -251,6 +259,7 @@ class Formatter(BaseModel):
     address: str
     number: str
     timezone: str
+    your_room: str
 
 
 class MessageFormatter(BaseModel):

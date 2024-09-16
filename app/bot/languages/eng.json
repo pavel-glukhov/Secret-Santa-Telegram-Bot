@@ -180,6 +180,12 @@
       },
       "wishes_menu": {
         "change_wish": "Edit wish ✒️"
+      },
+      "main_menu": {
+        "create_room": "Create a room \uD83D\uDD28",
+        "join_room": "Join a room \uD83C\uDFE0",
+        "about": "About the game ℹ️",
+        "user_profile": "My profile \uD83D\uDC64"
       }
     },
     "formatter": {
@@ -189,7 +195,8 @@
       "full_name": "<b>Full name</b>",
       "address": "<b>Address</b>",
       "number": "<b>Phone number</b>",
-      "timezone": "<b>Time zone</b>"
+      "timezone": "<b>Time zone</b>",
+      "your_room": "Your room"
     },
     "message_formatter": {
       "address_is_not_specified": "The player did not provide their address, contact the participant via chat to clarify the information",

@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema
 from app.bot.states.profiles import ChangeAddress
 from app.config import load_config
 from app.store.database.queries.users import UserRepo
@@ -15,35 +16,27 @@ router = Router()
 
 
 @router.callback_query(F.data == 'profile_edit_address')
-async def change_user_address(callback: types.CallbackQuery, state: FSMContext):
+async def change_user_address(callback: types.CallbackQuery,
+                              state: FSMContext,
+                              app_text_msg: TranslationMainSchema):
     keyboard_inline = generate_inline_keyboard(
-        {"Отмена": 'cancel'}
+        {app_text_msg.buttons.cancel_button: 'cancel'}
     )
     
-    message_text = (
-        'Для того, что бы ваш Тайный Санта смог отправить вам посылку, '
-        'напишите ваш адрес куда необходимо отправить посылку'
-        ' и не забудьте указать:\n\n'
-        '<b>— Страну</b>\n'
-        '<b>— область</b>\n'
-        '<b>— город</b>\n'
-        '<b>— улицу</b>\n'
-        '<b>— дом</b>\n'
-        '<b>— квартиру</b>\n'
-        '<b>— этаж</b>*\n'
-        '<b>— номер на домофоне, если отличается от квартиры</b>\n'
-        '<b>— индекс</b>\n\n'
-        '<b>Например: Россия, Московская область, г. Фрязино, ул. Пупкина,'
-        ' д. 99, кв. 999, этаж 25, индекс 123987.</b>\n'
-    )
-    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    message_text = app_text_msg.messages.profile_menu.change_address.change_address_first_msg
+
+    initial_bot_message = await callback.message.edit_text(text=message_text,
+                                                           reply_markup=keyboard_inline)
     
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeAddress.waiting_for_address_information)
 
 
 @router.message(ChangeAddress.waiting_for_address_information)
-async def process_changing_owner(message: types.Message, state: FSMContext, session: Session):
+async def process_changing_owner(message: types.Message,
+                                 state: FSMContext,
+                                 session: Session,
+                                 app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     address = message.text
     user_id = message.chat.id
@@ -53,7 +46,7 @@ async def process_changing_owner(message: types.Message, state: FSMContext, sess
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "profile_edit",
+            app_text_msg.buttons.return_back_button: "profile_edit",
         }
     )
     
@@ -63,13 +56,11 @@ async def process_changing_owner(message: types.Message, state: FSMContext, sess
         await UserRepo(session).update_user(user_id, encrypted_address=encrypted_data)
         logger.info(f'The user [{user_id}] updated an address.')
         
-        message_text = 'Адрес изменен.'
+        message_text = app_text_msg.messages.profile_menu.change_address.change_address_second_msg
         
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
         await state.clear()
     else:
-        message_text = (
-            'Адресные данные не могут превышать 150 символов.'
-            ' Попробуйте снова.'
-        )
+        message_text = app_text_msg.messages.profile_menu.change_address.error
+    
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)

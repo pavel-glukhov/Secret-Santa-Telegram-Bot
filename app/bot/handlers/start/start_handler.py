@@ -24,33 +24,33 @@ async def cancel_handler(callback: types.CallbackQuery, state: FSMContext, sessi
 @router.message(Command(commands=["start"]))
 async def start(message: types.Message, state: FSMContext,
                 session: Session,
-                language: TranslationMainSchema,
+                app_text_msg: TranslationMainSchema,
                 available_languages: list):
-    if not language:
+    if not app_text_msg:
         await select_language(message, available_languages)
         return
     await state.clear()
-    message_text = language.messages.main_menu.start_message
+    message_text = app_text_msg.messages.main_menu.start_message
     
     await message.answer(text=message_text)
-    await root_menu(message, session=session, language=language, edit_message=False)
+    await root_menu(message, session=session, language=app_text_msg, edit_message=False)
 
 
 @router.callback_query(F.data == 'root_menu')
 @router.message(Command(commands=['menu']))
 async def root_menu(data: types.Message | types.CallbackQuery,
                     session: Session,
-                    language: TranslationMainSchema,
+                    app_text_msg: TranslationMainSchema,
                     edit_message=True):
     message = data.message if isinstance(data, types.CallbackQuery) else data
     
     user = await create_user_or_enable(message, session)
-    keyboard = await create_common_keyboards(message, session)
+    keyboard = await create_common_keyboards(message, session, app_text_msg)
     
     is_profile_filled_out = all([user.encrypted_address, user.encrypted_number])
     
-    text_reminder_notification_for_user = language.messages.main_menu.menu_reminder
-    text_menu_message = language.messages.main_menu.menu
+    text_reminder_notification_for_user = app_text_msg.messages.main_menu.menu_reminder
+    text_menu_message = app_text_msg.messages.main_menu.menu
     
     message_text = (
         text_menu_message if is_profile_filled_out
