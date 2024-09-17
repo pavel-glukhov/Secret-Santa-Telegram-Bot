@@ -4,6 +4,7 @@ import logging
 import random
 
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema, language_return_dataclass
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
@@ -11,6 +12,7 @@ from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.wishes import WishRepo
 from app.store.database.sessions import get_session
+from app.store.redis import get_redis_client
 from app.store.scheduler.operations import remove_task
 
 logger = logging.getLogger(__name__)
@@ -29,7 +31,7 @@ class Person:
         self.to_send = player_to_send
 
 
-async def creating_active_users_pool(room_number, session):
+async def creating_active_users_pool(room_number, session, radis_client) -> list:
     room_members = await RoomRepo(session).get_list_members(room_number)
     row_list_players = [member for member in room_members]
     verified_users_list = []
@@ -45,7 +47,8 @@ async def creating_active_users_pool(room_number, session):
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
                 'player_contact_number': player.get_number(),
-                'player_wish': wish.wish
+                'player_wish': wish.wish,
+                'player_language': await language_return_dataclass(radis_client, player.language)
             }
             
             verified_users_list.append(player_information)
@@ -54,12 +57,13 @@ async def creating_active_users_pool(room_number, session):
     return verified_users_list
 
 
-async def send_result_of_game(room_number, semaphore) -> None:
+async def send_result_of_game(room_number,
+                              semaphore) -> None:
     session_generator = get_session()
     session = next(session_generator)
-    
+    redis_client = get_redis_client()
     async with semaphore:
-        verified_users = await creating_active_users_pool(room_number, session)
+        verified_users = await creating_active_users_pool(room_number, session, redis_client)
         
         if not _check_sending_capability(verified_users):
             return await _insufficient_number_players(room_number, session)
@@ -89,6 +93,8 @@ async def _prepare_sending_data(verified_users: list, room_number: int, session)
         receiver_last_name = person.to_send.player["player_last_name"]
         address_to_send = person.to_send.player['player_address']
         phone_to_send = person.to_send.player['player_contact_number']
+        player_language = person.to_send.player['player_language']
+        
         wish_to_send = (
             person.to_send.player['player_wish']
             if person.to_send.player['player_wish'] else ''
@@ -102,11 +108,12 @@ async def _prepare_sending_data(verified_users: list, room_number: int, session)
                                          receiver_last_name,
                                          address_to_send,
                                          phone_to_send,
-                                         wish_to_send)
+                                         wish_to_send,
+                                         player_language)
         sending_data.append(
             {
                 'user_id': person.player['player_id'],
-                'text': message_text
+                'text': message_text,
             }
         )
     return sending_data
@@ -119,13 +126,15 @@ def _check_sending_capability(verified_users):
     return True
 
 
-async def _insufficient_number_players(room_number: int, session) -> None:
+async def _insufficient_number_players(room_number: int,
+                                       session) -> None:
     room = await RoomRepo(session).get(room_number)
     owner = await room.owner
+    app_language = await language_return_dataclass(get_redis_client(), owner.language)
     
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "root_menu",
+            app_language.buttons.return_back_button: "root_menu",
         }
     )
     await RoomRepo(session).update(room_number,
@@ -133,17 +142,9 @@ async def _insufficient_number_players(room_number: int, session) -> None:
                                    closed_at=datetime.datetime.now())
     
     remove_task(room_number)
-    
-    message_text = (
-        f'Вы получили данное сообщение, т.к. '
-        f'рассылка в вашей комнате '
-        f'[<b>{room.name}</b>] '
-        f'была указана на данную дату.\n\n К сожалению, '
-        f'в вашей комнате недостаточно '
-        'активных игроков.\n\n'
-        'Активных игроков должно быть 3 или более.\n\n'
-        '<b>Пригласите больше игроков и задайте '
-        'новую дату жеребьевки</b>')
+    message_text = app_language.result_mailing.message_text.format(
+        room_name=room.name
+    )
     
     await send_message(
         user_id=owner.user_id,
