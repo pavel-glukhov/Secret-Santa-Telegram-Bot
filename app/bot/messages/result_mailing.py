@@ -95,7 +95,7 @@ async def _prepare_sending_data(
         receiver_last_name = person.to_send.player["player_last_name"]
         address_to_send = person.to_send.player['player_address']
         phone_to_send = person.to_send.player['player_contact_number']
-        player_language = person.to_send.player['player_language']
+        player_language = person.player['player_language']
 
         wish_to_send = (
             person.to_send.player['player_wish']
@@ -131,7 +131,7 @@ def _check_sending_capability(verified_users):
 async def _insufficient_number_players(room_number: int,
                                        session) -> None:
     room = await RoomRepo(session).get(room_number)
-    owner = await room.owner
+    owner = room.owner
     app_language = await language_return_dataclass(get_redis_client(), owner.language)
 
     keyboard_inline = generate_inline_keyboard(

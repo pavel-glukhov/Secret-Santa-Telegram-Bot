@@ -130,7 +130,7 @@ async def process_waiting_datetime(message: types.Message,
                                            closed_at=None, is_closed=False)
 
             datetime_set_to = datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")
-            message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
+            message_text = app_text_msg.messages.game_menu.start_game.time_set_to.format(
                 datetime_set_to=datetime_set_to)
 
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
