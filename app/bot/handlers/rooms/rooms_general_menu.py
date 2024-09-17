@@ -2,11 +2,11 @@ import logging
 
 from aiogram import F, Router, types
 from sqlalchemy.orm import Session
-from app.bot.languages import TranslationMainSchema
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema
 from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.scheduler.operations import get_task

@@ -16,7 +16,7 @@ def message_formatter(
                else player_language.message_formatter.address_is_not_specified)
     number = (receiver_phone if receiver_phone
               else player_language.message_formatter.number_is_not_specified)
-    
+
     full_name = (
         f'{first_name} {last_name}' if all([first_name, last_name])
         else first_name

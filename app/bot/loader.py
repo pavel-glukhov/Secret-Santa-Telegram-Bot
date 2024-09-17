@@ -7,5 +7,8 @@ from app.config import load_config
 
 config = load_config()
 
-bot = Bot(config.bot.token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(
+    config.bot.token,
+    default=DefaultBotProperties(
+        parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())

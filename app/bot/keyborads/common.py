@@ -28,7 +28,7 @@ async def create_common_keyboards(message: types.Message, session: Session,
         )
     user_id = message.chat.id
     user_rooms = await RoomRepo(session).get_all_users_of_room(user_id)
-    
+
     if user_rooms:
         for room in user_rooms:
             owner = room.owner
@@ -49,11 +49,12 @@ async def create_common_keyboards(message: types.Message, session: Session,
         }
     )
     keyboard_inline = generate_inline_keyboard(keyboard_dict)
-    
+
     return keyboard_inline
 
 
-def personal_room_keyboard_formatter(room: Room, is_owner: bool, text_message: str) -> str:
+def personal_room_keyboard_formatter(
+        room: Room, is_owner: bool, text_message: str) -> str:
     """
     Formatter for user's room button.
     Showing different message if user is owner of room.

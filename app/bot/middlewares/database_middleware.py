@@ -6,9 +6,10 @@ from sqlalchemy.orm import scoped_session
 
 
 class DatabaseMiddleware(BaseMiddleware):
-    def __init__(self, session_factory: Callable[[], Generator[scoped_session, None, None]]) -> None:
+    def __init__(self, session_factory: Callable[[
+    ], Generator[scoped_session, None, None]]) -> None:
         self.session_factory = session_factory
-    
+
     async def __call__(
             self,
             handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],

@@ -3,7 +3,6 @@ import logging
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
-from app.bot.languages import TranslationMainSchema
 
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
