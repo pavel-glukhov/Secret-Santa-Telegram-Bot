@@ -127,12 +127,12 @@
         "message_to_recipient": {
           "first_msg": "Write the message you want to send to your recipient. \uD83D\uDE4D\u200D♂",
           "msg_was_sent": "Your message to the recipient has been sent.",
-          "msg_text": "<b>Message from Secret Santa:</b>\nRoom: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+          "msg_text": "<b>Message from Secret Santa:</b>\nRoom: {room_name} [{room_number}]\n------------\n\n{text_message}\n\n------------\n\n"
         },
         "message_to_sender": {
           "first_msg": "Write the message you want to send to your Secret Santa. \uD83C\uDF85",
           "msg_was_sent": "Your message to Santa has been sent",
-          "msg_text": "<b>Message from your recipient:</b>\nRoom: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+          "msg_text": "<b>Message from your recipient:</b>\nRoom: {room_name} [{room_number}]\n------------\n\n{text_message}\n\n------------\n\n"
         }
       }
     },

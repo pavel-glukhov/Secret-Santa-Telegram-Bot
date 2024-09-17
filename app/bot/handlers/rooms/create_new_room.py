@@ -37,9 +37,10 @@ async def create_room(callback: types.CallbackQuery,
             text=message_text,
             reply_markup=keyboard_inline
         )
-
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'})
+        {cancel_button: 'cancel'})
     message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
@@ -59,12 +60,17 @@ async def process_name(message: types.Message,
     bot_message = state_data['bot_message_id']
     await state.update_data(room_name=room_name)
     await state.update_data(budget_question_id=message.message_id)
-    keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'})
 
-    if not len(room_name) > 16:
+    cancel_button = app_text_msg.buttons.cancel_button
+    
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
+
+    if not len(room_name) < 17:
+        cancel_button = app_text_msg.buttons.cancel_button
+        
         keyboard_inline = generate_inline_keyboard(
-            {app_text_msg.buttons.cancel_button: 'cancel'})
+            {cancel_button: 'cancel'})
         message_text = app_text_msg.messages.rooms_menu.create_new_room.long_room_name
 
         return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
@@ -86,8 +92,10 @@ async def process_budget_invalid(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'})
+        {cancel_button: 'cancel'})
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
 
@@ -104,8 +112,10 @@ async def process_budget(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'})
+        {cancel_button: 'cancel'})
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
 

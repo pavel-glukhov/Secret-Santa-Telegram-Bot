@@ -19,8 +19,10 @@ router = Router()
 async def join_room(callback: types.CallbackQuery,
                     state: FSMContext,
                     app_text_msg: TranslationMainSchema):
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.rooms_menu.subscribe.subscribe_first_msg
     initial_bot_message = await callback.message.edit_text(text=message_text,
@@ -44,18 +46,21 @@ async def process_room_number(message: types.Message,
 
     if not room_number.isdigit():
         text_message = app_text_msg.messages.rooms_menu.subscribe.number_error
+        cancel_button = app_text_msg.buttons.cancel_button
+        
         return await _edit_bot_message(
             bot_message_id,
             text_message,
-            {app_text_msg.buttons.cancel_button: 'cancel'}
+            {cancel_button: 'cancel'}
         )
 
     room = await RoomRepo(session).get(room_number=int(room_number))
-
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     if not room or room.is_closed:
         return await _is_not_exists_room(bot_message_id,
                                          room_number,
-                                         {app_text_msg.buttons.cancel_button: 'cancel'},
+                                         {cancel_button: 'cancel'},
                                          app_text_msg)
 
     is_member_of_room = await RoomRepo(session).is_member(user_id=message.chat.id,
@@ -92,8 +97,9 @@ async def _request_wishes(bot_message_id, state, text, app_text_msg):
     await state.set_state(JoinRoom.waiting_for_wishes)
 
     message_text = text.messages.rooms_menu.subscribe.subscribe_second_msg
-
-    await _edit_bot_message(bot_message_id, message_text, {app_text_msg.buttons.cancel_button: 'cancel'})
+    cancel_button = app_text_msg.buttons.cancel_button
+    
+    await _edit_bot_message(bot_message_id, message_text, {cancel_button: 'cancel'})
 
 
 async def _is_not_exists_room(message, room_number, keyboard_inline, text):

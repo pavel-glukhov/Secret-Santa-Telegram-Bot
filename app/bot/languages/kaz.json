@@ -127,12 +127,12 @@
         "message_to_recipient": {
           "first_msg": "Алушыңызға жібергіңіз келетін хабарламаны жазыңыз. \uD83D\uDE4D\u200D♂",
           "msg_was_sent": "Алушыңызға хабарлама жіберілді.",
-          "msg_text": "<b>Құпия Сантаның хабарламасы:</b>\nБөлме: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+          "msg_text": "<b>Құпия Сантаның хабарламасы:</b>\nБөлме: {room_name} [{room_number}]\n------------\n\n{text_message}\n\n------------\n\n"
         },
         "message_to_sender": {
           "first_msg": "Құпия Сантанызға жібергіңіз келетін хабарламаны жазыңыз. \uD83C\uDF85",
           "msg_was_sent": "Сантаға хабарлама жіберілді",
-          "msg_text": "<b>Алушыңыздан келген хабарлама:</b>\nБөлме: {room_name} {[room_number]}\n------------\n\n{text_message}\n\n------------\n\n"
+          "msg_text": "<b>Алушыңыздан келген хабарлама:</b>\nБөлме: {room_name} [{room_number}]\n------------\n\n{text_message}\n\n------------\n\n"
         }
       }
     },

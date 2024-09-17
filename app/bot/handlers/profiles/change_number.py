@@ -21,8 +21,10 @@ router = Router()
 async def change_phone_number(callback: types.CallbackQuery,
                               state: FSMContext,
                               app_text_msg: TranslationMainSchema):
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
 
     message_text = app_text_msg.messages.profile_menu.change_number.change_number_first_msg
@@ -46,9 +48,10 @@ async def process_changing_owner(message: types.Message,
     bot_message = state_data['bot_message_id']
 
     await message.delete()
-
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     cancel_keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
     keyboard_inline = generate_inline_keyboard(
         {

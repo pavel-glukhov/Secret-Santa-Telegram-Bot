@@ -19,8 +19,9 @@ router = Router()
 async def change_user_address(callback: types.CallbackQuery,
                               state: FSMContext,
                               app_text_msg: TranslationMainSchema):
+    cancel_button = app_text_msg.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
 
     message_text = app_text_msg.messages.profile_menu.change_address.change_address_first_msg

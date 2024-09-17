@@ -67,9 +67,11 @@ async def change_game_datetime(callback: types.CallbackQuery,
                                app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
+    
+    cancel_button = app_text_msg.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
 
     message_text = app_text_msg.messages.game_menu.start_game.start_game_first_msg
@@ -96,8 +98,10 @@ async def process_waiting_datetime(message: types.Message,
     user = await UserRepo(session).get_user_or_none(message.chat.id)
     timezone = user.timezone
     semaphore = asyncio.Semaphore(1)
+    
+    cancel_button = app_text_msg.buttons.cancel_button
     cancel_keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
     keyboard_inline = generate_inline_keyboard(
         {

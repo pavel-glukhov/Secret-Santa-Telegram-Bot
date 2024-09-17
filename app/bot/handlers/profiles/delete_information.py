@@ -19,8 +19,10 @@ router = Router()
 async def delete_user_information(callback: types.CallbackQuery,
                                   state: FSMContext,
                                   app_text_msg: TranslationMainSchema):
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.profile_menu.delete_information.delete_information_first_msg
 
@@ -40,8 +42,10 @@ async def process_deleting_information_invalid(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
-        {app_text_msg.buttons.cancel_button: 'cancel'}
+        {cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.profile_menu.delete_information.error
 
