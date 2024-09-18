@@ -141,6 +141,7 @@
       "cancel_button": "Cancel",
       "continue_button": "Continue",
       "menu": "Menu ◀️",
+      "reply": "Reply",
       "profile_menu": {
         "change_profile": "Edit profile \uD83D\uDC4B",
         "profile_edit_name": "Edit name",

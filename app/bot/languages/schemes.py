@@ -246,6 +246,7 @@ class Buttons(BaseModel):
     cancel_button: str
     continue_button: str
     menu: str
+    reply: str
     profile_menu: ButtonsProfileMenu
     room_menu: RoomMenuButtons
     game_menu: GameMenuButtons
