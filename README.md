@@ -67,11 +67,10 @@
 
 1. Aiogram 3
 2. FastAPI
-3. Jinja2
-4. SQLAlchemy 2
-5. Alemnic
-6. PostgreSQL
-7. Redis
+3. SQLAlchemy 2
+4. Alemnic
+5. PostgreSQL
+6. Redis
 
 ### Запуск Бота:
 
