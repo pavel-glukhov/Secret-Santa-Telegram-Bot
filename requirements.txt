@@ -12,3 +12,4 @@ SQLAlchemy==2.0.35
 alembic
 psycopg2
 pycountry
+requests
