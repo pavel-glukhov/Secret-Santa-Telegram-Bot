@@ -56,14 +56,21 @@ async def completed_message_to_santa(message: types.Message,
                                                       user_id=user_id)
 
     sender_language = await UserRepo(session).get_user_language(sender.user_id)
-    sender_app_language = await language_return_dataclass(get_redis_client(), sender_language)
+    sender_app_lng = await language_return_dataclass(get_redis_client(), sender_language)
     
-    first_message_text = sender_app_language.messages.communication_menu.message_to_sender.msg_text.format(
+    first_message_text = sender_app_lng.messages.communication_menu.message_to_sender.msg_text.format(
         room_name=room.name,
         room_number=room.number,
         text_message=message.text)
+    
+    # TODO сделать что бы не редактировалось сообщение. Добавить ответить
 
-    await send_message(user_id=sender.user_id, text=first_message_text)
+    inline_keyboard = {
+        sender_app_lng.buttons.room_menu.main_buttons.return_to_room_menu: f"room_menu_{room.number}"
+    }
+    await send_message(user_id=sender.user_id,
+                       text=first_message_text,
+                       inline_keyboard=inline_keyboard)
     second_message_text = app_text_msg.messages.communication_menu.message_to_sender.msg_was_sent
 
     keyboard_inline = generate_inline_keyboard(

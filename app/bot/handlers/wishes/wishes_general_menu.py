@@ -28,7 +28,6 @@ async def show_wishes(callback: types.CallbackQuery,
 
         }
     )
-
     user_id = message.chat.id
     wishes = await WishRepo(session).get(user_id, room_number)
 

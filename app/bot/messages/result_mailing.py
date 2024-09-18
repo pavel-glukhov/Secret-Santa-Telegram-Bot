@@ -116,6 +116,7 @@ async def _prepare_sending_data(
             {
                 'user_id': person.player['player_id'],
                 'text': message_text,
+                'player_language': player_language
             }
         )
     return sending_data

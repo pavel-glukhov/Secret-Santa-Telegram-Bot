@@ -62,18 +62,21 @@ async def completed_message_to_santa(message: types.Message,
         }
     )
     recipient_language = await UserRepo(session).get_user_language(recipient.user_id)
-    recipient_app_language = await language_return_dataclass(get_redis_client(), recipient_language)
+    recipient_app_lng = await language_return_dataclass(get_redis_client(), recipient_language)
     
-    first_message_text = recipient_app_language.messages.communication_menu.message_to_recipient.msg_text.format(
+    first_message_text = recipient_app_lng.messages.communication_menu.message_to_recipient.msg_text.format(
         room_name=room.name,
         room_number=room.number,
         text_message=message.text,
     )
-    
+    # TODO сделать что бы не редактировалось сообщение.
     logger.info(first_message_text)
-    
+    inline_keyboard = {
+        recipient_app_lng.buttons.room_menu.main_buttons.return_to_room_menu: f"room_menu_{room.number}"
+    }
     await send_message(user_id=recipient.user_id,
-                       text=first_message_text)
+                       text=first_message_text,
+                       inline_keyboard=inline_keyboard)
     second_message_text = app_text_msg.messages.communication_menu.message_to_recipient.msg_was_sent
     
     await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)

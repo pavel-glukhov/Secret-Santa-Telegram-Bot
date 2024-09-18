@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 from aiogram import F, Router, types
@@ -74,7 +74,11 @@ async def change_game_datetime(callback: types.CallbackQuery,
         {cancel_button: 'cancel'}
     )
 
-    message_text = app_text_msg.messages.game_menu.start_game.start_game_first_msg
+    example_date = datetime.now() + timedelta(days=30)
+    example = f"{example_date.strftime('%Y.%m.%d')} 13:00"
+    message_text = app_text_msg.messages.game_menu.start_game.start_game_first_msg.format(
+        example=example
+    )
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline)
@@ -129,15 +133,15 @@ async def process_waiting_datetime(message: types.Message,
             await RoomRepo(session).update(room_number, started_at=datetime.now(),
                                            closed_at=None, is_closed=False)
 
-            datetime_set_to = datetime_obj.strftime("%Y-%b-%d, %H:%M:%S")
+            datetime_set_to = datetime_obj.strftime("%Y.%m.%d %H:%M")
             message_text = app_text_msg.messages.game_menu.start_game.time_set_to.format(
                 datetime_set_to=datetime_set_to)
 
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()
         else:
-            current_time_str = current_time.strftime('%Y-%b-%d, %H:%M:%S')
-            datetime_obj_str = datetime_obj.strftime('%Y-%b-%d, %H:%M:%S')
+            current_time_str = current_time.strftime("%Y.%m.%d %H:%M")
+            datetime_obj_str = datetime_obj.strftime("%Y.%m.%d %H:%M")
             message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
                 current_time_str=current_time_str,
                 datetime_obj_str=datetime_obj_str)

@@ -78,7 +78,7 @@ async def process_changing_budget(message: types.Message,
     )
     await RoomRepo(session).update(room_number, budget=new_budget)
 
-    message_text = app_text_msg.messages.rooms_menu.change_budget.long_budget.format(
+    message_text = app_text_msg.messages.rooms_menu.change_budget.change_budget_second_msg.format(
         room_number=room_number,
         new_budget=new_budget
     )
