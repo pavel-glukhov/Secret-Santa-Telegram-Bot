@@ -9,8 +9,6 @@ services:
       - "443:443"
     volumes:
       - ./deploy/nginx/getting_ssl/templates:/etc/nginx/templates
-      - static_value:/var/html/static/
-      - template_value:/var/html/template/
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
     environment:
