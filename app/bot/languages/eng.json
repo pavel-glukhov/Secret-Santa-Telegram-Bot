@@ -21,7 +21,7 @@
         },
         "change_name": {
           "change_name_first_msg": "Hohoho, it's time to provide your details for Santa \uD83C\uDF85\nKeep in mind it will be used to send a gift by Santa.\n\n<b>First, write your first name</b>\n\n",
-          "change_name_second_msg": "<b>Now, provide your last name</b>\n\n",
+          "change_name_second_msg": "Now, provide your last name\n\n",
           "change_name_third_msg": "First name and last name changed."
         },
         "change_number": {
@@ -107,7 +107,7 @@
           "expired_datetime": "You entered a past date. Try again and enter the correct draw date. \n\n<b>Server time:</b> {current_time_str}\n<b>Your specified time:</b> {datetime_obj_str}",
           "incorrect_datetime": "You entered an incorrect date.\n\n Try again and enter the correct draw date.",
           "info_will_be_sent_msg": "<b>The mailing will be sent:</b> {time_to_send}",
-          "start_game_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nTo set the mailing time, send a message in the format\n<b>yyyy.mm.dd h:m</b> - <b>year.month.day hour:minutes</b>\n\n<b>Example: 2023.12.01 12:00</b>"
+          "start_game_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nTo set the mailing time, send a message in the format\n<b>yyyy.mm.dd h:m</b> - <b>year.month.day hour:minutes</b>\n\n<b>Example: {example}</b>"
         }
       },
       "wishes_menu": {
