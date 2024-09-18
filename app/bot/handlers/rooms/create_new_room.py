@@ -1,178 +1,162 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message
-from app.bot.states.rooms import CreateRoom
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema
+from app.bot.states.rooms import CreateRoom
 from app.config import load_config
-from app.store.queries.rooms import RoomRepo
+from app.store.database.queries.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(equals='menu_create_new_room'))
-async def create_room(callback: types.CallbackQuery, ):
-    count_user_rooms = await RoomRepo().get_count_user_rooms(
+@router.callback_query(F.data == 'menu_create_new_room')
+async def create_room(callback: types.CallbackQuery,
+                      state: FSMContext,
+                      session: Session,
+                      app_text_msg: TranslationMainSchema):
+    count_user_rooms = await RoomRepo(session).get_count_user_rooms(
         callback.message.chat.id)
     logger.info(count_user_rooms)
     if count_user_rooms >= load_config().room.user_rooms_count:
         keyboard_inline = generate_inline_keyboard(
             {
-                "Вернуться назад ◀️": "root_menu",
+                app_text_msg.buttons.return_back_button: "root_menu",
             }
         )
-        message_text = (
-            '<b>Новая комната не может быть создана, '
-            'т.к. вы достигли лимита.</b>\n\n '
-            'Вы можете являться владельцем только 10 комнат.'
+        message_text = app_text_msg.messages.rooms_menu.create_new_room.limit.format(
+            maximal_count_rooms=load_config().room.user_rooms_count
         )
+
         return await callback.message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline
         )
+    cancel_button = app_text_msg.buttons.cancel_button
     
-    await CreateRoom.waiting_for_room_name.set()
-    state = dp.get_current().current_state()
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
-    
-    message_text = (
-        'Хо-хо-хо! 🎅\n\n'
-        'Как ты хочешь назвать свою комнату?\n'
-        'Напиши мне ее название и мы пойдем дальше\n\n'
-        'Имя комнаты не должно превышать 16 символов.\n'
-    )
-    
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_first_msg
+
+    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(CreateRoom.waiting_for_room_name)
 
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_name)
-async def process_name(message: types.Message, state: FSMContext):
+@router.message(CreateRoom.waiting_for_room_name)
+async def process_name(message: types.Message,
+                       state: FSMContext,
+                       app_text_msg: TranslationMainSchema):
     room_name = message.text
     state_data = await state.get_data()
-    last_message = state_data['last_message']
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
     await state.update_data(room_name=room_name)
     await state.update_data(budget_question_id=message.message_id)
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
-    await delete_user_message(message.from_user.id, message.message_id)
+
+    cancel_button = app_text_msg.buttons.cancel_button
     
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
+
     if not len(room_name) < 17:
-        keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+        cancel_button = app_text_msg.buttons.cancel_button
         
-        message_text = (
-            'Вы ввели слишком длинное имя, '
-            'пожалуйста придумайте другое.\n'
-            'Имя комнаты не должно превышать 16 символов.\n'
-        )
-        
-        return await last_message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
-    await CreateRoom.next()
-    
-    message_text = (
-        f'Принято! Имя твоей комнаты <b>{room_name}</b>\n\n'
-        'А теперь укажи максимальный бюджет '
-        'на подарок Тайного Санты.\n'
-        'Напиши в чат сумму в любом формате, '
-        'например 2000 тенге,'
-        '200 рублей или 20$\n\n'
-        'Длина сообщения не должна превышать 16 символов.'
+        keyboard_inline = generate_inline_keyboard(
+            {cancel_button: 'cancel'})
+        message_text = app_text_msg.messages.rooms_menu.create_new_room.long_room_name
+
+        return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await state.set_state(CreateRoom.waiting_for_room_budget)
+
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_second_msg.format(
+        room_name=room_name
     )
-    
-    await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
 
-@dp.message_handler(lambda message:
-                    len(message.text.lower()) > 16,
-                    state=CreateRoom.waiting_for_room_budget)
-async def process_budget_invalid(message: types.Message):
-    state_data = await dp.get_current().current_state().get_data()
-    last_message = state_data['last_message']
-    await delete_user_message(message.from_user.id, message.message_id)
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+@router.message(lambda message:
+                len(message.text.lower()) > 16,
+                StateFilter(CreateRoom.waiting_for_room_budget))
+async def process_budget_invalid(message: types.Message,
+                                 state: FSMContext,
+                                 app_text_msg: TranslationMainSchema):
+    state_data = await state.get_data()
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
+    
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
-    
-    message_text = (
-        'Вы введи слишком длинное сообщение для бюджета.\n '
-        'Длина сообщения не может быть больше 16 символов\n'
-        'Для изменения вашего бюджета, отправьте новое сообщение.\n'
-    )
-    await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.long_budget
+
+    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_budget)
-async def process_budget(message: types.Message, state: FSMContext):
+@router.message(CreateRoom.waiting_for_room_budget)
+async def process_budget(message: types.Message,
+                         state: FSMContext, app_text_msg: TranslationMainSchema):
     await state.update_data(wishes_question_message_id=message.message_id)
     state_data = await state.get_data()
-    last_message = state_data['last_message']
-    keyboard_inline = generate_inline_keyboard({"Отмена": 'cancel'})
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
+    
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
     room_budget = message.text
     await state.update_data(room_budget=room_budget)
-    await delete_user_message(message.from_user.id, message.message_id)
-    
-    await CreateRoom.next()
-    
-    message_text = (
-        f'Принято! Ваш бюджет будет составлять <b>{room_budget}</b>\n\n'
-        'И последний вопрос.\n'
-        'Напиши свои пожелания по подарку. '
-        'Возможно у тебя есть хобби и '
-        'ты хочешь получить что-то особое?\n'
-    )
-    
-    await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
+
+    await state.set_state(CreateRoom.waiting_for_room_wishes)
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_third_msg.format(
+        room_budget=room_budget
     )
 
+    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
-@dp.message_handler(state=CreateRoom.waiting_for_room_wishes)
-async def process_wishes(message: types.Message, state: FSMContext):
+
+@router.message(CreateRoom.waiting_for_room_wishes)
+async def process_wishes(message: types.Message, state: FSMContext, session: Session,
+                         app_text_msg: TranslationMainSchema):
     user_wishes = message.text
     state_data = await state.get_data()
-    last_message = state_data['last_message']
-    keyboard_inline = generate_inline_keyboard({"Меню ◀️": 'root_menu'})
-    await delete_user_message(message.from_user.id, message.message_id)
-    room = await RoomRepo().create(user_wish=user_wishes,
-                                   owner=message.chat.id,
-                                   name=state_data['room_name'],
-                                   budget=state_data['room_budget'])
-    
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
+    keyboard_inline = generate_inline_keyboard(
+        {app_text_msg.buttons.room_menu.main_buttons.menu: 'root_menu'}
+    )
+
+    room = await RoomRepo(session).create(user_wish=user_wishes,
+                                          owner_id=message.chat.id,
+                                          name=state_data['room_name'],
+                                          budget=state_data['room_budget'])
+
     logger.info(
         f'The new room "{room.number}" has been created by {message.chat.id}'
     )
-    message_text = (
-        '"Хо-хо-хо! 🎅\n\n'
-        f'Комната <b>"{room.name}"</b> создана.\n'
-        f'Держи номер комнаты <b>{room.number}</b>\n'
-        f'Этот код нужно сообщить своим друзьям, '
-        f'что бы они присоединились '
-        f'к твоей игре.\n\n'
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_forth_msg.format(
+        room_name=room.name,
+        room_number=room.number
     )
-    
-    await last_message.edit_text(
-        text=message_text,
-    )
-    message_text = "А пока ты можешь вернуться назад и обновить свой профиль"
-    
-    await last_message.answer(
+
+    await bot_message.edit_text(text=message_text)
+    message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_additional_msg
+
+    await bot_message.answer(
         text=message_text,
         reply_markup=keyboard_inline,
     )
-    await state.finish()
+    await state.clear()

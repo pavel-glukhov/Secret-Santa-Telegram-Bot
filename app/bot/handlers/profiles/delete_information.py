@@ -1,75 +1,68 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
-from app.bot import dispatcher as dp
-from app.bot.handlers.operations import delete_user_message
-from app.bot.states.profiles import DeleteUserInformation
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.store.queries.users import UserRepo
+from app.bot.languages import TranslationMainSchema
+from app.bot.states.profiles import DeleteUserInformation
+from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
+router = Router()
 
-# ТЕКСТ ПЕРЕНЕСЕН
 
-@dp.callback_query_handler(Text(equals='profile_edit_delete_all'))
-async def delete_user_information(callback: types.CallbackQuery):
-    await DeleteUserInformation.waiting_for_conformation.set()
-    state = dp.get_current().current_state()
-    keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        }
-    )
-    message_text = (
-        'Напиши <b>подтверждаю</b> для удаления твоих данных из профиля.\n\n'
-    )
+@router.callback_query(F.data == 'profile_edit_delete_all')
+async def delete_user_information(callback: types.CallbackQuery,
+                                  state: FSMContext,
+                                  app_text_msg: TranslationMainSchema):
+    cancel_button = app_text_msg.buttons.cancel_button
     
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'}
+    )
+    message_text = app_text_msg.messages.profile_menu.delete_information.delete_information_first_msg
+
+    initial_bot_message = await callback.message.edit_text(text=message_text,
+                                                           reply_markup=keyboard_inline)
+
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(DeleteUserInformation.waiting_for_conformation)
 
 
-@dp.message_handler(lambda message:
-                    message.text.lower() != 'подтверждаю' or message.text.lower() != 'confirm',
-                    state=DeleteUserInformation.waiting_for_conformation)
-async def process_deleting_information_invalid(message: types.Message):
-    state = dp.get_current().current_state()
+@router.message(lambda message: message.text.lower() not in ['confirm'],
+                StateFilter(DeleteUserInformation.waiting_for_conformation))
+async def process_deleting_information_invalid(message: types.Message,
+                                               state: FSMContext,
+                                               app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
-    last_message = state_data['last_message']
-    await delete_user_message(message.from_user.id, message.message_id)
+    await message.delete()
+
+    bot_message = state_data['bot_message_id']
+    cancel_button = app_text_msg.buttons.cancel_button
     
     keyboard_inline = generate_inline_keyboard(
-        {
-            "Отмена": 'cancel',
-        }
+        {cancel_button: 'cancel'}
     )
-    
-    message_text = (
-        'Вы ввели неверную команду. Попробуйте снова.\n\n'
-        'Для подтверждения, введите слово <b>"подтверждаю"</b>'
-    )
-    return await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
+    message_text = app_text_msg.messages.profile_menu.delete_information.error
+
+    return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
 
-@dp.message_handler(lambda message:
-                    message.text.lower() == 'подтверждаю' or message.text.lower() == 'confirm',
-                    state=DeleteUserInformation.waiting_for_conformation)
+@router.message(lambda message: message.text.lower() in ['confirm'],
+                StateFilter(DeleteUserInformation.waiting_for_conformation))
 async def process_deleting_information(message: types.Message,
-                                       state: FSMContext):
+                                       state: FSMContext,
+                                       session: Session,
+                                       app_text_msg: TranslationMainSchema):
     user_id = message.chat.id
     state_data = await state.get_data()
-    last_message = state_data['last_message']
-    await delete_user_message(message.from_user.id, message.message_id)
-    
+
+    await message.delete()
+    bot_message = state_data['bot_message_id']
     data = {
         'first_name': None,
         'last_name': None,
@@ -77,19 +70,15 @@ async def process_deleting_information(message: types.Message,
         'encrypted_address': None,
         'encrypted_number': None,
     }
-    await UserRepo().update_user(user_id=user_id, **data)
+    await UserRepo(session).update_user(user_id=user_id, **data)
     logger.info(f'The user [{user_id}] deleted personal information.'
                 )
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "menu_user_profile",
+            app_text_msg.buttons.return_back_button: "menu_user_profile",
         }
     )
-    
-    message_text = 'Все данные о вас были удалены.\n\n'
-    
-    await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline
-    )
-    await state.finish()
+    message_text = app_text_msg.messages.profile_menu.delete_information.delete_information_second_msg
+
+    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await state.clear()

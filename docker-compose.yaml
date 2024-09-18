@@ -38,8 +38,6 @@ services:
       - "443:443"
     volumes:
       - ./deploy/nginx/prod/templates:/etc/nginx/templates
-      - static_value:/var/html/static/
-      - template_value:/var/html/template/
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
     env_file:
@@ -57,17 +55,15 @@ services:
   backend:
     build: .
     restart: always
-    command: "uvicorn main:create_app --host 0.0.0.0 --port 8000"
+    command: "uvicorn app.cli:create_app --reload --host 0.0.0.0 --port 8000"
     volumes:
-      - static_value:/code/static/
-      - template_value:/code/templates/
       - type: bind
         source: ${LOGS_MOUNT_FOLDER}
         target: /code/logs/
     ports:
       - "8000:8000"
     environment:
-      - TZ=Asia/Almaty
+      - TZ=${SERVER_TIMEZONE}
     depends_on:
       - db
       - redis
@@ -77,7 +73,5 @@ services:
 
 volumes:
   postgres_data:
-  template_value:
   redis_data:
   log_value:
-  static_value:

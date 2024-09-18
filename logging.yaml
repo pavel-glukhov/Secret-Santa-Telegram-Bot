@@ -24,29 +24,33 @@ handlers:
 
 loggers:
   root:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
   fastapi:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
   aiogram.event:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
-  tortoise:
-    level: DEBUG
+  sqlalchemy:
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
   apscheduler:
-    level: DEBUG
+    level: INFO
+    handlers: [console_handler, timed_rotating_handler]
+
+  redis:
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
   asyncio:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
 
   asyncpg:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]

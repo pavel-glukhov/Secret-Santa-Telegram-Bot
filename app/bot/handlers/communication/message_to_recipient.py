@@ -1,72 +1,83 @@
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram import F, Router, types
+from aiogram.fsm.context import FSMContext
+from sqlalchemy.orm import Session
 
-from app.bot import dispatcher as dp
-from app.bot.states.communication import MessageToRecipient
-from app.bot.handlers.operations import delete_user_message, get_room_number
+from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
+from app.bot.languages import TranslationMainSchema, language_return_dataclass
 from app.bot.messages.send_messages import send_message
-from app.store.queries.game_result import GameResultRepo
-from app.store.queries.rooms import RoomRepo
+from app.bot.states.communication import MessageToRecipient
+from app.store.database.queries.game_result import GameResultRepo
+from app.store.database.queries.rooms import RoomRepo
+from app.store.database.queries.users import UserRepo
+from app.store.redis import get_redis_client
 
 logger = logging.getLogger(__name__)
+router = Router()
 
 
-@dp.callback_query_handler(Text(startswith='room_closed-con-rec'))
-async def message_to_recipient(callback: types.CallbackQuery):
-    await MessageToRecipient.waiting_message.set()
+@router.callback_query(F.data.startswith('room_closed-con-rec'))
+async def message_to_recipient(callback: types.CallbackQuery,
+                               state: FSMContext,
+                               app_text_msg: TranslationMainSchema):
     room_number = get_room_number(callback)
-    state = dp.get_current().current_state()
     await state.update_data(
         room_number=room_number,
     )
+    cancel_button = app_text_msg.buttons.cancel_button
+    
     keyboard_inline = generate_inline_keyboard(
         {
-            "Отмена": 'cancel',
+            cancel_button: 'cancel',
         }
     )
-    message_text = (
-        'Напишите сообщение которое вы хотите отправить вашему получателю. 🙍‍♂️'
-    )
-    async with state.proxy() as data:
-        data['last_message'] = await callback.message.edit_text(
-            text=message_text,
-            reply_markup=keyboard_inline
-        )
+    message_text = app_text_msg.messages.communication_menu.message_to_recipient.first_msg
+    initial_bot_message = await callback.message.edit_text(text=message_text,
+                                                           reply_markup=keyboard_inline)
+    
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.set_state(MessageToRecipient.waiting_message)
 
 
-@dp.message_handler(state=MessageToRecipient.waiting_message)
+@router.message(MessageToRecipient.waiting_message)
 async def completed_message_to_santa(message: types.Message,
-                                     state: FSMContext):
+                                     state: FSMContext,
+                                     session: Session,
+                                     app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
-    room = await RoomRepo().get(state_data['room_number'])
+    room = await RoomRepo(session).get(state_data['room_number'])
     user_id = message.chat.id
-    last_message = state_data['last_message']
-    recipient = await GameResultRepo().get_recipient(room_id=room.number,
-                                                     user_id=user_id)
+    
+    await message.delete()
+    
+    bot_message = state_data['bot_message_id']
+    recipient = await GameResultRepo(session).get_recipient(room_id=room.number,
+                                                            user_id=user_id)
+    
     keyboard_inline = generate_inline_keyboard(
         {
-            "Вернуться назад ◀️": "root_menu",
+            app_text_msg.buttons.return_back_button: "root_menu",
         }
     )
-    text = (
-        f'<b>Сообщение от Тайного Санты:</b>\n'
-        f'Комната: {room.name} {[room.number]}\n'
-        f'------------\n\n'
-        f'{message.text}\n\n'
-        f'------------\n\n'
+    recipient_language = await UserRepo(session).get_user_language(recipient.user_id)
+    recipient_app_lng = await language_return_dataclass(get_redis_client(), recipient_language)
+    
+    first_message_text = recipient_app_lng.messages.communication_menu.message_to_recipient.msg_text.format(
+        room_name=room.name,
+        room_number=room.number,
+        text_message=message.text,
     )
-    await delete_user_message(message.from_user.id, message.message_id)
+    # TODO сделать что бы не редактировалось сообщение.
+    logger.info(first_message_text)
+    inline_keyboard = {
+        recipient_app_lng.buttons.room_menu.main_buttons.return_to_room_menu: f"room_menu_{room.number}"
+    }
     await send_message(user_id=recipient.user_id,
-                       text=text)
+                       text=first_message_text,
+                       inline_keyboard=inline_keyboard)
+    second_message_text = app_text_msg.messages.communication_menu.message_to_recipient.msg_was_sent
     
-    message_text = 'Сообщение вашему получателю было отправлено'
-    
-    await last_message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
-    await state.finish()
+    await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)
+    await state.clear()

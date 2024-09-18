@@ -39,6 +39,7 @@ class RoomConfig:
 class BotConfig:
     token: str
     telegram_login: str
+    language_folder: str
 
 
 @dataclass
@@ -48,6 +49,14 @@ class DataBaseConfig:
     password: str
     host: str
     port: str
+    
+    @property
+    def postgres_url(self):
+        return (f'postgresql://'
+                f'{self.user}:'
+                f'{self.password}'
+                f'@{self.host}/'
+                f'{self.name}')
 
 
 @dataclass
@@ -84,6 +93,7 @@ def load_config() -> AppConfig:
         bot=BotConfig(
             token=os.getenv('TELEGRAM_TOKEN'),
             telegram_login=os.getenv('TELEGRAM_LOGIN'),
+            language_folder=os.path.join(ROOT_PATH, 'app\\bot\\languages')
         ),
         web=WebSettings(
             jwt_settings=JWTSettings(

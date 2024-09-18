@@ -1,25 +1,42 @@
-from tortoise import fields
-from tortoise.models import Model
+from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey,
+                        Integer, LargeBinary, String, Table)
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.sql import func
 
 from app.config import load_config
 from app.store.encryption import CryptData
 
 
-class User(Model):
-    user_id = fields.BigIntField(pk=True)
-    username = fields.CharField(max_length=256, unique=True, null=True)
-    first_name = fields.CharField(max_length=128, null=True)
-    last_name = fields.CharField(max_length=128, null=True)
-    email = fields.CharField(max_length=64, null=True)
-    encrypted_address = fields.BinaryField(null=True)
-    encrypted_number = fields.BinaryField(null=True)
-    registered_at = fields.DatetimeField(auto_now_add=True)
-    is_active = fields.BooleanField(default=True)
-    is_superuser = fields.BooleanField(default=False)
-    timezone = fields.CharField(max_length=32, null=True)
+class Base(DeclarativeBase):
+    pass
+
+
+rooms_users = Table('rooms_users', Base.metadata,
+                    Column('room_id', Integer, ForeignKey('rooms.id'), primary_key=True),
+                    Column('user_id', BigInteger, ForeignKey('users.user_id'), primary_key=True))
+
+
+class User(Base):
+    __tablename__ = 'users'
     
-    class Meta:
-        table = "users"
+    user_id = Column(BigInteger, primary_key=True)
+    username = Column(String(256), unique=True, nullable=True)
+    first_name = Column(String(128), nullable=True)
+    last_name = Column(String(128), nullable=True)
+    email = Column(String(64), nullable=True)
+    encrypted_address = Column(LargeBinary, nullable=True)
+    encrypted_number = Column(LargeBinary, nullable=True)
+    registered_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    timezone = Column(String(32), nullable=True)
+    language = Column(String(3), nullable=True)
+    room_owner = relationship("Room", back_populates="owner")
+    members = relationship("Room", secondary=rooms_users, back_populates="members")
+    wishes_in_room = relationship("WishRoom", back_populates="user", overlaps="user_wishes")
+    user_wishes = relationship("WishRoom", back_populates="user", overlaps="wishes_in_room")
+    recipients = relationship("GameResult", foreign_keys='GameResult.recipient_id', back_populates="recipient")
+    senders = relationship("GameResult", foreign_keys='GameResult.sender_id', back_populates="sender")
     
     def get_address(self) -> str | None:
         if self.encrypted_address:
@@ -37,54 +54,51 @@ class User(Model):
         return f"User {self.user_id} : {self.username}"
 
 
-class Room(Model):
-    id = fields.IntField(pk=True)
-    name = fields.CharField(max_length=16, null=False)
-    number = fields.IntField(null=False, unique=True)
-    budget = fields.CharField(max_length=16, null=False)
-    created_at = fields.DatetimeField(auto_now_add=True)
-    is_closed = fields.BooleanField(default=False)
-    started_at = fields.DatetimeField(null=True)
-    closed_at = fields.DatetimeField(null=True)
-    owner = fields.ForeignKeyField('models.User',
-                                   related_name='room_owner')
-    members = fields.ManyToManyField('models.User',
-                                     related_name='members',
-                                     through='rooms_users',
-                                     on_delete='CASCADE')
-    wishes = fields.ManyToManyField('models.User',
-                                    through='wishes_rooms',
-                                    related_name='wishes_in_room',
-                                    on_delete='CASCADE')
+class Room(Base):
+    __tablename__ = 'rooms'
     
-    class Meta:
-        table = "rooms"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(16), nullable=False)
+    number = Column(Integer, unique=True, nullable=False)
+    budget = Column(String(16), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_closed = Column(Boolean, default=False)
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    closed_at = Column(DateTime(timezone=True), nullable=True)
+    owner_id = Column(BigInteger, ForeignKey('users.user_id'))
+    
+    owner = relationship("User", back_populates="room_owner")
+    members = relationship("User", secondary=rooms_users, back_populates="members")
+    wishes = relationship("WishRoom", back_populates="room", cascade="all, delete-orphan")
+    results_of_rooms = relationship("GameResult", back_populates="room")
     
     def __str__(self):
         return f"Room {self.number}: {self.name}"
 
 
-class WishRoom(Model):
-    room = fields.ForeignKeyField('models.Room', related_name='room_wishes')
-    user = fields.ForeignKeyField('models.User', related_name='user_wishes')
-    wish = fields.CharField(max_length=256, null=False)
+class WishRoom(Base):
+    __tablename__ = 'wishes_rooms'
     
-    class Meta:
-        table = "wishes_rooms"
+    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('users.user_id'), primary_key=True)
+    wish = Column(String(256), nullable=False)
+    
+    room = relationship("Room", back_populates="wishes")
+    user = relationship("User", back_populates="user_wishes")
 
 
-class GameResult(Model):
-    id = fields.IntField(pk=True)
-    room = fields.ForeignKeyField('models.Room',
-                                  related_name='results_of_rooms')
-    recipient = fields.ForeignKeyField('models.User',
-                                       related_name='recipients')
-    sender = fields.ForeignKeyField('models.User',
-                                    related_name='senders')
-    assigned_at = fields.DatetimeField(auto_now_add=True)
+class GameResult(Base):
+    __tablename__ = 'game_results'
     
-    class Meta:
-        table = "game_results"
+    id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'))
+    recipient_id = Column(BigInteger, ForeignKey('users.user_id'))
+    sender_id = Column(BigInteger, ForeignKey('users.user_id'))
+    assigned_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    room = relationship("Room", back_populates="results_of_rooms")
+    recipient = relationship("User", foreign_keys=[recipient_id], back_populates="recipients")
+    sender = relationship("User", foreign_keys=[sender_id], back_populates="senders")
     
     def __str__(self):
-        return f"Room {self.room}: {self.recipient} {self.sender}"
+        return f"Room {self.room_id}: {self.recipient_id} {self.sender_id}"

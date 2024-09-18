@@ -3,22 +3,24 @@ import asyncio
 import logging
 
 import requests
+from sqlalchemy.orm import Session, scoped_session
 
 from app.config import load_config
-from app.store.database import close_db, init_db
-from app.store.queries.users import UserRepo
+from app.store.database.queries.users import UserRepo
+from app.store.database.sessions import create_session
 
 logger = logging.getLogger(__name__)
 
 
 async def update_user_permissions(telegram_user_id, is_superuser: bool):
-    await init_db()
-    user = await UserRepo().get_user_or_none(int(telegram_user_id))
-    if user:
-        await UserRepo().update_user(int(telegram_user_id),
-                                     is_superuser=is_superuser)
-    await close_db()
-    return True if user else False
+    get_session: scoped_session = create_session()
+
+    with get_session() as session:
+        user = await UserRepo(session).get_user_or_none(int(telegram_user_id))
+        if user:
+            await UserRepo(session).update_user(int(telegram_user_id),
+                                                is_superuser=is_superuser)
+        return True if user else False
 
 
 def set_superuser(telegram_user_id):
