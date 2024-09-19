@@ -22,10 +22,12 @@ async def create_common_keyboards(message: types.Message, session: Session,
     count_user_rooms = await RoomRepo(session).get_count_user_rooms(
         message.chat.id)
     keyboard_dict = {text.buttons.main_menu.join_room: "menu_join_room"}
+    
     if count_user_rooms < load_config().room.user_rooms_count:
         keyboard_dict.update(
             {text.buttons.main_menu.create_room: "menu_create_new_room"}
         )
+        
     user_id = message.chat.id
     user_rooms = await RoomRepo(session).get_all_users_of_room(user_id)
 
@@ -67,9 +69,9 @@ def personal_room_keyboard_formatter(
     owner_tag = ' 🤴' if is_owner else ''
     scheduler_tag = '⏱' if get_task(room.number) else ''
     closed_tag = '✅' if room.is_closed else ''
-    text = text_message
-    return (f'{text}: {room.name} ({room.number})'
-            f'{owner_tag} {scheduler_tag}{closed_tag}')
+    
+    return (f'{text_message}: {room.name} ({room.number})'
+            f'{owner_tag} {scheduler_tag} {closed_tag}')
 
 
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
