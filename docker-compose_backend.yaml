@@ -24,7 +24,7 @@ services:
       - '--save 60 10000'
       - '--maxmemory ${REDIS_MAXMEM:-300mb}'
       - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
-      - '--requirepass ${REDIS_PASSWORD}'
+      - '--requirepass ${$$REDIS_PASSWORD}'
     volumes:
       - redis_data:/data
     env_file:
@@ -38,22 +38,19 @@ services:
       - "443:443"
     volumes:
       - ./deploy/nginx/prod/templates:/etc/nginx/templates
-      - ./deploy/nginx/getting_ssl/templates:/etc/nginx/templates
       - ./deploy/certbot/www/:/var/www/certbot/:ro
       - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
-    environment:
-      - NGINX_HOST_NAME=${DOMAIN_NAME}
     env_file:
       - .env
+    environment:
+      - NGINX_HOST_NAME=${DOMAIN_NAME}
+
 
   certbot:
     image: certbot/certbot:latest
-    command: certonly --webroot --webroot-path=/var/www/certbot/ --email ${EMAIL} --agree-tos --no-eff-email --staging -d ${DOMAIN_NAME}
     volumes:
       - ./deploy/certbot/www/:/var/www/certbot/:rw
       - ./deploy/certbot/conf/:/etc/letsencrypt/:rw
-    depends_on:
-      - nginx
 
   backend:
     build: .
