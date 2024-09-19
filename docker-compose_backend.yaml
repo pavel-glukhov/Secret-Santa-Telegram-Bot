@@ -1,0 +1,77 @@
+version: '3.10'
+
+services:
+  db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./deploy/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7.2.3
+    command:
+      - 'redis-server'
+      - '--loglevel ${REDIS_LOGLEVEL:-warning}'
+      - '--save 900 1'
+      - '--save 300 10'
+      - '--save 60 10000'
+      - '--maxmemory ${REDIS_MAXMEM:-300mb}'
+      - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
+      - '--requirepass ${$$REDIS_PASSWORD}'
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:1.25.3
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/prod/templates:/etc/nginx/templates
+      - ./deploy/certbot/www/:/var/www/certbot/:ro
+      - ./deploy/certbot/conf/:/etc/nginx/ssl/:ro
+    env_file:
+      - .env
+    environment:
+      - NGINX_HOST_NAME=${DOMAIN_NAME}
+
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./deploy/certbot/www/:/var/www/certbot/:rw
+      - ./deploy/certbot/conf/:/etc/letsencrypt/:rw
+
+  backend:
+    build: .
+    restart: always
+    command: "uvicorn app.cli:create_app --reload --host 0.0.0.0 --port 8000"
+    volumes:
+      - type: bind
+        source: ${LOGS_MOUNT_FOLDER}
+        target: /code/logs/
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=${SERVER_TIMEZONE}
+    depends_on:
+      - db
+      - redis
+      - nginx
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  redis_data:
+  log_value:
