@@ -45,7 +45,7 @@ async def update_wishes(callback: types.CallbackQuery,
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )

@@ -35,7 +35,7 @@ async def start(message: types.Message, state: FSMContext,
         return
     await state.clear()
     message_text = app_text_msg.messages.main_menu.start_message
-    
+
     await message.answer(text=message_text)
     await root_menu(message, session=session, app_text_msg=app_text_msg, edit_message=False)
 
@@ -47,21 +47,21 @@ async def root_menu(data: types.Message | types.CallbackQuery,
                     app_text_msg: TranslationMainSchema,
                     edit_message=True):
     message = data.message if isinstance(data, types.CallbackQuery) else data
-    
+
     user = await create_user_or_enable(message, session)
     keyboard = await create_common_keyboards(message, session, app_text_msg)
-    
+
     is_profile_filled_out = all(
         [user.encrypted_address, user.encrypted_number])
-    
+
     text_reminder_notification_for_user = app_text_msg.messages.main_menu.menu_reminder
     text_menu_message = app_text_msg.messages.main_menu.menu
-    
+
     message_text = (
         text_menu_message if is_profile_filled_out
         else text_reminder_notification_for_user + text_menu_message
     )
-    
+
     if edit_message:
         await message.edit_text(text=message_text, reply_markup=keyboard)
     else:
@@ -81,7 +81,7 @@ async def create_user_or_enable(message: types.Message, session: Session):
     )
     if created:
         logger.info(f'The new user "{user_id}" has been created')
-    
+
     if not user.is_active:
         await UserRepo(session).enable_user(message.chat.id)
         logger.info(f'The new user "{user_id}" has been enabled')

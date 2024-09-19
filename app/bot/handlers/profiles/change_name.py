@@ -42,7 +42,7 @@ async def process_changing_first_name(message: types.Message,
     state_data = await state.get_data()
     bot_message = state_data['bot_message_id']
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )

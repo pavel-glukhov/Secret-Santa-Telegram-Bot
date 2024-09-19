@@ -23,7 +23,7 @@ async def delete_room(callback: types.CallbackQuery,
     await state.update_data(room_number=room_number)
     await state.update_data(question_message_id=callback.message.message_id)
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
 
@@ -46,7 +46,7 @@ async def process_delete_room_invalid(message: types.Message,
     state_data = await state.get_data()
     room_number = state_data['room_number']
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
     logger.info('Incorrect confirmation'

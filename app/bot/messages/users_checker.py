@@ -3,17 +3,21 @@ import logging
 
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
-
+from aiohttp import ClientError
 from app.bot.loader import bot
 from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)
 
 
-async def checking_user_is_active(user_id, session):
+async def checking_user_is_active(user_id: int, session) -> bool:
     """
     Checking if a bot was blocked by user
     or user's chat is not existing by other reason.
+
+    :param user_id: ID of the user to check.
+    :param session: Database session.
+    :return: True if the user is active, False otherwise.
     """
     try:
         await bot.send_chat_action(user_id, action='typing')
@@ -25,9 +29,13 @@ async def checking_user_is_active(user_id, session):
 
     except TelegramRetryAfter as e:
         logger.error(
-            f"Target [ID:{user_id}]: Flood limit is exceeded."
-            f" Sleep {e.retry_after} seconds.")
+            f"Target [ID:{user_id}]: Flood limit is exceeded. Sleep {e.retry_after} seconds.")
         await asyncio.sleep(e.retry_after)
+        return False
+
+    except ClientError:
+        logger.error(f"Target [ID:{user_id}]: Network error occurred.")
+        await asyncio.sleep(5)
         return False
 
     except TelegramAPIError:
