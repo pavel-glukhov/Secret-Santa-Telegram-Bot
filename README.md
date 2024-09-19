@@ -83,16 +83,24 @@
       # requirepass foobared
       ```
     - Создать свой .env файл по шаблону .env.example
-    - pip install -r requirements
-    - alembic upgrade head
-    - uvicorn app.cli:create_app --reload
+    -  ```pip install -r requirements ```
+    -  ```alembic upgrade head ```
+    -  ```uvicorn app.cli:create_app --reload ```
 
 #### В Docker контейнере:
 
 - Установить Docker https://docs.docker.com/engine/install/ubuntu/
     - Создать свой .env файл по шаблону .env.example
-    - sudo docker compose -f docker-compose_ssl.yaml up
-    - sudo docker compose -f docker-compose.yaml up --build
+  
+- Запуск Docker Compose
+    -  ```docker-compose up -d ```
+- Пересборка при обновлении кода
+    -  ```docker-compose build ```
+- Перезапуск контейнеров с пересобранными образами:
+    -  ```docker-compose up -d --build ```
+
+
+
 
   Миграции
      ```console
@@ -115,10 +123,10 @@
     ```
 
   Или сформируйте и сделайте GET запрос
-  https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
+   ```https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/ ```
 
   Пример:
-  https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/
+   ```https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/ ```
 
 - Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя
   команду **/setdomain**
