@@ -22,7 +22,7 @@ async def change_phone_number(callback: types.CallbackQuery,
                               state: FSMContext,
                               app_text_msg: TranslationMainSchema):
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
@@ -49,7 +49,7 @@ async def process_changing_owner(message: types.Message,
 
     await message.delete()
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     cancel_keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )

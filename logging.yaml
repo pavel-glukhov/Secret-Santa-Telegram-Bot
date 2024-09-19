@@ -28,15 +28,15 @@ loggers:
     handlers: [console_handler, timed_rotating_handler]
 
   fastapi:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]
 
   aiogram.event:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]
 
   sqlalchemy:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]
 
   apscheduler:
@@ -44,13 +44,13 @@ loggers:
     handlers: [console_handler, timed_rotating_handler]
 
   redis:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]
 
   asyncio:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]
 
   asyncpg:
-    level: INFO
+    level: WARNING
     handlers: [console_handler, timed_rotating_handler]

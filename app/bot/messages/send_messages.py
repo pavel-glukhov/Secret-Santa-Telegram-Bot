@@ -3,15 +3,13 @@ import logging
 
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
-
+from aiohttp import ClientError
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
 from app.bot.loader import bot
 
 logger = logging.getLogger(__name__)
 
 
-# TODO сделать что бы при отправке сообщений были разные кнопки.
 async def send_message(user_id: int,
                        text: str,
                        inline_keyboard: dict,
@@ -19,31 +17,29 @@ async def send_message(user_id: int,
                        **kwargs) -> bool:
     """
     Safe messages sender
-    :param user_id:
-    :param text:
-    :param player_language:
-    :param inline_keyboard:
-    :param disable_notification:
-    :return:
+    :param user_id: ID of the user to send the message to.
+    :param text: Text of the message.
+    :param inline_keyboard: Inline keyboard configuration.
+    :param disable_notification: Whether to disable notifications.
+    :return: True if the message was sent successfully, False otherwise.
     """
-    keyboard_inline = generate_inline_keyboard(
-        inline_keyboard
-    )
+    keyboard_inline = generate_inline_keyboard(inline_keyboard)
     try:
         await bot.send_message(user_id, text,
                                disable_notification=disable_notification,
                                reply_markup=keyboard_inline,
                                **kwargs)
-    
     except TelegramForbiddenError:
         logger.error(f"Target [ID:{user_id}]: blocked by user")
     except TelegramRetryAfter as e:
         logger.error(
-            f"Target [ID:{user_id}]: Flood limit is exceeded."
-            f" Sleep {e.retry_after} seconds.")
+            f"Target [ID:{user_id}]: Flood limit is exceeded. Sleep {e.retry_after} seconds.")
         await asyncio.sleep(e.retry_after)
-        return await send_message(user_id, text, inline_keyboard)  # Recursive call
-    
+        return await send_message(user_id, text, inline_keyboard)
+    except ClientError:
+        logger.error(f"Target [ID:{user_id}]: Network error occurred.")
+        await asyncio.sleep(5)
+        return await send_message(user_id, text, inline_keyboard)
     except TelegramAPIError:
         logger.exception(f"Target [ID:{user_id}]: failed")
     else:
@@ -54,16 +50,18 @@ async def send_message(user_id: int,
 
 async def broadcaster(list_users: list) -> None:
     """
-    broadcaster
-    :return: Count of messages
+    Broadcast messages to a list of users.
+    :param list_users: List of users to send messages to.
     """
     count = 0
+    tasks = []
     try:
         for user in list_users:
-            if await send_message(user_id=user['user_id'],
-                                  text=user['text'],
-                                  inline_keyboard={user['player_language'].menu_button: "start_menu"}):
-                count += 1
+            tasks.append(send_message(user_id=user['user_id'],
+                                      text=user['text'],
+                                      inline_keyboard={user['player_language'].menu_button: "start_menu"}))
             await asyncio.sleep(.05)  # 20 messages per second
+        results = await asyncio.gather(*tasks)
+        count = sum(results)
     finally:
-        logger.info(f"{count} messages successful sent.")
+        logger.info(f"{count} messages successfully sent.")

@@ -20,7 +20,7 @@ async def delete_user_information(callback: types.CallbackQuery,
                                   state: FSMContext,
                                   app_text_msg: TranslationMainSchema):
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
@@ -43,7 +43,7 @@ async def process_deleting_information_invalid(message: types.Message,
 
     bot_message = state_data['bot_message_id']
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )

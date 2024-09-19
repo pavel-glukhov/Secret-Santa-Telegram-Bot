@@ -22,7 +22,7 @@ async def create_room(callback: types.CallbackQuery,
                       app_text_msg: TranslationMainSchema):
     count_user_rooms = await RoomRepo(session).get_count_user_rooms(
         callback.message.chat.id)
-    logger.info(count_user_rooms)
+
     if count_user_rooms >= load_config().room.user_rooms_count:
         keyboard_inline = generate_inline_keyboard(
             {
@@ -38,7 +38,7 @@ async def create_room(callback: types.CallbackQuery,
             reply_markup=keyboard_inline
         )
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
     message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_first_msg
@@ -62,13 +62,13 @@ async def process_name(message: types.Message,
     await state.update_data(budget_question_id=message.message_id)
 
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
 
     if not len(room_name) < 17:
         cancel_button = app_text_msg.buttons.cancel_button
-        
+
         keyboard_inline = generate_inline_keyboard(
             {cancel_button: 'cancel'})
         message_text = app_text_msg.messages.rooms_menu.create_new_room.long_room_name
@@ -93,7 +93,7 @@ async def process_budget_invalid(message: types.Message,
 
     bot_message = state_data['bot_message_id']
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
     logger.info('long budget message'
@@ -113,7 +113,7 @@ async def process_budget(message: types.Message,
 
     bot_message = state_data['bot_message_id']
     cancel_button = app_text_msg.buttons.cancel_button
-    
+
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
     room_budget = message.text
