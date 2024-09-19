@@ -82,7 +82,6 @@ async def completed_message_to_santa(message: types.Message,
         room_number=room.number,
         text_message=message.text,
     )
-    logger.info(first_message_text)
     inline_keyboard = {
         recipient_app_lng.buttons.reply: f"room_closed-con-san_no_ed_{room.number}",
         recipient_app_lng.buttons.menu: "start_menu"

@@ -59,7 +59,7 @@ async def broadcaster(list_users: list) -> None:
         for user in list_users:
             tasks.append(send_message(user_id=user['user_id'],
                                       text=user['text'],
-                                      inline_keyboard={user['player_language'].menu_button: "start_menu"}))
+                                      inline_keyboard={user['player_language'].buttons.menu: "start_menu"}))
             await asyncio.sleep(.05)  # 20 messages per second
         results = await asyncio.gather(*tasks)
         count = sum(results)
