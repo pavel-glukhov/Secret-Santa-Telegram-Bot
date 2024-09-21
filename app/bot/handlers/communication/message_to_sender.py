@@ -35,21 +35,21 @@ async def message_to_santa(callback: types.CallbackQuery,
         room_number=room_number,
     )
     cancel_button = app_text_msg.buttons.cancel_button
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             cancel_button: 'cancel',
         }
     )
     message_text = app_text_msg.messages.communication_menu.message_to_sender.first_msg
-
+    
     if edit_message:
         initial_bot_message = await callback.message.edit_text(text=message_text,
                                                                reply_markup=keyboard_inline)
     else:
         initial_bot_message = await callback.message.answer(text=message_text,
                                                             reply_markup=keyboard_inline)
-
+    
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(MessageToSanta.waiting_message)
 
@@ -61,30 +61,34 @@ async def completed_message_to_santa(message: types.Message,
     state_data = await state.get_data()
     user_id = message.chat.id
     room = await RoomRepo(session).get(state_data['room_number'])
-
+    
     await message.delete()
-
+    
     bot_message = state_data['bot_message_id']
     sender = await GameResultRepo(session).get_sender(room_id=room.number,
                                                       user_id=user_id)
-
+    
     sender_language = await UserRepo(session).get_user_language(sender.user_id)
     sender_app_lng = await language_return_dataclass(get_redis_client(), sender_language)
-
+    
     first_message_text = sender_app_lng.messages.communication_menu.message_to_sender.msg_text.format(
         room_name=room.name,
         room_number=room.number,
         text_message=message.text)
-
+    
     inline_keyboard = {
-        sender_app_lng.buttons.reply: f"room_closed-con-rec_no_ed_{room.number}",
-        sender_app_lng.buttons.menu: "start_menu"
+        sender_app_lng.buttons.reply: f"room_closed-con-rec_{room.number}",
+        sender_app_lng.buttons.menu: "root_menu"
     }
     await send_message(user_id=sender.user_id,
                        text=first_message_text,
-                       inline_keyboard=inline_keyboard)
+                       )
+    await send_message(user_id=sender.user_id,
+                       text=sender_app_lng.messages.main_menu.allowed_actions,
+                       reply_markup=generate_inline_keyboard(inline_keyboard)
+                       )
     second_message_text = app_text_msg.messages.communication_menu.message_to_sender.msg_was_sent
-
+    
     keyboard_inline = generate_inline_keyboard(
         {
             app_text_msg.buttons.return_back_button: "root_menu",

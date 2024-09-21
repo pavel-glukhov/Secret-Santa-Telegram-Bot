@@ -3,6 +3,7 @@
     "messages": {
       "main_menu": {
         "menu": "<b>Menu</b>",
+        "allowed_actions": "Available actions:",
         "language_selection": "\uD83C\uDDEC\uD83C\uDDE7 First, choose the bot's language.\n\n",
         "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
         "start_message": "Ho-ho-ho! It's time to play Secret Santa!\n\nCreate your room for friends, or join an existing one.",
@@ -207,6 +208,7 @@
       "message_text": "------------\n<b>Hello {sender_name}!</b>\n<b>Congratulations, you have become a Secret Santa!!!!!</b> \uD83D\uDCA5\uD83D\uDCA5\n\n<b>Your recipient:</b>\n<b>Name:</b> {full_name}\n\n<b>Address:</b> {address}\n\n<b>Phone:</b> {number}\n\n<b>Gift wishes:</b> {receiver_wish}\n\n<b>Quickly run to the post office and send your gift!</b> \uD83C\uDFC3 \n------------\n"
     },
     "result_mailing": {
+      "separator": "-----------",
       "message_text": "You received this message because the mailing for your room [<b>{room_name}</b>] was set for this date.\n\n Unfortunately, there are not enough active players in your room.\n\nThere should be 3 or more active players.\n\n<b>Invite more players and set a new draw date</b>"
     }
   }

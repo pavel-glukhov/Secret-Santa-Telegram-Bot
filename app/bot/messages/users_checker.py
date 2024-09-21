@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
-                                TelegramRetryAfter)
+                                TelegramRetryAfter, TelegramBadRequest)
 from aiohttp import ClientError
 from app.bot.loader import bot
 from app.store.database.queries.users import UserRepo
@@ -21,25 +21,29 @@ async def checking_user_is_active(user_id: int, session) -> bool:
     """
     try:
         await bot.send_chat_action(user_id, action='typing')
-
+    
+    except TelegramBadRequest as e:
+        logger.error(f"Target [ID:{user_id}]: checking is failed")
+        logger.error(f"user checker: {e.message}")
+        return False
+    
     except TelegramForbiddenError:
         logger.error(f"The bot was blocked by user [ID:{user_id}]")
         await UserRepo(session).disable_user(user_id)
         return False
-
+    
     except TelegramRetryAfter as e:
         logger.error(
             f"Target [ID:{user_id}]: Flood limit is exceeded. Sleep {e.retry_after} seconds.")
         await asyncio.sleep(e.retry_after)
         return False
-
+    
     except ClientError:
         logger.error(f"Target [ID:{user_id}]: Network error occurred.")
         await asyncio.sleep(5)
         return False
-
+    
     except TelegramAPIError:
-        logger.exception(f"Target [ID:{user_id}]: failed")
+        logger.exception(f"Target [ID:{user_id}]: checking is failed")
         return False
-
     return True

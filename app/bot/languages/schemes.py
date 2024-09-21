@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class MainMenu(BaseModel):
     menu: str
+    allowed_actions: str
     language_selection: str
     select_language_answer: str
     start_message: str
@@ -273,6 +274,7 @@ class MessageFormatter(BaseModel):
 
 class ResultMailing(BaseModel):
     message_text: str
+    separator: str
 
 
 class Messages(BaseModel):

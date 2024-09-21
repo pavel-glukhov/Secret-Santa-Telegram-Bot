@@ -4,7 +4,6 @@ import logging
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
 from aiohttp import ClientError
-from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.loader import bot
 
 logger = logging.getLogger(__name__)
@@ -12,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 async def send_message(user_id: int,
                        text: str,
-                       inline_keyboard: dict,
                        disable_notification: bool = False,
                        **kwargs) -> bool:
     """
@@ -23,11 +21,9 @@ async def send_message(user_id: int,
     :param disable_notification: Whether to disable notifications.
     :return: True if the message was sent successfully, False otherwise.
     """
-    keyboard_inline = generate_inline_keyboard(inline_keyboard)
     try:
         await bot.send_message(user_id, text,
                                disable_notification=disable_notification,
-                               reply_markup=keyboard_inline,
                                **kwargs)
     except TelegramForbiddenError:
         logger.error(f"Target [ID:{user_id}]: blocked by user")
@@ -35,11 +31,11 @@ async def send_message(user_id: int,
         logger.error(
             f"Target [ID:{user_id}]: Flood limit is exceeded. Sleep {e.retry_after} seconds.")
         await asyncio.sleep(e.retry_after)
-        return await send_message(user_id, text, inline_keyboard)
+        return await send_message(user_id, text, **kwargs)
     except ClientError:
         logger.error(f"Target [ID:{user_id}]: Network error occurred.")
         await asyncio.sleep(5)
-        return await send_message(user_id, text, inline_keyboard)
+        return await send_message(user_id, text, **kwargs)
     except TelegramAPIError:
         logger.exception(f"Target [ID:{user_id}]: failed")
     else:
@@ -59,7 +55,7 @@ async def broadcaster(list_users: list) -> None:
         for user in list_users:
             tasks.append(send_message(user_id=user['user_id'],
                                       text=user['text'],
-                                      inline_keyboard={user['player_language'].buttons.menu: "start_menu"}))
+                                      reply_markup={user['player_language'].buttons.menu: "start_menu"}))
             await asyncio.sleep(.05)  # 20 messages per second
         results = await asyncio.gather(*tasks)
         count = sum(results)

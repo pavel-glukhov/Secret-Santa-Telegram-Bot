@@ -102,3 +102,15 @@ class GameResult(Base):
     
     def __str__(self):
         return f"Room {self.room_id}: {self.recipient_id} {self.sender_id}"
+
+
+class UsersMessages(Base):
+    __tablename__ = 'users_messages'
+    
+    id = Column(Integer, primary_key=True)
+    recipient_id = Column(BigInteger, ForeignKey('users.user_id'))
+    sender_id = Column(BigInteger, ForeignKey('users.user_id'))
+    room_id = Column(Integer, ForeignKey('rooms.id'))
+    message = Column(String(), nullable=True)
+    sent_at = Column(DateTime(timezone=True), nullable=True)
+    
