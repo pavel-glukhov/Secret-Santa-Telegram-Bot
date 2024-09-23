@@ -27,17 +27,14 @@ class RoomRepo:
         if not user:
             raise ValueError(f"User with id {owner_id} does not exist.")
         
-        # Generate unique number
         unique_number = self._get_room_unique_number()
         
         room = Room(name=name, budget=budget, owner_id=owner_id, number=unique_number)
         self.session.add(room)
         self.session.commit()
         
-        # Add owner as a member
         room.members.append(user)
         
-        # Create WishRoom entry
         wish_room = WishRoom(wish=user_wish, user_id=owner_id, room_id=room.id)
         self.session.add(wish_room)
         self.session.commit()

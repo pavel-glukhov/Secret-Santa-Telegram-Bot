@@ -1,9 +1,11 @@
----
 version: 1
 disable_existing_loggers: False
+
 formatters:
   default:
     format: "%(asctime)s\t%(levelname)s\t%(filename)s:%(lineno)d\t%(message)s"
+  json:
+    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "filename": "%(filename)s", "lineno": %(lineno)d, "message": "%(message)s"}'
 
 handlers:
   console_handler:
@@ -15,42 +17,50 @@ handlers:
   timed_rotating_handler:
     class: logging.handlers.TimedRotatingFileHandler
     level: INFO
-    formatter: default
+    formatter: json
     filename: log.file
     backupCount: 14
-    encoding: utf8
+    encoding: utf-8
     when: midnight
     interval: 1
 
 loggers:
-  root:
+  my_app:
     level: INFO
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   fastapi:
     level: WARNING
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   aiogram.event:
     level: WARNING
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   sqlalchemy:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   apscheduler:
     level: INFO
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   redis:
     level: WARNING
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   asyncio:
     level: WARNING
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
 
   asyncpg:
     level: WARNING
     handlers: [console_handler, timed_rotating_handler]
+    propagate: no
