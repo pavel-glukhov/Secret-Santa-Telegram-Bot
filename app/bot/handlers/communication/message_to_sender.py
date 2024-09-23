@@ -9,6 +9,7 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema, language_return_dataclass
 from app.bot.messages.send_messages import send_message
 from app.bot.states.communication import MessageToSanta
+from app.store.database.queries.communication import CommunicationRepo
 from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.users import UserRepo
@@ -80,6 +81,13 @@ async def completed_message_to_santa(message: types.Message,
         sender_app_lng.buttons.reply: f"room_closed-con-rec_{room.number}",
         sender_app_lng.buttons.menu: "root_menu"
     }
+    await CommunicationRepo(session).insert(
+        recipient_id=sender.user_id,
+        sender_id=user_id,
+        room=room,
+        message=message.text
+
+    )
     await send_message(user_id=sender.user_id,
                        text=first_message_text,
                        )
