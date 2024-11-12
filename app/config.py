@@ -18,7 +18,6 @@ class JWTSettings:
 
 @dataclass()
 class WebSettings:
-    jwt_settings: JWTSettings
     domain_name: str
 
 
@@ -96,9 +95,6 @@ def load_config() -> AppConfig:
             language_folder=os.path.join(ROOT_PATH, 'app\\bot\\languages')
         ),
         web=WebSettings(
-            jwt_settings=JWTSettings(
-                authjwt_secret_key=os.getenv('AUTH_JWT_SECRET_KEY')
-            ),
             domain_name=os.getenv('DOMAIN_NAME'),
         ),
         db=DataBaseConfig(
