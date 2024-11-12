@@ -28,10 +28,10 @@ async def setup_webhook():
 
 
 async def on_startup():
+    setup_logging()
     await load_languages_to_redis()
     register_routers(dp)
     register_middlewares(dp)
-    setup_logging()
     scheduler.start()
     await setup_webhook()
     logger.info("App has been started")
@@ -48,7 +48,7 @@ def init_fast_api_handlers(app: FastAPI) -> None:
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(debug=False, docs_url=None, redoc_url=None)
+    app = FastAPI(debug=True, docs_url=None, redoc_url=None)
     init_fast_api_handlers(app)
     register_fastapi_routers(app)
     return app

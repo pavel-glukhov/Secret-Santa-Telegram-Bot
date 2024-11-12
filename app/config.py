@@ -143,7 +143,10 @@ def webhook_settings(config) -> dict:
 def setup_logging() -> None:
     config = load_config()
     configuration_file = os.path.join(ROOT_PATH, config.log.config_file)
-    
+
+    if not os.path.exists(config.log.log_path):
+        os.makedirs(config.log.log_path)
+
     with open(configuration_file, 'r') as stream:
         logging_cfg = yaml.load(stream, Loader=yaml.FullLoader)
     

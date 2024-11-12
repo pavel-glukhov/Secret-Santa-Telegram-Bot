@@ -40,13 +40,14 @@ class LanguageMiddleware(BaseMiddleware):
 
         chat_id = self._get_chat_id(event)
         if chat_id is not None:
+            data['available_languages'] = available_languages
             user_language = await UserRepo(session).get_user_language(chat_id)
-            app_language = await language_return_dataclass(self.redis_client(), user_language)
-            data['app_text_msg'] = app_language if user_language else None
-        else:
-            data['app_text_msg'] = None
+            if user_language:
+                data['app_text_msg'] = await language_return_dataclass(self.redis_client(), user_language)
+            else:
+                data['app_text_msg'] = None
 
-        data['available_languages'] = available_languages
+
         return await handler(event, data)
 
     def _get_chat_id(self, event: Update):

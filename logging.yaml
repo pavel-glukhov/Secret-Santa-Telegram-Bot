@@ -10,7 +10,7 @@ formatters:
 handlers:
   console_handler:
     class: logging.StreamHandler
-    level: DEBUG
+    level: INFO
     formatter: default
     stream: ext://sys.stdout
 
@@ -31,17 +31,17 @@ loggers:
     propagate: no
 
   fastapi:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
 
   aiogram.event:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
 
   sqlalchemy:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
 

@@ -31,9 +31,10 @@ async def start(message: types.Message, state: FSMContext,
                 app_text_msg: TranslationMainSchema,
                 available_languages: list):
     if not app_text_msg:
+        await create_user_or_enable(message, session)
         await select_language(message, available_languages)
         return None
-    
+
     await state.clear()
     message_text = app_text_msg.messages.main_menu.start_message
 
