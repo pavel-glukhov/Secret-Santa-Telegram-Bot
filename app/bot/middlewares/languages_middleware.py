@@ -1,4 +1,5 @@
 from typing import Callable, Generator
+
 from aiogram import BaseMiddleware
 from aiogram.types import Update
 from sqlalchemy.orm import scoped_session

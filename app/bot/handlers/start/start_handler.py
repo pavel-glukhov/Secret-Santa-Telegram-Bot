@@ -43,7 +43,6 @@ async def start(message: types.Message, state: FSMContext,
 
 
 @router.callback_query(F.data == 'root_menu')
-@router.message(Command(commands=['menu']))
 async def root_menu(data: types.Message | types.CallbackQuery,
                     session: Session,
                     app_text_msg: TranslationMainSchema,

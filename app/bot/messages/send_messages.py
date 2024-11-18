@@ -4,6 +4,7 @@ import logging
 from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
                                 TelegramRetryAfter)
 from aiohttp import ClientError
+
 from app.bot.loader import bot
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,13 @@
-from app.bot.handlers.communication import (message_to_recipient, message_to_sender)
+from app.bot.handlers.communication import (message_to_recipient,
+                                            message_to_sender)
 from app.bot.handlers.game import start_game_general_menu
-from app.bot.handlers.profiles import (change_address, change_name, change_number, delete_information,
+from app.bot.handlers.profiles import (change_address, change_name,
+                                       change_number, delete_information,
                                        profile_general_menu)
-from app.bot.handlers.rooms import (activate, change_budget, change_owner, config_room, create_new_room, delete_room,
-                                    members, rooms_general_menu, subscribe, unsubscribe, update_room)
+from app.bot.handlers.rooms import (activate, change_budget, change_owner,
+                                    config_room, create_new_room, delete_room,
+                                    members, rooms_general_menu, subscribe,
+                                    unsubscribe, update_room)
 from app.bot.handlers.start import about, language, start_handler
 from app.bot.handlers.time_zones import change_timezone_general_menu
 from app.bot.handlers.wishes import wishes_general_menu

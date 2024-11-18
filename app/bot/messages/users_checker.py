@@ -1,9 +1,10 @@
 import asyncio
 import logging
 
-from aiogram.exceptions import (TelegramAPIError, TelegramForbiddenError,
-                                TelegramRetryAfter, TelegramBadRequest)
+from aiogram.exceptions import (TelegramAPIError, TelegramBadRequest,
+                                TelegramForbiddenError, TelegramRetryAfter)
 from aiohttp import ClientError
+
 from app.bot.loader import bot
 from app.store.database.queries.users import UserRepo
 

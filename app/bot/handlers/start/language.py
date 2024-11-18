@@ -28,12 +28,6 @@ async def update_language(callback: types.CallbackQuery, session: Session):
     selected_language = callback.data[12:]
     await UserRepo(session).update_user(user_id=callback.message.chat.id, language=selected_language)
     app_language = await language_return_dataclass(get_redis_client(), selected_language)
-    logger.info('----------------------------------------------------------')
-    logger.info('----------------------------------------------------------')
-    logger.info(app_language)
-    logger.info('----------------------------------------------------------')
-    logger.info('----------------------------------------------------------')
-
     keyboard_inline = generate_inline_keyboard(
         {app_language.buttons.continue_button: "root_menu"})
 

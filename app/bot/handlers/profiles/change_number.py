@@ -44,7 +44,6 @@ async def process_changing_owner(message: types.Message,
     state_data = await state.get_data()
     phone_number = message.text
     user_id = message.chat.id
-    text = message.text
     bot_message = state_data['bot_message_id']
 
     await message.delete()
