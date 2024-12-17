@@ -112,7 +112,7 @@
         }
       },
       "wishes_menu": {
-        "your_wishes": "Ваші таємні бажання \uD83D\uDE4A: \n: {wishes}\n",
+        "your_wishes": "Ваші таємні бажання \uD83D\uDE4A:\n{wishes}\n",
         "new_wishes": "<b>Напишіть нове бажання:</b>\n",
         "changed_wishes": "Ваші бажання в кімнаті <b>{room_name}</b> змінено на:\n\n{wish}\n\nСанта обов'язково врахує ваші побажання! \uD83C\uDF85"
       },

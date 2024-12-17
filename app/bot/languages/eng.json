@@ -112,7 +112,7 @@
         }
       },
       "wishes_menu": {
-        "your_wishes": "Your secret wishes \uD83D\uDE4A: \n: {wishes}\n",
+        "your_wishes": "Your secret wishes \uD83D\uDE4A:\n{wishes}\n",
         "new_wishes": "<b>Write a new wish:</b>\n",
         "changed_wishes": "Your wishes in the room <b>{room_name}</b> have been changed to:\n\n{wish}\n\nSanta will definitely take your wishes into account! \uD83C\uDF85"
       },

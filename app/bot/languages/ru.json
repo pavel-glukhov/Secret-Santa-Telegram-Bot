@@ -112,7 +112,7 @@
         }
       },
       "wishes_menu": {
-        "your_wishes": "Ваши тайные желания \uD83D\uDE4A: \n: {wishes}\n",
+        "your_wishes": "Ваши тайные желания \uD83D\uDE4A:\n{wishes}\n",
         "new_wishes": "<b>Напиши новое желание:</b>\n",
         "changed_wishes": "Ваши желания в комнате <b>{room_name}</b> изменены на:\n\n{wish}\n\nСанта обязательно учтет ваши пожелания! \uD83C\uDF85"
       },

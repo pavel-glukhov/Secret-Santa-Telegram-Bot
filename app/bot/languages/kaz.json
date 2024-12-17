@@ -112,7 +112,7 @@
         }
       },
       "wishes_menu": {
-        "your_wishes": "Сіздің құпия тілектеріңіз \uD83D\uDE4A: \n: {wishes}\n",
+        "your_wishes": "Сіздің құпия тілектеріңіз \uD83D\uDE4A:\n{wishes}\n",
         "new_wishes": "<b>Жаңа тілекті жазыңыз:</b>\n",
         "changed_wishes": "<b>{room_name}</b> бөлмесіндегі тілектеріңіз өзгертілді:\n\n{wish}\n\nСанта міндетті түрде сіздің тілектеріңізді ескереді! \uD83C\uDF85"
       },
