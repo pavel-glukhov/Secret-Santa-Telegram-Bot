@@ -20,7 +20,7 @@ class WishRepo:
         
         if user and room:
             user_wish_in_room = self.session.query(WishRoom).filter_by(user=user, room=room).first()
-            return user_wish_in_room
+            return user_wish_in_room.wish
         
         return None
 
