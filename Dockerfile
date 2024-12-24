@@ -1,6 +1,7 @@
 FROM python:3.12
 
 RUN mkdir /code
+RUN mkdir /code/logs
 COPY requirements.txt /code
 RUN pip install --upgrade setuptools
 RUN pip install --upgrade pip
