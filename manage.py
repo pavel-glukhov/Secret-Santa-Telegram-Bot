@@ -3,7 +3,7 @@ import asyncio
 import logging
 
 import requests
-from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy.orm import scoped_session
 
 from app.config import load_config
 from app.store.database.queries.users import UserRepo
