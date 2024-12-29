@@ -64,12 +64,12 @@ class RoomRepo:
         :param room_number: Number of game room
         :return: Bool
         """
-        user = self.session.query(User).filter_by(user_id=user_id).first()
+
         room = self.session.query(Room).filter_by(number=room_number).first()
-        
         if not room:
             return False
-        
+
+        user = self.session.query(User).filter_by(user_id=user_id).first()
         room.members.append(user)
         self.session.commit()
         return True
@@ -170,7 +170,11 @@ class RoomRepo:
         :param user_id: Telegram user ID of the user
         :return: List of Room instances
         """
-        rooms = self.session.query(Room).join(rooms_users).filter(rooms_users.c.user_id == user_id).all()
+        rooms = self.session.query(
+            Room).join(
+            rooms_users).filter(
+            rooms_users.c.user_id == user_id
+        ).all()
         return rooms
     
     async def delete(self, room_number: int):
@@ -226,7 +230,10 @@ class RoomRepo:
         :param user_id: Telegram user ID of the user
         :return: Count of rooms owned by the user
         """
-        return self.session.query(Room).filter_by(owner_id=user_id).count()
+        return self.session.query(
+            Room).filter_by(
+            owner_id=user_id
+        ).count()
     
     def _get_room_unique_number(self) -> int:
         

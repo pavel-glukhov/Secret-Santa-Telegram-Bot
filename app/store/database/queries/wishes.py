@@ -19,12 +19,16 @@ class WishRepo:
         room = self.session.query(Room).filter_by(number=room_id).first()
         
         if user and room:
-            user_wish_in_room = self.session.query(WishRoom).filter_by(user=user, room=room).first()
+            user_wish_in_room = self.session.query(
+                WishRoom).filter_by(user=user, room=room).first()
             return user_wish_in_room.wish
         
         return None
 
-    async def create_or_update_wish_for_room(self, wish: str, user_id: int, room_id: int) -> None:
+    async def create_or_update_wish_for_room(self,
+                                             wish: str,
+                                             user_id: int,
+                                             room_id: int) -> None:
         """
         Create or update a wish for a specific room
 
@@ -36,12 +40,17 @@ class WishRepo:
         room = self.session.query(Room).filter_by(number=room_id).first()
     
         if user and room:
-            existing_wish = self.session.query(WishRoom).filter_by(user_id=user.user_id, room_id=room.id).first()
+            existing_wish = self.session.query(
+                WishRoom).filter_by(
+                user_id=user.user_id, room_id=room.id
+            ).first()
         
             if existing_wish:
                 existing_wish.wish = wish
             else:
-                new_wish = WishRoom(user=user, room=room, wish=wish)
+                new_wish = WishRoom(user=user,
+                                    room=room,
+                                    wish=wish)
                 self.session.add(new_wish)
         
             self.session.commit()
@@ -53,7 +62,10 @@ class WishRepo:
         :param user_id: Telegram user ID of the user
         :param room_id: Room number
         """
-        user_wish_in_room = self.session.query(WishRoom).filter_by(user_id=user_id, room_id=room_id).first()
+        user_wish_in_room = self.session.query(
+            WishRoom).filter_by(
+            user_id=user_id, room_id=room_id
+        ).first()
         
         if user_wish_in_room:
             self.session.delete(user_wish_in_room)

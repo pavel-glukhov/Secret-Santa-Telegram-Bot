@@ -22,9 +22,11 @@ class PaginatorRepo:
             for rel in related:
                 query = query.options(joinedload(rel))
         
-        total_items = await self.session.scalar(select(func.count()).select_from(model))
+        total_items = await self.session.scalar(
+            select(func.count()).select_from(model))
         
-        result = await self.session.execute(query.limit(page_size).offset((page - 1) * page_size))
+        result = await self.session.execute(
+            query.limit(page_size).offset((page - 1) * page_size))
         items = result.scalars().all()
         
         return items, total_items
