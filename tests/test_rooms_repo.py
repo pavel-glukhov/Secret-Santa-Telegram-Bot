@@ -13,10 +13,10 @@ def room_repo(session):
 
 @pytest.mark.asyncio
 async def test_create_room(room_repo, session):
-    user = User(user_id=4000000, username="test_432562")
+    user = User(user_id=4000999, username="test_432532")
     add_and_commit(session, user)
     room = await room_repo.create(name="Room1",
-                                  owner_id=4000000,
+                                  owner_id=user.user_id,
                                   budget="100$",
                                   user_wish="Books")
 

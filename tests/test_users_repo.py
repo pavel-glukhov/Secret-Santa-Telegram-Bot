@@ -23,7 +23,7 @@ def user(session):
 
 @pytest.mark.asyncio
 async def test_get_or_create_user(user_repo, session):
-    user_id = 1000001
+    user_id = 999999999
     user_data = {
         "username": "testuser",
         "language": "en",
@@ -80,7 +80,8 @@ async def test_get_user_language(user_repo, session):
     assert await user_repo.get_user_language(999) is None
 
 @pytest.mark.asyncio
-async def test_list_rooms_where_owner(user_repo, session, user):
+async def test_list_rooms_where_owner(user_repo, session):
+    user = User(user_id=934055335, username="count_user_999442", language="es")
     room1 = Room(number=234523,
                  name="test_room1",
                  budget="200$",
@@ -90,7 +91,7 @@ async def test_list_rooms_where_owner(user_repo, session, user):
                  budget="200$",
                  owner_id=user.user_id)
 
-    add_and_commit(session, room1, room2)
+    add_and_commit(session, room1, room2, user)
 
     rooms = await user_repo.list_rooms_where_owner(user)
     assert len(rooms) == 2
