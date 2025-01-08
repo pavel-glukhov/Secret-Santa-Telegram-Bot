@@ -1,14 +1,25 @@
 import pytest
+from sqlalchemy.exc import IntegrityError
+
 from app.store.database.models import User, Room
 from app.store.database.queries.users import UserRepo
+
+from tests.conftest import add_and_commit
+
 
 @pytest.fixture
 def user_repo(session):
     return UserRepo(session)
 
-def add_and_commit(session, *entities):
-    session.add_all(entities)
-    session.commit()
+@pytest.fixture(scope='function')
+def user(session):
+    user = User(user_id=3000000,
+                username="test_432562")
+    try:
+        add_and_commit(session, user)
+    except IntegrityError:
+        session.rollback()
+    return user
 
 @pytest.mark.asyncio
 async def test_get_or_create_user(user_repo, session):
@@ -30,49 +41,35 @@ async def test_get_or_create_user(user_repo, session):
     assert created is False
 
 @pytest.mark.asyncio
-async def test_get_user_or_none(user_repo, session):
-    user = User(user_id=1000002, username="user2", language="fr")
-    add_and_commit(session, user)
-
-    fetched_user = await user_repo.get_user_or_none(1000002)
+async def test_get_user_or_none(user_repo, user):
+    fetched_user = await user_repo.get_user_or_none(3000000)
     assert fetched_user is not None
-    assert fetched_user.user_id == 1000002
+    assert fetched_user.user_id == 3000000
 
-    fetched_user = await user_repo.get_user_or_none("user2")
+    fetched_user = await user_repo.get_user_or_none("test_432562")
     assert fetched_user is not None
-    assert fetched_user.username == "user2"
+    assert fetched_user.username == "test_432562"
 
     assert await user_repo.get_user_or_none(0) is None
 
 @pytest.mark.asyncio
-async def test_update_user(user_repo, session):
-    user = User(user_id=1000003, username="user3", language="en")
-    add_and_commit(session, user)
+async def test_update_user(user_repo, session, user):
+    await user_repo.update_user(user_id=user.user_id,
+                                first_name="first_name123",
+                                last_name="last_name_123",
+                                language="ru")
 
-    await user_repo.update_user(user_id=1000003, username="updated_user3", language="ru")
-
-    updated_user = session.get(User, 1000003)
-    assert updated_user.username == "updated_user3"
+    updated_user = session.get(User, user.user_id)
     assert updated_user.language == "ru"
-
+    assert updated_user.first_name == "first_name123"
+    assert updated_user.last_name == "last_name_123"
 @pytest.mark.asyncio
-async def test_disable_enable_user(user_repo, session):
-    user = User(user_id=1000006, username="disable_user", is_active=True)
-    add_and_commit(session, user)
+async def test_disable_enable_user(user_repo, session, user):
+    await user_repo.disable_user(user.user_id)
+    assert session.get(User, user.user_id).is_active is False
 
-    await user_repo.disable_user(1000006)
-    assert session.get(User, 1000006).is_active is False
-
-    await user_repo.enable_user(1000006)
-    assert session.get(User, 1000006).is_active is True
-
-@pytest.mark.asyncio
-async def test_delete_user(user_repo, session):
-    user = User(user_id=1000007, username="delete_user")
-    add_and_commit(session, user)
-
-    await user_repo.delete_user(1000007)
-    assert session.get(User, 1000007) is None
+    await user_repo.enable_user(user.user_id)
+    assert session.get(User, user.user_id).is_active is True
 
 @pytest.mark.asyncio
 async def test_get_user_language(user_repo, session):
@@ -83,11 +80,17 @@ async def test_get_user_language(user_repo, session):
     assert await user_repo.get_user_language(999) is None
 
 @pytest.mark.asyncio
-async def test_list_rooms_where_owner(user_repo, session):
-    user = User(user_id=1000009, username="owner_user_943")
-    room1 = Room(number=234523, name="test_room1", budget="200$", owner_id=1000009)
-    room2 = Room(number=532453, name="test_room2", budget="200$", owner_id=1000009)
-    add_and_commit(session, user, room1, room2)
+async def test_list_rooms_where_owner(user_repo, session, user):
+    room1 = Room(number=234523,
+                 name="test_room1",
+                 budget="200$",
+                 owner_id=user.user_id)
+    room2 = Room(number=532453,
+                 name="test_room2",
+                 budget="200$",
+                 owner_id=user.user_id)
+
+    add_and_commit(session, room1, room2)
 
     rooms = await user_repo.list_rooms_where_owner(user)
     assert len(rooms) == 2
@@ -95,10 +98,19 @@ async def test_list_rooms_where_owner(user_repo, session):
     assert room2 in rooms
 
 @pytest.mark.asyncio
-async def test_is_room_owner(user_repo, session):
-    user = User(user_id=1000010, username="owner_check")
-    room = Room(number=324521, name="test_room3", budget="200$", owner_id=1000010)
-    add_and_commit(session, user, room)
+async def test_is_room_owner(user_repo, session, user):
+    room = Room(number=324521,
+                name="test_room3",
+                budget="200$",
+                owner_id=user.user_id)
+    add_and_commit(session, room)
 
     assert await user_repo.is_room_owner(user, 324521) is True
     assert await user_repo.is_room_owner(user, 999999) is False
+
+
+@pytest.mark.asyncio
+async def test_delete_user(user_repo, session, user):
+    await user_repo.delete_user(user.user_id)
+    assert session.get(User, user.user_id) is None
+
