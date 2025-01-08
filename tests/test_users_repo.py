@@ -84,9 +84,9 @@ async def test_get_user_language(user_repo, session):
 
 @pytest.mark.asyncio
 async def test_list_rooms_where_owner(user_repo, session):
-    user = User(user_id=1000009, username="owner_user")
-    room1 = Room(id=1, number=100101, name="test_room1", budget="200$", owner_id=1000009)
-    room2 = Room(id=2, number=100102, name="test_room2", budget="200$", owner_id=1000009)
+    user = User(user_id=1000009, username="owner_user_943")
+    room1 = Room(number=234523, name="test_room1", budget="200$", owner_id=1000009)
+    room2 = Room(number=532453, name="test_room2", budget="200$", owner_id=1000009)
     add_and_commit(session, user, room1, room2)
 
     rooms = await user_repo.list_rooms_where_owner(user)
@@ -97,8 +97,8 @@ async def test_list_rooms_where_owner(user_repo, session):
 @pytest.mark.asyncio
 async def test_is_room_owner(user_repo, session):
     user = User(user_id=1000010, username="owner_check")
-    room = Room(id=3, number=100103, name="test_room3", budget="200$", owner_id=1000010)
+    room = Room(number=324521, name="test_room3", budget="200$", owner_id=1000010)
     add_and_commit(session, user, room)
 
-    assert await user_repo.is_room_owner(user, 100103) is True
+    assert await user_repo.is_room_owner(user, 324521) is True
     assert await user_repo.is_room_owner(user, 999999) is False
