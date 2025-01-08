@@ -87,18 +87,6 @@ class UserRepo:
             self.session.delete(user)
             self.session.commit()
 
-    async def get_list_all_users(self, order_by: str = 'user_id'):
-        """Get list of all users"""
-        result = self.session.execute(
-            select(User).order_by(order_by))
-        return result.scalars().all()
-
-    async def count_users(self) -> int:
-        """Get count of all users"""
-        result = self.session.execute(
-            select([func.count()]).select_from(User))
-        return result.scalar()
-
     async def get_user_language(self, user_id):
         user = self.session.query(
             User).filter(
