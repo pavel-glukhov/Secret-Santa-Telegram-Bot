@@ -7,12 +7,15 @@ from app.store.database.queries.rooms import RoomRepo
 def room_repo(session):
     return RoomRepo(session)
 
+def add_and_commit(session, *entities):
+    session.add_all(entities)
+    session.commit()
+
 
 @pytest.mark.asyncio
 async def test_create_room(room_repo, session):
     user = User(user_id=1000001, username="owner")
-    session.add(user)
-    session.commit()
+    add_and_commit(session, user)
 
     room = await room_repo.create(name="Room1",
                                   owner_id=1000001,
@@ -34,9 +37,7 @@ async def test_update_room(room_repo, session):
                 budget="100$",
                 number=100102,
                 )
-
-    session.add(room)
-    session.commit()
+    add_and_commit(session, room)
 
     room = session.query(Room).filter_by(name='Room2').first()
 
@@ -52,8 +53,8 @@ async def test_update_room(room_repo, session):
 async def test_add_member(room_repo, session):
     user = User(user_id=1000002, username="member")
     room = Room(name="Room_add_tst", budget="200", owner_id=1000001, number=100103)
-    session.add_all([user, room])
-    session.commit()
+    add_and_commit(session, user, room)
+
 
     room = session.query(Room).filter_by(name='Room_add_tst').first()
     result = await room_repo.add_member(user_id=1000002, room_number=room.number)
@@ -66,8 +67,7 @@ async def test_remove_member(room_repo, session):
     user = User(user_id=1000003, username="member2")
     room = Room(name="Room3", number=98765, budget="300", owner_id=1000003)
     room.members.append(user)
-    session.add_all([user, room])
-    session.commit()
+    add_and_commit(session, user, room)
 
     await room_repo.remove_member(user_id=1000003, room_number=98765)
     assert user not in room.members
@@ -79,8 +79,7 @@ async def test_is_member(room_repo, session):
 
     room = Room(name="Room4", number=13579, budget="400$", owner_id=1000004)
     room.members.append(user)
-    session.add_all([user,room])
-    session.commit()
+    add_and_commit(session, user, room)
 
     assert await room_repo.is_member(user_id=1000004, room_number=13579) is True
     assert await room_repo.is_member(user_id=1000099, room_number=13579) is False
@@ -89,8 +88,7 @@ async def test_is_member(room_repo, session):
 @pytest.mark.asyncio
 async def test_is_room_owner(room_repo, session):
     room = Room(name="Room5", number=24680, budget="500$", owner_id=1000001)
-    session.add(room)
-    session.commit()
+    add_and_commit(session,  room)
 
     assert await room_repo.is_owner(user_id=1000001, room_number=24680) is True
     assert await room_repo.is_owner(user_id=1000002, room_number=24680) is False
@@ -98,8 +96,7 @@ async def test_is_room_owner(room_repo, session):
 @pytest.mark.asyncio
 async def test_delete_room(room_repo, session):
     room = Room(name="Room6", number=111222, budget="600", owner_id=1000001)
-    session.add(room)
-    session.commit()
+    add_and_commit(session,  room)
 
     assert await room_repo.delete(room_number=111222) is True
     assert session.query(Room).filter_by(number=111222).first() is None
