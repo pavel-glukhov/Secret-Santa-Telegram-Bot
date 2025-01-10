@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Backup a Postgresql database
+# Backup the postgresql database
 #
 
 BACKUP_DIR=/backups/database/
