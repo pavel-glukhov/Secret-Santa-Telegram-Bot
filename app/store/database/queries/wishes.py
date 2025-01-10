@@ -6,7 +6,7 @@ from app.store.database.models import Room, User, WishRoom
 class WishRepo:
     def __init__(self, session: Session):
         self.session = session
-    
+
     async def get(self, user_id: int, room_id: int) -> WishRoom | None:
         """
         Get user's wish for a specific room
@@ -17,12 +17,12 @@ class WishRepo:
         """
         user = self.session.query(User).filter_by(user_id=user_id).first()
         room = self.session.query(Room).filter_by(number=room_id).first()
-        
+
         if user and room:
             user_wish_in_room = self.session.query(
                 WishRoom).filter_by(user=user, room=room).first()
             return user_wish_in_room.wish
-        
+
         return None
 
     async def create_or_update_wish_for_room(self,
@@ -38,13 +38,13 @@ class WishRepo:
         """
         user = self.session.query(User).filter_by(user_id=user_id).first()
         room = self.session.query(Room).filter_by(number=room_id).first()
-    
+
         if user and room:
             existing_wish = self.session.query(
                 WishRoom).filter_by(
                 user_id=user.user_id, room_id=room.id
             ).first()
-        
+
             if existing_wish:
                 existing_wish.wish = wish
             else:
@@ -52,9 +52,9 @@ class WishRepo:
                                     room=room,
                                     wish=wish)
                 self.session.add(new_wish)
-        
+
             self.session.commit()
-    
+
     async def delete(self, user_id: int, room_id: int) -> None:
         """
         Delete user's wish for a specific room
@@ -66,7 +66,7 @@ class WishRepo:
             WishRoom).filter_by(
             user_id=user_id, room_id=room_id
         ).first()
-        
+
         if user_wish_in_room:
             self.session.delete(user_wish_in_room)
             self.session.commit()
