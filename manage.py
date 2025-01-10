@@ -1,7 +1,7 @@
 import argparse
 import asyncio
 import logging
-
+from cryptography.fernet import Fernet
 import requests
 from sqlalchemy.orm import scoped_session
 
@@ -47,6 +47,8 @@ def register_webhook():
     print(f'Result: {data.get("result")}')
     print(f'Result: {data.get("description")}')
 
+def generate_encryption_key():
+    print(Fernet.generate_key().decode())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -68,14 +70,22 @@ if __name__ == "__main__":
     register_webhook_parser = subparsers.add_parser(
         'register_webhook',
         help='Set telegram webhook url.')
-    
+
+    generate_encryption_key_parser = subparsers.add_parser(
+        'generate_key',
+        help='Generate base64 encryption key')
+
     args = parser.parse_args()
-    
-    if args.command == 'set_superuser':
+
+    if args.command is None:
+        parser.print_help()
+    elif args.command == 'set_superuser':
         set_superuser(args.telegram_id)
     elif args.command == 'remove_superuser':
         remove_superuser(args.telegram_id)
     elif args.command == 'register_webhook':
         register_webhook()
+    elif args.command == 'generate_key':
+        generate_encryption_key()
     else:
         print("Incorrect command.")

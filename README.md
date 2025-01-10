@@ -69,19 +69,26 @@
 6. Redis
 
 ### Запуск Бота:
+- Создать свой .env файл по шаблону .env.example
+- Для генерации параметра **ENCRYPT_SECRET_KEY** в **.env** файле, используйте: 
+     ```
+        python .\manage.py generate_key
+    ```
 
 #### Ручной запуск:
+
 
 - Установить PostgreSQL и Redis, сконфигурировать и создать БД.
     - Redis требует включения доступа по паролю:
        ```
       sudo nano /etc/redis/redis.conf
       # requirepass foobared
-      ```
-    - Создать свой .env файл по шаблону .env.example
+
     -  ```pip install -r requirements ```
     -  ```alembic upgrade head ```
     -  ```uvicorn app.cli:create_app --reload ```
+    
+
 
 #### В Docker контейнере:
 
