@@ -65,7 +65,9 @@ async def test_get_room_id_count(game_repo, session):
 
 @pytest.mark.asyncio
 async def test_get_sender(game_repo, session):
-    room = Room(number=444222, name="get_room_23514", budget="200$")
+    room = Room(number=444222,
+                name="get_room_23514",
+                budget="200$")
     recipient = User(user_id=40000005,
                      username="User1033")
     sender = User(user_id=40000006,
