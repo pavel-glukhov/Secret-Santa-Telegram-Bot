@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-from functools import lru_cache
 
 from pydantic import ValidationError
 from redis import Redis
@@ -39,7 +38,6 @@ async def load_language_files_to_redis(
     return None
 
 
-@lru_cache
 async def language_return_dataclass(
         redis_client: Redis, user_language: str) -> TranslationMainSchema:
     try:

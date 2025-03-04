@@ -48,7 +48,7 @@ async def creating_active_users_pool(
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
                 'player_contact_number': player.get_number(),
-                'player_wish': wish.wish,
+                'player_wish': wish,
                 'player_language': await language_return_dataclass(radis_client, player.language)
             }
             

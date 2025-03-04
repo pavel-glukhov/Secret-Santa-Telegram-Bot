@@ -133,7 +133,7 @@ async def process_waiting_datetime(message: types.Message,
             await RoomRepo(session).update(room_number, started_at=datetime.now(),
                                            closed_at=None, is_closed=False)
 
-            datetime_set_to = datetime_obj.strftime("%Y.%m.%d %H:%M")
+            datetime_set_to = datetime_obj.strftime("%d %b %Y %H:%M")
             message_text = app_text_msg.messages.game_menu.start_game.time_set_to.format(
                 datetime_set_to=datetime_set_to)
 
