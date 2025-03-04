@@ -4,7 +4,7 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
+from app.bot.handlers.communication.send_answer import send_answer
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema, language_return_dataclass
 from app.bot.messages.send_messages import send_message
@@ -27,28 +27,9 @@ async def message_to_santa_no_edit(callback: types.CallbackQuery,
 
 
 @router.callback_query(F.data.startswith('room_closed-con-rec'))
-async def message_to_recipient(callback: types.CallbackQuery,
-                               state: FSMContext,
-                               app_text_msg: TranslationMainSchema,
-                               edit_message=True):
-    cancel_button = app_text_msg.buttons.cancel_button
-    keyboard_inline = generate_inline_keyboard(
-        {
-            cancel_button: 'cancel',
-        }
-    )
-    message_text = app_text_msg.messages.communication_menu.message_to_recipient.first_msg
-
-    if edit_message:
-        initial_bot_message = await callback.message.edit_text(text=message_text,
-                                                               reply_markup=keyboard_inline)
-    else:
-        initial_bot_message = await callback.message.answer(text=message_text,
-                                                            reply_markup=keyboard_inline)
-
-    await state.update_data(bot_message_id=initial_bot_message,
-                            room_number=get_room_number(callback))
-    await state.set_state(MessageToRecipient.waiting_message)
+async def message_to_recipient(callback: types.CallbackQuery, state: FSMContext,
+                               app_text_msg: TranslationMainSchema, edit_message=True):
+    await send_answer(callback, state, app_text_msg, edit_message, "recipient")
 
 
 @router.message(MessageToRecipient.waiting_message)
