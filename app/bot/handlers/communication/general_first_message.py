@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-async def send_answer(callback, state, app_text_msg, edit_message, recipient_type):
+async def send_first_message_to_user(callback, state, app_text_msg, edit_message, recipient_type):
     cancel_button = app_text_msg.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard({cancel_button: 'cancel'})
 

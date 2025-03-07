@@ -4,7 +4,7 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.communication.send_answer import send_answer
+from app.bot.handlers.communication.general_first_message import send_first_message_to_user
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema, language_return_dataclass
 from app.bot.messages.send_messages import send_message
@@ -29,7 +29,7 @@ async def message_to_santa_no_edit(callback: types.CallbackQuery,
 @router.callback_query(F.data.startswith('room_closed-con-rec'))
 async def message_to_recipient(callback: types.CallbackQuery, state: FSMContext,
                                app_text_msg: TranslationMainSchema, edit_message=True):
-    await send_answer(callback, state, app_text_msg, edit_message, "recipient")
+    await send_first_message_to_user(callback, state, app_text_msg, edit_message, "recipient")
 
 
 @router.message(MessageToRecipient.waiting_message)

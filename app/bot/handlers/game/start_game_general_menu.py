@@ -112,17 +112,16 @@ async def process_waiting_datetime(message: types.Message,
             app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
         }
     )
-    if timezone:
-        timezone = pytz.timezone(timezone)
-        datetime_obj = _convert_datetime_with_timezone(_parse_date(text),
-                                                       timezone)
-        current_time = datetime.now(timezone)
-    else:
-        datetime_obj = _parse_date(text)
-        current_time = datetime.now()
+
+    timezone = pytz.timezone(timezone) if timezone else None
+    datetime_obj = _convert_datetime_with_timezone(
+        _parse_date(text), timezone) if timezone else _parse_date(text)
+
+    current_time = datetime.now(timezone) if timezone else datetime.now()
 
     if datetime_obj:
         if datetime_obj > current_time:
+
             if task := get_task(task_id=room_number):
                 task.remove()
 
@@ -139,19 +138,23 @@ async def process_waiting_datetime(message: types.Message,
 
             await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
             await state.clear()
-        else:
-            current_time_str = current_time.strftime("%Y.%m.%d %H:%M")
-            datetime_obj_str = datetime_obj.strftime("%Y.%m.%d %H:%M")
-            message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
-                current_time_str=current_time_str,
-                datetime_obj_str=datetime_obj_str)
 
-            await _incorrect_data_format(bot_message, message_text,
-                                         cancel_keyboard_inline)
-    else:
-        message_text = app_text_msg.messages.game_menu.start_game.incorrect_datetime
+            return None
+
+        current_time_str = current_time.strftime("%Y.%m.%d %H:%M")
+        datetime_obj_str = datetime_obj.strftime("%Y.%m.%d %H:%M")
+
+        message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
+            current_time_str=current_time_str,
+            datetime_obj_str=datetime_obj_str)
+
         await _incorrect_data_format(bot_message, message_text,
                                      cancel_keyboard_inline)
+        return None
+
+    message_text = app_text_msg.messages.game_menu.start_game.incorrect_datetime
+    await _incorrect_data_format(bot_message, message_text,
+                                 cancel_keyboard_inline)
 
 
 def _convert_datetime_with_timezone(datetime_obj: datetime,
