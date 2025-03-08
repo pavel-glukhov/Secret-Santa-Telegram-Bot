@@ -34,4 +34,5 @@ async def configuration_room(callback: types.CallbackQuery,
 
     await callback.message.edit_text(
         text=message_text,
-        reply_markup=keyboard_inline, )
+        reply_markup=keyboard_inline
+    )

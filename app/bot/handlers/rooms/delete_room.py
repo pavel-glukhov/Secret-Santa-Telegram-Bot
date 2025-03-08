@@ -58,7 +58,10 @@ async def process_delete_room_invalid(message: types.Message,
         room_number=room_number
     )
 
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
 
 @router.message(lambda message: message.text.lower() in ['confirm'],
@@ -82,7 +85,10 @@ async def completed_process_delete_room(message: types.Message,
 
     if is_room_deleted:
         message_text = app_text_msg.messages.rooms_menu.delete_room.delete_room_second_msg
-        await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+        await bot_message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
 
         logger.info(
             f'The user [{message.from_user.id}]'
@@ -91,7 +97,10 @@ async def completed_process_delete_room(message: types.Message,
     else:
         message_text = app_text_msg.messages.rooms_menu.delete_room.error
 
-        await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+        await bot_message.edit_text(
+            text=message_text,
+            reply_markup=keyboard_inline
+        )
         logger.info(
             f'The room [{room_number}]'
             'was not removed removed'

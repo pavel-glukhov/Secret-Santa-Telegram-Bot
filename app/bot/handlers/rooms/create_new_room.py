@@ -43,7 +43,8 @@ async def create_room(callback: types.CallbackQuery,
         {cancel_button: 'cancel'})
     message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_first_msg
 
-    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(text=message_text,
+                                                           reply_markup=keyboard_inline)
 
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(CreateRoom.waiting_for_room_name)
@@ -73,13 +74,17 @@ async def process_name(message: types.Message,
             {cancel_button: 'cancel'})
         message_text = app_text_msg.messages.rooms_menu.create_new_room.long_room_name
 
-        return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+        return await bot_message.edit_text(text=message_text,
+                                           reply_markup=keyboard_inline)
     await state.set_state(CreateRoom.waiting_for_room_budget)
 
     message_text = app_text_msg.messages.rooms_menu.create_new_room.create_new_room_second_msg.format(
         room_name=room_name
     )
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
 
 @router.message(lambda message:
@@ -101,12 +106,16 @@ async def process_budget_invalid(message: types.Message,
 
     message_text = app_text_msg.messages.rooms_menu.create_new_room.long_budget
 
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
 
 @router.message(CreateRoom.waiting_for_room_budget)
 async def process_budget(message: types.Message,
-                         state: FSMContext, app_text_msg: TranslationMainSchema):
+                         state: FSMContext,
+                         app_text_msg: TranslationMainSchema):
     await state.update_data(wishes_question_message_id=message.message_id)
     state_data = await state.get_data()
     await message.delete()
@@ -124,7 +133,10 @@ async def process_budget(message: types.Message,
         room_budget=room_budget
     )
 
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
 
 @router.message(CreateRoom.waiting_for_room_wishes)

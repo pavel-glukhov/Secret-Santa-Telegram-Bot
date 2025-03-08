@@ -28,7 +28,9 @@ async def update_room_name(callback: types.CallbackQuery,
 
     message_text = app_text_msg.messages.rooms_menu.update_room.update_room_first_msg
 
-    initial_bot_message = await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline)
 
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeRoomName.waiting_for_room_name)
@@ -36,7 +38,8 @@ async def update_room_name(callback: types.CallbackQuery,
 
 @router.message(lambda message: len(message.text.lower()) > 16,
                 StateFilter(ChangeRoomName.waiting_for_room_name))
-async def process_change_room_name_invalid(message: types.Message, state: FSMContext,
+async def process_change_room_name_invalid(message: types.Message,
+                                           state: FSMContext,
                                            app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     await message.delete()
@@ -51,12 +54,17 @@ async def process_change_room_name_invalid(message: types.Message, state: FSMCon
                 f' command from [{message.from_user.id}] ')
 
     message_text = app_text_msg.messages.rooms_menu.update_room.long_name
-    await bot_message.edit_text(text=message_text, reply_markup=cancel_keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=cancel_keyboard_inline
+    )
 
 
 @router.message(ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
-                                     state: FSMContext, session: Session, app_text_msg: TranslationMainSchema):
+                                     state: FSMContext,
+                                     session: Session,
+                                     app_text_msg: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     new_room_name = message.text
@@ -64,8 +72,10 @@ async def update_room_name_get_value(message: types.Message,
 
     bot_message = state_data['bot_message_id']
 
-    await RoomRepo(session).update(room_number=room_number,
-                                   name=new_room_name)
+    await RoomRepo(session).update(
+        room_number=room_number,
+        name=new_room_name
+    )
 
     keyboard_inline = generate_inline_keyboard(
         {
@@ -78,6 +88,8 @@ async def update_room_name_get_value(message: types.Message,
     message_text = app_text_msg.messages.rooms_menu.update_room.update_room_second_msg.format(
         new_room_name=new_room_name
     )
-
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
     await state.clear()

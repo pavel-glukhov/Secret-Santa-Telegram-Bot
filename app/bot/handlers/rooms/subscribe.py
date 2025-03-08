@@ -25,8 +25,10 @@ async def join_room(callback: types.CallbackQuery,
         {cancel_button: 'cancel'}
     )
     message_text = app_text_msg.messages.rooms_menu.subscribe.subscribe_first_msg
-    initial_bot_message = await callback.message.edit_text(text=message_text,
-                                                           reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(JoinRoom.waiting_for_room_number)
@@ -63,23 +65,45 @@ async def process_room_number(message: types.Message,
                                          {cancel_button: 'cancel'},
                                          app_text_msg)
 
-    is_member_of_room = await RoomRepo(session).is_member(user_id=message.chat.id,
-                                                          room_number=int(room_number))
+    is_member_of_room = await RoomRepo(session).is_member(
+        user_id=message.chat.id,
+        room_number=int(room_number)
+    )
 
     if is_member_of_room:
-        await _handle_existing_member(bot_message_id, message, state, session, room_number, app_text_msg)
+        await _handle_existing_member(
+            bot_message_id,
+            message,
+            state,
+            session,
+            room_number,
+            app_text_msg
+        )
     else:
-        await _request_wishes(bot_message_id, state, app_text_msg, app_text_msg)
+        await _request_wishes(
+            bot_message_id,
+            state,
+            app_text_msg,
+            app_text_msg
+        )
 
 
-async def _edit_bot_message(bot_message_id, text, buttons):
+async def _edit_bot_message(bot_message_id,
+                            text,
+                            buttons):
     keyboard_inline = generate_inline_keyboard(buttons)
-    await bot_message_id.edit_text(text=text,
-                                   reply_markup=keyboard_inline)
+    await bot_message_id.edit_text(
+        text=text,
+        reply_markup=keyboard_inline
+    )
 
 
 async def _handle_existing_member(
-        bot_message_id, message, state, session, room_number, language):
+        bot_message_id,
+        message,
+        state, session,
+        room_number,
+        language):
     keyboard_inline = await create_common_keyboards(message, session, language)
 
     await _edit_bot_message(
@@ -93,16 +117,24 @@ async def _handle_existing_member(
     await state.clear()
 
 
-async def _request_wishes(bot_message_id, state, text, app_text_msg):
+async def _request_wishes(bot_message_id,
+                          state,
+                          text,
+                          app_text_msg):
     await state.set_state(JoinRoom.waiting_for_wishes)
 
     message_text = text.messages.rooms_menu.subscribe.subscribe_second_msg
     cancel_button = app_text_msg.buttons.cancel_button
 
-    await _edit_bot_message(bot_message_id, message_text, {cancel_button: 'cancel'})
+    await _edit_bot_message(bot_message_id,
+                            message_text,
+                            {cancel_button: 'cancel'})
 
 
-async def _is_not_exists_room(message, room_number, keyboard_inline, text):
+async def _is_not_exists_room(message,
+                              room_number,
+                              keyboard_inline,
+                              text):
     message_text = text.messages.rooms_menu.subscribe.room_is_not_exist_or_closed
 
     await message.edit_text(
@@ -146,9 +178,13 @@ async def process_room_wishes(message: types.Message,
         }
     )
     message_text = app_text_msg.messages.rooms_menu.subscribe.subscribe_third_msg.format(
-        room_number=room_number)
+        room_number=room_number
+    )
 
-    await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
+    await bot_message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
     logger.info(
         f'The user[{message.from_user.id}] '
         f'successful subscribed to the room [{state_data["room_number"]}]'

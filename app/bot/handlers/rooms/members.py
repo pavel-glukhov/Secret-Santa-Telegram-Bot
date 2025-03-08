@@ -25,6 +25,20 @@ async def members_list(callback: types.CallbackQuery,
     )
     room = await RoomRepo(session).get(room_number)
     members = room.members
+
+    message_text = app_text_msg.messages.rooms_menu.members.menu_msg.format(
+        room_name=room.name,
+        room_number=room_number,
+        member_string=_generate_user_name_list(members)
+    )
+
+    await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline,
+    )
+
+
+def _generate_user_name_list(members) -> str:
     member_string = ''
     for number, member in enumerate(members, start=1):
         if member.first_name:
@@ -43,14 +57,4 @@ async def members_list(callback: types.CallbackQuery,
 
         member_string += (
             f'{number}) {user_name}\n')
-
-    message_text = app_text_msg.messages.rooms_menu.members.menu_msg.format(
-        room_name=room.name,
-        room_number=room_number,
-        member_string=member_string
-    )
-
-    await callback.message.edit_text(
-        text=message_text,
-        reply_markup=keyboard_inline,
-    )
+    return member_string
