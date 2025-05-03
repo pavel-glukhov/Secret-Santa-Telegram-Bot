@@ -1,4 +1,5 @@
-## Secret Santa Telegram Bot
+## Secret Santa Telegram Bot 
+Version: 0.3
 
 ### Описание
 
