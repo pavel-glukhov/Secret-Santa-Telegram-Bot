@@ -74,7 +74,7 @@ class ChangeOwner(BaseModel):
     change_owner_room_second_msg: str
 
 
-class ConfigRoom(BaseModel):
+class SettingsMenu(BaseModel):
     main_menu: str
 
 
@@ -125,7 +125,7 @@ class RoomsMenu(BaseModel):
     activate: ActivateRoom
     change_budget: ChangeBudget
     change_owner: ChangeOwner
-    config_room: ConfigRoom
+    settings_menu: SettingsMenu
     create_new_room: CreateNewRoom
     delete_room: DeleteRoom
     members: Members

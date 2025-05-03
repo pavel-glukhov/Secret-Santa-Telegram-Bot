@@ -27,7 +27,7 @@ async def configuration_room(callback: types.CallbackQuery,
     )
     room = await RoomRepo(session).get(room_number)
 
-    message_text = app_text_msg.messages.rooms_menu.config_room.main_menu.format(
+    message_text = app_text_msg.messages.rooms_menu.settings_menu.main_menu.format(
         room_name=room.name,
         room_number=room_number
     )

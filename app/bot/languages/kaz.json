@@ -59,7 +59,7 @@
           "change_owner_room_first_msg": "Бөлме иесін өзгерткіңіз келе ме?\nЖаңа бөлме иесі оның қатысушысы болуы керек.\n<b>Сіз бөлмені басқару мүмкіндігін жоғалтасыз.</b>\n\n<b>Иесін ауыстыру үшін оның лақап атын жазыңыз.</b>\n",
           "change_owner_room_second_msg": "Хо-хо-хо! \uD83C\uDF85\n\nМен иесін ауыстырдым, енді ол <b>{new_owner}</b>"
         },
-        "config_room": {
+        "settings_menu": {
           "main_menu": "<b>Бөлме параметрлері:</b> <b>{room_name}</b> (<b>{room_number}</b>)"
         },
         "create_new_room": {

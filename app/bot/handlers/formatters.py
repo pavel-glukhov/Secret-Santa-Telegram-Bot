@@ -15,12 +15,15 @@ def get_full_name(user: User) -> str | None:
 def user_information_formatter(
         user: User,
         app_text_msg: TranslationMainSchema) -> list:
-    address_value = user.get_address() or app_text_msg.formatter.address_is_not_specified
-    number_value = user.get_number() or app_text_msg.formatter.number_is_not_specified
-    timezone = user.timezone or app_text_msg.formatter.timezone_is_not_specified
+    address = (user.get_address()
+                     or app_text_msg.formatter.address_is_not_specified)
+    phone_number = (user.get_number()
+                    or app_text_msg.formatter.number_is_not_specified)
+    timezone = (user.timezone
+                or app_text_msg.formatter.timezone_is_not_specified)
 
     full_name = get_full_name(user)
-    return [full_name, address_value, number_value, timezone]
+    return [full_name, address, phone_number, timezone]
 
 
 def profile_information_formatter(

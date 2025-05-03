@@ -59,7 +59,7 @@
           "change_owner_room_first_msg": "Want to change the room owner?\nThe new owner must be a participant in the room.\n<b>Keep in mind, you will lose control of the room.</b>\n\n<b>To change the owner, write their nickname.</b>\n",
           "change_owner_room_second_msg": "Ho-ho-ho! \uD83C\uDF85\n\nI changed the owner, now it's <b>{new_owner}</b>"
         },
-        "config_room": {
+        "settings_menu": {
           "main_menu": "<b>Room settings:</b> <b>{room_name}</b> (<b>{room_number}</b>)"
         },
         "create_new_room": {

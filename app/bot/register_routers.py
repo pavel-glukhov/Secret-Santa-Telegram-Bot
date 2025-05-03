@@ -5,7 +5,7 @@ from app.bot.handlers.profiles import (change_address, change_name,
                                        change_number, delete_information,
                                        profile_general_menu)
 from app.bot.handlers.rooms import (activate, change_budget, change_owner,
-                                    config_room, create_new_room, delete_room,
+                                    settings_menu, create_new_room, delete_room,
                                     members, rooms_general_menu, subscribe,
                                     unsubscribe, update_room)
 from app.bot.handlers.start import about, language, start_handler
@@ -45,7 +45,7 @@ def register_room_handlers(dp) -> None:
     dp.include_router(activate.router)
     dp.include_router(change_budget.router)
     dp.include_router(change_owner.router)
-    dp.include_router(config_room.router)
+    dp.include_router(settings_menu.router)
     dp.include_router(create_new_room.router)
     dp.include_router(delete_room.router)
     dp.include_router(members.router)
