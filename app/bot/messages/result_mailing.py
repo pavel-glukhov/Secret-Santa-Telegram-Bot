@@ -138,7 +138,7 @@ async def _insufficient_number_players(room_number: int,
     app_language = await language_return_dataclass(get_redis_client(), owner.language)
     
     keyboard_inline = {
-        app_language.buttons.menu: "root_menu",
+        app_language.buttons.menu: "start_menu",
     }
     await RoomRepo(session).update(room_number,
                                    is_closed=True,
@@ -152,10 +152,6 @@ async def _insufficient_number_players(room_number: int,
     await send_message(
         user_id=owner.user_id,
         text=message_text,
-    )
-    await send_message(
-        user_id=owner.user_id,
-        text=app_language.messages.main_menu.allowed_actions,
         reply_markup=generate_inline_keyboard(keyboard_inline)
     )
     
