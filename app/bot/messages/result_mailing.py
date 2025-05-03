@@ -48,7 +48,7 @@ async def creating_active_users_pool(
                 'player_first_name': player.first_name,
                 'player_last_name': player.last_name,
                 'player_contact_number': player.get_number(),
-                'player_wish': wish,
+                'player_wish': wish if wish is not None else None,
                 'player_language': await language_return_dataclass(radis_client, player.language)
             }
             
@@ -63,6 +63,7 @@ async def send_result_of_game(room_number,
     session_generator = get_session()
     session = next(session_generator)
     redis_client = get_redis_client()
+
     async with semaphore:
         verified_users = await creating_active_users_pool(room_number, session, redis_client)
         
@@ -131,6 +132,7 @@ def _check_sending_capability(verified_users):
 
 async def _insufficient_number_players(room_number: int,
                                        session) -> None:
+
     room = await RoomRepo(session).get(room_number)
     owner = room.owner
     app_language = await language_return_dataclass(get_redis_client(), owner.language)

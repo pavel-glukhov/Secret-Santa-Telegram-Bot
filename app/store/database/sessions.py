@@ -6,7 +6,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from app.config import load_config
 
-engine = create_engine(load_config().db.postgres_url, pool_pre_ping=True)
+engine = create_engine(load_config().db.postgres_url, pool_pre_ping=True, echo=False)
 
 
 @lru_cache
