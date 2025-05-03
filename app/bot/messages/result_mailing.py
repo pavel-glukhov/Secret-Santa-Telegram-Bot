@@ -69,7 +69,7 @@ async def send_result_of_game(room_number,
         if not _check_sending_capability(verified_users):
             return await _insufficient_number_players(room_number, session)
         
-        data = await _prepare_sending_data(verified_users, room_number, session)
+        data = await _prepare_data_to_send(verified_users, room_number, session)
         await RoomRepo(session).update(room_number,
                                        is_closed=True,
                                        closed_at=datetime.datetime.now())
@@ -77,7 +77,7 @@ async def send_result_of_game(room_number,
         return await broadcaster(data)
 
 
-async def _prepare_sending_data(
+async def _prepare_data_to_send(
         verified_users: list, room_number: int, session) -> list:
     random.shuffle(verified_users)
     persons = [Person(user) for user in verified_users]
