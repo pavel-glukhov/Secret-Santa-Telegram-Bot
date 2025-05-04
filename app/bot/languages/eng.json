@@ -105,10 +105,13 @@
           "count_players": "<b>At least 3 participants are required to start the game</b>",
           "time_not_set": "<b>Time is not set</b>\n\n<b>At least 3 participants are required to start the game</b>\n\n<b>Your time zone</b>: {timezone}",
           "time_set_to": "The mailing date is set for {datetime_set_to}",
-          "expired_datetime": "You entered a past date. Try again and enter the correct draw date. \n\n<b>Server time:</b> {current_time_str}\n<b>Your specified time:</b> {datetime_obj_str}",
-          "incorrect_datetime": "You entered an incorrect date.\n\n Try again and enter the correct draw date.",
+          "expired_datetime": "❌ You entered a past date. Try again and enter the correct draw date. \n\n<b>Server time:</b> {current_time_str}\n<b>Your specified time:</b> {datetime_obj_str}",
           "info_will_be_sent_msg": "<b>The mailing will be sent:</b> {time_to_send}",
-          "start_game_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nTo set the mailing time, send a message in the format\n<b>yyyy.mm.dd h:m</b> - <b>year.month.day hour:minutes</b>\n\n<b>Example: {example}</b>"
+          "start_game_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nTo set the mailing time, send a message in the format\n<b>yyyy.mm.dd h:m</b> - <b>year.month.day hour:minutes</b>\n\n<b>Example: {example}</b>",
+          "choose_date": "Choose a date:",
+          "choose_time": "You have selected the draw date: {date}\nNow choose the time range for result distribution:",
+          "days_short": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          "between": "Between {start} and {end}"
         }
       },
       "wishes_menu": {

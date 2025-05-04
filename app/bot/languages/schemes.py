@@ -140,9 +140,12 @@ class StartGame(BaseModel):
     time_not_set: str
     time_set_to: str
     expired_datetime: str
-    incorrect_datetime: str
     info_will_be_sent_msg: str
     start_game_first_msg: str
+    choose_date: str
+    choose_time: str
+    days_short: str
+    between: str
 
 
 class GameMenu(BaseModel):
