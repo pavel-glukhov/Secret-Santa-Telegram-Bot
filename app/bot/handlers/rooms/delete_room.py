@@ -18,16 +18,16 @@ router = Router()
 @router.callback_query(F.data.startswith('room_delete'))
 async def delete_room(callback: types.CallbackQuery,
                       state: FSMContext,
-                      app_text_msg: TranslationMainSchema):
+                      lang: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
     await state.update_data(question_message_id=callback.message.message_id)
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
 
-    message_text = app_text_msg.messages.rooms_menu.delete_room.delete_room_first_msg.format(
+    message_text = lang.messages.rooms_menu.delete_room.delete_room_first_msg.format(
         room_number=room_number
     )
 
@@ -42,10 +42,10 @@ async def delete_room(callback: types.CallbackQuery,
                 StateFilter(DeleteRoom.waiting_conformation))
 async def process_delete_room_invalid(message: types.Message,
                                       state: FSMContext,
-                                      app_text_msg: TranslationMainSchema):
+                                      lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
@@ -54,7 +54,7 @@ async def process_delete_room_invalid(message: types.Message,
     await message.delete()
     bot_message = state_data['bot_message_id']
 
-    message_text = app_text_msg.messages.rooms_menu.delete_room.error_command_verif.format(
+    message_text = lang.messages.rooms_menu.delete_room.error_command_verif.format(
         room_number=room_number
     )
 
@@ -69,7 +69,7 @@ async def process_delete_room_invalid(message: types.Message,
 async def completed_process_delete_room(message: types.Message,
                                         state: FSMContext,
                                         session: Session,
-                                        app_text_msg: TranslationMainSchema):
+                                        lang: TranslationMainSchema):
     state_data = await state.get_data()
     await message.delete()
 
@@ -78,13 +78,13 @@ async def completed_process_delete_room(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "root_menu",
+            lang.buttons.return_back_button: "root_menu",
         }
     )
     is_room_deleted = await RoomRepo(session).delete(room_number=room_number)
 
     if is_room_deleted:
-        message_text = app_text_msg.messages.rooms_menu.delete_room.delete_room_second_msg
+        message_text = lang.messages.rooms_menu.delete_room.delete_room_second_msg
         await bot_message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline
@@ -95,7 +95,7 @@ async def completed_process_delete_room(message: types.Message,
             f' removed the room [{room_number}]'
         )
     else:
-        message_text = app_text_msg.messages.rooms_menu.delete_room.error
+        message_text = lang.messages.rooms_menu.delete_room.error
 
         await bot_message.edit_text(
             text=message_text,

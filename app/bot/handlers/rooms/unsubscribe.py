@@ -15,24 +15,24 @@ router = Router()
 @router.callback_query(F.data.startswith('room_exit'))
 async def left_room(callback: types.CallbackQuery,
                     session: Session,
-                    app_text_msg: TranslationMainSchema):
+                    lang: TranslationMainSchema):
     room_number = get_room_number(callback)
     user_id = callback.message.chat.id
     await RoomRepo(session).remove_member(user_id, room_number)
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "root_menu",
+            lang.buttons.return_back_button: "root_menu",
         }
     )
-    message_text = app_text_msg.messages.rooms_menu.unsubscribe.unsubscribe_first_msg.format(
+    message_text = lang.messages.rooms_menu.unsubscribe.unsubscribe_first_msg.format(
         room_number=room_number
     )
 
     await callback.message.edit_text(
         text=message_text,
     )
-    message_text = app_text_msg.messages.rooms_menu.unsubscribe.unsubscribe_second_msg.format(
+    message_text = lang.messages.rooms_menu.unsubscribe.unsubscribe_second_msg.format(
         room_number=room_number
     )
 

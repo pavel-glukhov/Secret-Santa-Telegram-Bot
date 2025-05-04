@@ -11,15 +11,15 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-async def send_first_message_to_user(callback, state, app_text_msg, edit_message, recipient_type):
-    cancel_button = app_text_msg.buttons.cancel_button
+async def send_first_message_to_user(callback, state, lang, edit_message, recipient_type):
+    cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard({cancel_button: 'cancel'})
 
     if recipient_type == "recipient":
-        message_text = app_text_msg.messages.communication_menu.message_to_recipient.first_msg
+        message_text = lang.messages.communication_menu.message_to_recipient.first_msg
         next_state = MessageToRecipient.waiting_message
     else:
-        message_text = app_text_msg.messages.communication_menu.message_to_sender.first_msg
+        message_text = lang.messages.communication_menu.message_to_sender.first_msg
         next_state = MessageToSanta.waiting_message
 
     if edit_message:

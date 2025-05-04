@@ -34,34 +34,36 @@ router = Router()
 @router.callback_query(F.data.startswith('room_start-game'))
 async def start_game(callback: types.CallbackQuery,
                      session: Session,
-                     app_text_msg: TranslationMainSchema):
+                     lang: TranslationMainSchema):
     room_number = get_room_number(callback)
-    room_repo = RoomRepo(session)
-    user_repo = UserRepo(session)
-
-    room_members = await room_repo.get_list_members(room_number)
     task = get_task(task_id=room_number)
-    user = await user_repo.get_user_or_none(callback.message.chat.id)
+    room_members = await RoomRepo(session).get_list_members(room_number)
+    user = await UserRepo(session).get_user_or_none(callback.message.chat.id)
+    timezone = user.timezone or lang.messages.game_menu.start_game.time_zone_inf
 
-    timezone = user.timezone or app_text_msg.messages.game_menu.start_game.time_zone_inf
+    change_datetime_button = lang.buttons.game_menu.room_change_game_dt
+    change_timezone_button = lang.buttons.game_menu.change_time_zone
+    return_back_button = lang.buttons.return_back_button
 
     keyboard = {
-        app_text_msg.buttons.game_menu.room_change_game_dt: f"room_change-game-dt_{room_number}",
-        app_text_msg.buttons.game_menu.change_time_zone: f"change_time_zone_{room_number}",
-        app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
+        change_datetime_button: f"room_change-game-dt_{room_number}",
+        change_timezone_button: f"change_time_zone_{room_number}",
+        return_back_button: f"room_menu_{room_number}"
     }
 
     if len(room_members) < 3:
-        message_text = app_text_msg.messages.game_menu.start_game.count_players
-        keyboard.pop(app_text_msg.buttons.game_menu.change_time_zone)
+        message_text = lang.messages.game_menu.start_game.count_players
+        keyboard.pop(lang.buttons.game_menu.change_time_zone)
     else:
         if task:
             time_to_send = task.next_run_time.strftime("%b-%d-%Y %H:%M")
-            message_text = app_text_msg.messages.game_menu.start_game.info_will_be_sent_msg.format(
-                time_to_send=time_to_send)
+            message_text = lang.messages.game_menu.start_game.msg_to_send.format(
+                time_to_send=time_to_send
+            )
         else:
-            message_text = app_text_msg.messages.game_menu.start_game.time_not_set.format(
-                timezone=timezone)
+            message_text = lang.messages.game_menu.start_game.time_not_set.format(
+                timezone=timezone
+            )
 
     keyboard_inline = generate_inline_keyboard(keyboard)
     await callback.message.edit_text(
@@ -73,34 +75,36 @@ async def start_game(callback: types.CallbackQuery,
 @router.callback_query(F.data.startswith('room_change-game-dt'))
 async def start_datetime(callback: types.CallbackQuery,
                          state: FSMContext,
-                         app_text_msg: TranslationMainSchema):
+                         lang: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
     await state.set_state(DateTimePicker.picking_date)
     today = date.today()
-    await callback.message.edit_text(text=app_text_msg.messages.game_menu.start_game.choose_date,
-                                     reply_markup=_generate_calendar(today.year, today.month, app_text_msg))
+    await callback.message.edit_text(
+        text=lang.messages.game_menu.start_game.choose_date,
+        reply_markup=_generate_calendar(today.year, today.month, lang)
+    )
 
 
 @router.callback_query(DateTimePicker.picking_date, F.data.startswith("prev_"))
 async def calendar_prev(callback: CallbackQuery,
-                        app_text_msg: TranslationMainSchema):
+                        lang: TranslationMainSchema):
     _, year, month = callback.data.split("_")
     new_date = date(int(year), int(month), 1) - relativedelta(months=1)
 
     await callback.message.edit_reply_markup(
-        reply_markup=_generate_calendar(new_date.year, new_date.month, app_text_msg))
+        reply_markup=_generate_calendar(new_date.year, new_date.month, lang))
     await callback.answer()
 
 
 @router.callback_query(DateTimePicker.picking_date, F.data.startswith("next_"))
 async def calendar_next(callback: CallbackQuery,
-                        app_text_msg: TranslationMainSchema):
+                        lang: TranslationMainSchema):
     _, year, month = callback.data.split("_")
     new_date = date(int(year), int(month), 1) + relativedelta(months=1)
 
     await callback.message.edit_reply_markup(
-        reply_markup=_generate_calendar(new_date.year, new_date.month, app_text_msg))
+        reply_markup=_generate_calendar(new_date.year, new_date.month, lang))
     await callback.answer()
 
 
@@ -108,17 +112,17 @@ async def calendar_next(callback: CallbackQuery,
                        F.data.startswith("date_"))
 async def date_selected(callback: CallbackQuery,
                         state: FSMContext,
-                        app_text_msg: TranslationMainSchema):
+                        lang: TranslationMainSchema):
     _, year, month, day = callback.data.split("_")
     selected_date = f'{year}.{month}.{day}'
     await state.update_data(selected_date=selected_date)
     await state.set_state(DateTimePicker.picking_time)
 
     await callback.message.edit_text(
-        text=app_text_msg.messages.game_menu.start_game.choose_date.format(
+        text=lang.messages.game_menu.start_game.choose_date.format(
             date=datetime.datetime.strptime(selected_date, "%Y.%m.%d").date()
         ),
-        reply_markup=_generate_time_ranges_keyboard(app_text_msg)
+        reply_markup=_generate_time_ranges_keyboard(lang)
     )
 
 
@@ -126,7 +130,7 @@ async def date_selected(callback: CallbackQuery,
 async def time_selected(callback: CallbackQuery,
                         state: FSMContext,
                         session: Session,
-                        app_text_msg: TranslationMainSchema):
+                        lang: TranslationMainSchema):
     semaphore = asyncio.Semaphore(1)
 
     user_data = await state.get_data()
@@ -152,28 +156,40 @@ async def time_selected(callback: CallbackQuery,
 
     if datetime_obj:
         if datetime_obj > current_time:
-            add_task(task_func=send_result_of_game, date_time=selected_date_time,
-                     task_id=room_number, room_number=room_number,
-                     semaphore=semaphore)
+            add_task(
+                task_func=send_result_of_game,
+                date_time=selected_date_time,
+                task_id=room_number,
+                room_number=room_number,
+                semaphore=semaphore
+            )
 
-            await RoomRepo(session).update(room_number, started_at=datetime.datetime.now(),
-                                           closed_at=None, is_closed=False)
+            await RoomRepo(session).update(
+                room_number,
+                started_at=datetime.datetime.now(),
+                closed_at=None, is_closed=False
+            )
+            return_back_button = lang.buttons.return_back_button
 
             keyboard_inline = generate_inline_keyboard(
                 {
-                    app_text_msg.buttons.return_back_button: f"room_menu_{room_number}"
+                    return_back_button: f"room_menu_{room_number}"
                 }
             )
-            message_text = app_text_msg.messages.game_menu.start_game.time_set_to.format(
-                datetime_set_to=selected_date_time.strftime("%d %b %Y %H:%M"))
+            message_text = lang.messages.game_menu.start_game.time_set_to.format(
+                datetime_set_to=selected_date_time.strftime("%d %b %Y %H:%M")
+            )
 
-            await callback.message.edit_text(text=message_text, reply_markup=keyboard_inline)
+            await callback.message.edit_text(
+                text=message_text,
+                reply_markup=keyboard_inline
+            )
 
             await state.clear()
             return None
 
-        back_to_set_datetime = app_text_msg.buttons.game_menu.room_change_game_dt
-        cancel_button = app_text_msg.buttons.cancel_button
+        back_to_set_datetime = lang.buttons.game_menu.room_change_game_dt
+        cancel_button = lang.buttons.cancel_button
 
         keyboard_inline = generate_inline_keyboard(
             {back_to_set_datetime: f"room_change-game-dt_{room_number}",
@@ -183,9 +199,10 @@ async def time_selected(callback: CallbackQuery,
         current_time_str = current_time.strftime("%Y.%m.%d %H:%M")
         datetime_obj_str = datetime_obj.strftime("%Y.%m.%d %H:%M")
 
-        message_text = app_text_msg.messages.game_menu.start_game.expired_datetime.format(
+        message_text = lang.messages.game_menu.start_game.expired_datetime.format(
             current_time_str=current_time_str,
-            datetime_obj_str=datetime_obj_str)
+            datetime_obj_str=datetime_obj_str
+        )
 
         await _incorrect_data_format(callback.message, message_text,
                                      keyboard_inline)
@@ -221,9 +238,10 @@ def _generate_calendar(year: int, month: int, lang: TranslationMainSchema) -> In
         InlineKeyboardButton(text="➡️", callback_data=f"next_{year}_{month}")
     )
     list_of_month_letters = lang.messages.game_menu.start_game.expired_datetime
-    builder.row(*[InlineKeyboardButton(
-        text=d, callback_data="ignore") for d in list_of_month_letters]
-                )
+    builder.row(
+        *[InlineKeyboardButton(
+            text=d, callback_data="ignore") for d in list_of_month_letters]
+    )
 
     first_day = date(year, month, 1)
     start_day = (first_day.weekday() + 1) % 7

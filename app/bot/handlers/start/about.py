@@ -14,15 +14,15 @@ router = Router()
 @router.callback_query(F.data == 'menu_about_game')
 @router.message(Command(commands=['about']))
 async def about_game(data: types.Message | types.CallbackQuery,
-                     app_text_msg: TranslationMainSchema):
+                     lang: TranslationMainSchema):
     message = data.message if isinstance(data, types.CallbackQuery) else data
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "root_menu",
+            lang.buttons.return_back_button: "root_menu",
         }
     )
-    message_text = app_text_msg.messages.main_menu.about_message.format(
+    message_text = lang.messages.main_menu.about_message.format(
         room_user_rooms_count=load_config().room.user_rooms_count,
         support_account=load_config().support_account
     )

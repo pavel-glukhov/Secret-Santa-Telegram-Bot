@@ -22,21 +22,21 @@ router = Router()
 @router.callback_query(F.data.startswith('room_closed-con-rec_no_ed'))
 async def message_to_santa_no_edit(callback: types.CallbackQuery,
                                    state: FSMContext,
-                                   app_text_msg: TranslationMainSchema):
-    await message_to_recipient(callback, state, app_text_msg, edit_message=False)
+                                   lang: TranslationMainSchema):
+    await message_to_recipient(callback, state, lang, edit_message=False)
 
 
 @router.callback_query(F.data.startswith('room_closed-con-rec'))
 async def message_to_recipient(callback: types.CallbackQuery, state: FSMContext,
-                               app_text_msg: TranslationMainSchema, edit_message=True):
-    await send_first_message_to_user(callback, state, app_text_msg, edit_message, "recipient")
+                               lang: TranslationMainSchema, edit_message=True):
+    await send_first_message_to_user(callback, state, lang, edit_message, "recipient")
 
 
 @router.message(MessageToRecipient.waiting_message)
 async def completed_message_to_santa(message: types.Message,
                                      state: FSMContext,
                                      session: Session,
-                                     app_text_msg: TranslationMainSchema):
+                                     lang: TranslationMainSchema):
     state_data = await state.get_data()
     room = await RoomRepo(session).get(state_data['room_number'])
     user_id = message.chat.id
@@ -49,7 +49,7 @@ async def completed_message_to_santa(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "root_menu",
+            lang.buttons.return_back_button: "root_menu",
         }
     )
     recipient_language = await UserRepo(session).get_user_language(recipient.user_id)
@@ -78,7 +78,7 @@ async def completed_message_to_santa(message: types.Message,
                        text=recipient_app_lng.messages.main_menu.allowed_actions,
                        reply_markup=generate_inline_keyboard(inline_keyboard)
                        )
-    second_message_text = app_text_msg.messages.communication_menu.message_to_recipient.msg_was_sent
+    second_message_text = lang.messages.communication_menu.message_to_recipient.msg_was_sent
 
     await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)
     await state.clear()

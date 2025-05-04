@@ -18,45 +18,45 @@ router = Router()
 async def cancel_handler(callback: types.CallbackQuery,
                          state: FSMContext,
                          session: Session,
-                         app_text_msg: TranslationMainSchema):
+                         lang: TranslationMainSchema):
     message = callback.message
     await state.clear()
-    await root_menu(message, session, app_text_msg)
+    await root_menu(message, session, lang)
 
 
 @router.callback_query(F.data == 'start_menu')
 @router.message(Command(commands=["start"]))
 async def start(message: types.Message, state: FSMContext,
                 session: Session,
-                app_text_msg: TranslationMainSchema,
+                lang: TranslationMainSchema,
                 available_languages: list):
-    if not app_text_msg:
+    if not lang:
         await create_user_or_enable(message, session)
         await select_language(message, available_languages)
         return None
 
     await state.clear()
-    message_text = app_text_msg.messages.main_menu.start_message
+    message_text = lang.messages.main_menu.start_message
 
     await message.answer(text=message_text)
-    await root_menu(message, session=session, app_text_msg=app_text_msg, edit_message=False)
+    await root_menu(message, session=session, lang=lang, edit_message=False)
 
 
 @router.callback_query(F.data == 'root_menu')
 async def root_menu(data: types.Message | types.CallbackQuery,
                     session: Session,
-                    app_text_msg: TranslationMainSchema,
+                    lang: TranslationMainSchema,
                     edit_message=True):
     message = data.message if isinstance(data, types.CallbackQuery) else data
 
     user = await create_user_or_enable(message, session)
-    keyboard = await create_common_keyboards(message, session, app_text_msg)
+    keyboard = await create_common_keyboards(message, session, lang)
 
     is_profile_filled_out = all(
         [user.encrypted_address, user.encrypted_number])
 
-    text_reminder_notification_for_user = app_text_msg.messages.main_menu.menu_reminder
-    text_menu_message = app_text_msg.messages.main_menu.menu
+    text_reminder_notification_for_user = lang.messages.main_menu.menu_reminder
+    text_menu_message = lang.messages.main_menu.menu
 
     message_text = (
         text_menu_message if is_profile_filled_out

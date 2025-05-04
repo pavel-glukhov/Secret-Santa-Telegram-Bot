@@ -20,14 +20,14 @@ router = Router()
 @router.callback_query(F.data == 'profile_edit_number')
 async def change_phone_number(callback: types.CallbackQuery,
                               state: FSMContext,
-                              app_text_msg: TranslationMainSchema):
-    cancel_button = app_text_msg.buttons.cancel_button
+                              lang: TranslationMainSchema):
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
 
-    message_text = app_text_msg.messages.profile_menu.change_number.change_number_first_msg
+    message_text = lang.messages.profile_menu.change_number.change_number_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
@@ -40,21 +40,21 @@ async def change_phone_number(callback: types.CallbackQuery,
 async def process_changing_owner(message: types.Message,
                                  state: FSMContext,
                                  session: Session,
-                                 app_text_msg: TranslationMainSchema):
+                                 lang: TranslationMainSchema):
     state_data = await state.get_data()
     phone_number = message.text
     user_id = message.chat.id
     bot_message = state_data['bot_message_id']
 
     await message.delete()
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     cancel_keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "profile_edit",
+            lang.buttons.return_back_button: "profile_edit",
         }
     )
 
@@ -65,10 +65,10 @@ async def process_changing_owner(message: types.Message,
         await UserRepo(session).update_user(user_id, encrypted_number=encrypted_data)
         logger.info(f'The user [{user_id}] updated call number.')
 
-        message_text = app_text_msg.messages.profile_menu.change_number.change_number_second_msg
+        message_text = lang.messages.profile_menu.change_number.change_number_second_msg
 
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
         await state.clear()
     else:
-        message_text = app_text_msg.messages.profile_menu.change_number.error
+        message_text = lang.messages.profile_menu.change_number.error
         return await bot_message.edit_text(text=message_text, reply_markup=cancel_keyboard_inline)

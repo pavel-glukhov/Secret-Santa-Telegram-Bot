@@ -18,16 +18,16 @@ router = Router()
 @router.callback_query(F.data.startswith('room_change-budget'))
 async def change_room_budget(callback: types.CallbackQuery,
                              state: FSMContext,
-                             app_text_msg: TranslationMainSchema):
+                             lang: TranslationMainSchema):
     room_number = get_room_number(callback)
     await state.update_data(room_number=room_number)
 
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
-    message_text = app_text_msg.messages.rooms_menu.change_budget.change_budget_first_msg
+    message_text = lang.messages.rooms_menu.change_budget.change_budget_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
@@ -41,12 +41,12 @@ async def change_room_budget(callback: types.CallbackQuery,
                 StateFilter(ChangeBudget.waiting_for_budget))
 async def process_change_budget_invalid(message: types.Message,
                                         state: FSMContext,
-                                        app_text_msg: TranslationMainSchema):
+                                        lang: TranslationMainSchema):
     state_data = await state.get_data()
     await message.delete()
 
     bot_message = state_data['bot_message_id']
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
@@ -54,7 +54,7 @@ async def process_change_budget_invalid(message: types.Message,
     logger.info('long budget message'
                 f' command from [{message.from_user.id}] ')
 
-    message_text = app_text_msg.messages.rooms_menu.change_budget.long_budget
+    message_text = lang.messages.rooms_menu.change_budget.long_budget
 
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
 
@@ -63,7 +63,7 @@ async def process_change_budget_invalid(message: types.Message,
 async def process_changing_budget(message: types.Message,
                                   state: FSMContext,
                                   session: Session,
-                                  app_text_msg: TranslationMainSchema):
+                                  lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     await message.delete()
@@ -73,12 +73,12 @@ async def process_changing_budget(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: f"room_config_{room_number}",
+            lang.buttons.return_back_button: f"room_config_{room_number}",
         }
     )
     await RoomRepo(session).update(room_number, budget=new_budget)
 
-    message_text = app_text_msg.messages.rooms_menu.change_budget.change_budget_second_msg.format(
+    message_text = lang.messages.rooms_menu.change_budget.change_budget_second_msg.format(
         room_number=room_number,
         new_budget=new_budget
     )

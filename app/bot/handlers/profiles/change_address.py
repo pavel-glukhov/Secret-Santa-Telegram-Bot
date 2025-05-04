@@ -18,13 +18,13 @@ router = Router()
 @router.callback_query(F.data == 'profile_edit_address')
 async def change_user_address(callback: types.CallbackQuery,
                               state: FSMContext,
-                              app_text_msg: TranslationMainSchema):
-    cancel_button = app_text_msg.buttons.cancel_button
+                              lang: TranslationMainSchema):
+    cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
 
-    message_text = app_text_msg.messages.profile_menu.change_address.change_address_first_msg
+    message_text = lang.messages.profile_menu.change_address.change_address_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text,
                                                            reply_markup=keyboard_inline)
@@ -37,7 +37,7 @@ async def change_user_address(callback: types.CallbackQuery,
 async def process_changing_owner(message: types.Message,
                                  state: FSMContext,
                                  session: Session,
-                                 app_text_msg: TranslationMainSchema):
+                                 lang: TranslationMainSchema):
     state_data = await state.get_data()
     address = message.text
     user_id = message.chat.id
@@ -47,7 +47,7 @@ async def process_changing_owner(message: types.Message,
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "profile_edit",
+            lang.buttons.return_back_button: "profile_edit",
         }
     )
 
@@ -57,11 +57,11 @@ async def process_changing_owner(message: types.Message,
         await UserRepo(session).update_user(user_id, encrypted_address=encrypted_data)
         logger.info(f'The user [{user_id}] updated an address.')
 
-        message_text = app_text_msg.messages.profile_menu.change_address.change_address_second_msg
+        message_text = lang.messages.profile_menu.change_address.change_address_second_msg
 
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
         await state.clear()
     else:
-        message_text = app_text_msg.messages.profile_menu.change_address.error
+        message_text = lang.messages.profile_menu.change_address.error
 
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)

@@ -18,13 +18,13 @@ router = Router()
 @router.callback_query(F.data == 'menu_join_room')
 async def join_room(callback: types.CallbackQuery,
                     state: FSMContext,
-                    app_text_msg: TranslationMainSchema):
-    cancel_button = app_text_msg.buttons.cancel_button
+                    lang: TranslationMainSchema):
+    cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
-    message_text = app_text_msg.messages.rooms_menu.subscribe.subscribe_first_msg
+    message_text = lang.messages.rooms_menu.subscribe.subscribe_first_msg
     initial_bot_message = await callback.message.edit_text(
         text=message_text,
         reply_markup=keyboard_inline
@@ -38,7 +38,7 @@ async def join_room(callback: types.CallbackQuery,
 async def process_room_number(message: types.Message,
                               state: FSMContext,
                               session: Session,
-                              app_text_msg: TranslationMainSchema):
+                              lang: TranslationMainSchema):
     room_number = message.text
     state_data = await state.get_data()
     await state.update_data(room_number=room_number)
@@ -47,8 +47,8 @@ async def process_room_number(message: types.Message,
     await message.delete()
 
     if not room_number.isdigit():
-        text_message = app_text_msg.messages.rooms_menu.subscribe.number_error
-        cancel_button = app_text_msg.buttons.cancel_button
+        text_message = lang.messages.rooms_menu.subscribe.number_error
+        cancel_button = lang.buttons.cancel_button
 
         return await _edit_bot_message(
             bot_message_id,
@@ -57,13 +57,13 @@ async def process_room_number(message: types.Message,
         )
 
     room = await RoomRepo(session).get(room_number=int(room_number))
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     if not room or room.is_closed:
         return await _is_not_exists_room(bot_message_id,
                                          room_number,
                                          {cancel_button: 'cancel'},
-                                         app_text_msg)
+                                         lang)
 
     is_member_of_room = await RoomRepo(session).is_member(
         user_id=message.chat.id,
@@ -77,14 +77,14 @@ async def process_room_number(message: types.Message,
             state,
             session,
             room_number,
-            app_text_msg
+            lang
         )
     else:
         await _request_wishes(
             bot_message_id,
             state,
-            app_text_msg,
-            app_text_msg
+            lang,
+            lang
         )
 
 
@@ -120,11 +120,11 @@ async def _handle_existing_member(
 async def _request_wishes(bot_message_id,
                           state,
                           text,
-                          app_text_msg):
+                          lang):
     await state.set_state(JoinRoom.waiting_for_wishes)
 
     message_text = text.messages.rooms_menu.subscribe.subscribe_second_msg
-    cancel_button = app_text_msg.buttons.cancel_button
+    cancel_button = lang.buttons.cancel_button
 
     await _edit_bot_message(bot_message_id,
                             message_text,
@@ -152,7 +152,7 @@ async def _is_not_exists_room(message,
 async def process_room_wishes(message: types.Message,
                               state: FSMContext,
                               session: Session,
-                              app_text_msg: TranslationMainSchema):
+                              lang: TranslationMainSchema):
     state_data = await state.get_data()
     wishes = message.text
     chat_id = message.chat.id
@@ -174,10 +174,10 @@ async def process_room_wishes(message: types.Message,
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.room_menu.subscribe.to_room: f"room_menu_{room_number}",
+            lang.buttons.room_menu.subscribe.to_room: f"room_menu_{room_number}",
         }
     )
-    message_text = app_text_msg.messages.rooms_menu.subscribe.subscribe_third_msg.format(
+    message_text = lang.messages.rooms_menu.subscribe.subscribe_third_msg.format(
         room_number=room_number
     )
 

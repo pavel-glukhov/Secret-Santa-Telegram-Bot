@@ -22,19 +22,19 @@ router = Router()
 @router.callback_query(F.data.startswith('room_closed-con-san_no_ed'))
 async def message_to_santa_no_edit(callback: types.CallbackQuery,
                                    state: FSMContext,
-                                   app_text_msg: TranslationMainSchema):
-    await message_to_santa(callback, state, app_text_msg, edit_message=False)
+                                   lang: TranslationMainSchema):
+    await message_to_santa(callback, state, lang, edit_message=False)
 
 
 @router.callback_query(F.data.startswith('room_closed-con-san'))
 async def message_to_santa(callback: types.CallbackQuery, state: FSMContext,
-                           app_text_msg: TranslationMainSchema, edit_message=True):
-    await send_first_message_to_user(callback, state, app_text_msg, edit_message, "sender")
+                           lang: TranslationMainSchema, edit_message=True):
+    await send_first_message_to_user(callback, state, lang, edit_message, "sender")
 
 @router.message(MessageToSanta.waiting_message)
 async def completed_message_to_santa(message: types.Message,
                                      state: FSMContext, session: Session,
-                                     app_text_msg: TranslationMainSchema):
+                                     lang: TranslationMainSchema):
     state_data = await state.get_data()
     user_id = message.chat.id
     room = await RoomRepo(session).get(state_data['room_number'])
@@ -71,11 +71,11 @@ async def completed_message_to_santa(message: types.Message,
                        text=sender_app_lng.messages.main_menu.allowed_actions,
                        reply_markup=generate_inline_keyboard(inline_keyboard)
                        )
-    second_message_text = app_text_msg.messages.communication_menu.message_to_sender.msg_was_sent
+    second_message_text = lang.messages.communication_menu.message_to_sender.msg_was_sent
 
     keyboard_inline = generate_inline_keyboard(
         {
-            app_text_msg.buttons.return_back_button: "root_menu",
+            lang.buttons.return_back_button: "root_menu",
         }
     )
     await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)
