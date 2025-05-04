@@ -4,8 +4,6 @@ from aiogram import F, Router, types
 from sqlalchemy.orm import Session
 
 from app.bot.handlers.formatters import profile_information_formatter
-from app.bot.handlers.operations import get_room_number
-from app.bot.handlers.wishes.wishes_general_menu import show_wishes
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.store.database.queries.game_result import GameResultRepo
@@ -19,8 +17,8 @@ router = Router()
 @router.callback_query(F.data.startswith('room_menu'))
 async def my_room(callback: types.CallbackQuery,
                   session: Session,
-                  lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                  lang: TranslationMainSchema,
+                  room_number: int):
     user_id = callback.message.chat.id
 
     room_repo = RoomRepo(session)

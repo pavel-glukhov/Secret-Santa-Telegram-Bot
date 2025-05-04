@@ -18,7 +18,6 @@ import random
 from sqlalchemy.orm import Session
 
 from app.bot.handlers.game.states import DateTimePicker
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.bot.messages.result_mailing import send_result_of_game
@@ -34,8 +33,8 @@ router = Router()
 @router.callback_query(F.data.startswith('room_start-game'))
 async def start_game(callback: types.CallbackQuery,
                      session: Session,
-                     lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                     lang: TranslationMainSchema,
+                     room_number: int):
     task = get_task(task_id=room_number)
     room_members = await RoomRepo(session).get_list_members(room_number)
     user = await UserRepo(session).get_user_or_none(callback.message.chat.id)
@@ -75,8 +74,8 @@ async def start_game(callback: types.CallbackQuery,
 @router.callback_query(F.data.startswith('room_change-game-dt'))
 async def start_datetime(callback: types.CallbackQuery,
                          state: FSMContext,
-                         lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                         lang: TranslationMainSchema,
+                         room_number: int):
     await state.update_data(room_number=room_number)
     await state.set_state(DateTimePicker.picking_date)
     today = date.today()
@@ -156,6 +155,9 @@ async def time_selected(callback: CallbackQuery,
 
     if datetime_obj:
         if datetime_obj > current_time:
+            if task := get_task(task_id=room_number):
+                task.remove()
+
             add_task(
                 task_func=send_result_of_game,
                 date_time=selected_date_time,
@@ -237,7 +239,7 @@ def _generate_calendar(year: int, month: int, lang: TranslationMainSchema) -> In
         InlineKeyboardButton(text=month_name, callback_data="ignore"),
         InlineKeyboardButton(text="➡️", callback_data=f"next_{year}_{month}")
     )
-    list_of_month_letters = lang.messages.game_menu.start_game.expired_datetime
+    list_of_month_letters = lang.messages.game_menu.start_game.days_short
     builder.row(
         *[InlineKeyboardButton(
             text=d, callback_data="ignore") for d in list_of_month_letters]

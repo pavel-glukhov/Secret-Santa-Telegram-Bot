@@ -22,7 +22,6 @@ async def change_phone_number(callback: types.CallbackQuery,
                               state: FSMContext,
                               lang: TranslationMainSchema):
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
@@ -47,14 +46,16 @@ async def process_changing_owner(message: types.Message,
     bot_message = state_data['bot_message_id']
 
     await message.delete()
-    cancel_button = lang.buttons.cancel_button
 
+    cancel_button = lang.buttons.cancel_button
     cancel_keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
+
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "profile_edit",
+            return_back_button: "profile_edit",
         }
     )
 

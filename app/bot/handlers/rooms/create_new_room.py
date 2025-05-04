@@ -24,9 +24,10 @@ async def create_room(callback: types.CallbackQuery,
         callback.message.chat.id)
 
     if count_user_rooms >= load_config().room.user_rooms_count:
+        return_back_button = lang.buttons.return_back_button
         keyboard_inline = generate_inline_keyboard(
             {
-                lang.buttons.return_back_button: "root_menu",
+                return_back_button: "root_menu",
             }
         )
         message_text = lang.messages.rooms_menu.create_new_room.limit.format(
@@ -38,9 +39,9 @@ async def create_room(callback: types.CallbackQuery,
             reply_markup=keyboard_inline
         )
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
+
     message_text = lang.messages.rooms_menu.create_new_room.create_new_room_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text,
@@ -63,7 +64,6 @@ async def process_name(message: types.Message,
     await state.update_data(budget_question_id=message.message_id)
 
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'})
 

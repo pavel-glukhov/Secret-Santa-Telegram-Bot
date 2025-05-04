@@ -5,7 +5,6 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.bot.states.rooms import DeleteRoom
@@ -18,8 +17,8 @@ router = Router()
 @router.callback_query(F.data.startswith('room_delete'))
 async def delete_room(callback: types.CallbackQuery,
                       state: FSMContext,
-                      lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                      lang: TranslationMainSchema,
+                      room_number: int):
     await state.update_data(room_number=room_number)
     await state.update_data(question_message_id=callback.message.message_id)
     cancel_button = lang.buttons.cancel_button
@@ -48,7 +47,9 @@ async def process_delete_room_invalid(message: types.Message,
     cancel_button = lang.buttons.cancel_button
 
     keyboard_inline = generate_inline_keyboard(
-        {cancel_button: 'cancel'})
+        {cancel_button: 'cancel'}
+    )
+
     logger.info('Incorrect confirmation'
                 f' command from [{message.from_user.id}]')
     await message.delete()
@@ -76,9 +77,10 @@ async def completed_process_delete_room(message: types.Message,
     bot_message = state_data['bot_message_id']
     room_number = state_data['room_number']
 
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "root_menu",
+            return_back_button: "root_menu",
         }
     )
     is_room_deleted = await RoomRepo(session).delete(room_number=room_number)

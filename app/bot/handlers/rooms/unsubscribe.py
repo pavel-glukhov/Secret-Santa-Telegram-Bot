@@ -3,7 +3,6 @@ import logging
 from aiogram import F, Router, types
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.store.database.queries.rooms import RoomRepo
@@ -15,14 +14,15 @@ router = Router()
 @router.callback_query(F.data.startswith('room_exit'))
 async def left_room(callback: types.CallbackQuery,
                     session: Session,
-                    lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                    lang: TranslationMainSchema,
+                    room_number: int):
     user_id = callback.message.chat.id
     await RoomRepo(session).remove_member(user_id, room_number)
 
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "root_menu",
+            return_back_button: "root_menu",
         }
     )
     message_text = lang.messages.rooms_menu.unsubscribe.unsubscribe_first_msg.format(

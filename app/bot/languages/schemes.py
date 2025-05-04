@@ -144,7 +144,7 @@ class StartGame(BaseModel):
     start_game_first_msg: str
     choose_date: str
     choose_time: str
-    days_short: str
+    days_short: list
     between: str
 
 

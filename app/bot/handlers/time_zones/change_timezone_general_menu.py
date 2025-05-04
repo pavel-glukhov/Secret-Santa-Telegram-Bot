@@ -9,7 +9,6 @@ from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.handlers.pagination import Pagination
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
@@ -24,9 +23,9 @@ router = Router()
 @router.callback_query(F.data.startswith('change_time_zone'))
 async def get_letter(callback: types.CallbackQuery,
                      state: FSMContext,
-                     lang: TranslationMainSchema):
+                     lang: TranslationMainSchema,
+                     room_number: int):
     await state.set_state(TimeZoneStates.selecting_letter)
-    room_number = get_room_number(callback)
 
     if room_number:
         await state.update_data(room_number=room_number)

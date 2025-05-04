@@ -45,9 +45,11 @@ async def process_changing_owner(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
+
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "profile_edit",
+            return_back_button: "profile_edit",
         }
     )
 

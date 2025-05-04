@@ -19,9 +19,8 @@ async def cancel_handler(callback: types.CallbackQuery,
                          state: FSMContext,
                          session: Session,
                          lang: TranslationMainSchema):
-    message = callback.message
     await state.clear()
-    await root_menu(message, session, lang)
+    await root_menu(callback.message, session, lang)
 
 
 @router.callback_query(F.data == 'start_menu')

@@ -27,9 +27,12 @@ async def message_to_santa_no_edit(callback: types.CallbackQuery,
 
 
 @router.callback_query(F.data.startswith('room_closed-con-rec'))
-async def message_to_recipient(callback: types.CallbackQuery, state: FSMContext,
-                               lang: TranslationMainSchema, edit_message=True):
-    await send_first_message_to_user(callback, state, lang, edit_message, "recipient")
+async def message_to_recipient(callback: types.CallbackQuery,
+                               state: FSMContext,
+                               lang: TranslationMainSchema,
+                               room_number: int,
+                               edit_message=True):
+    await send_first_message_to_user(callback, state, lang, room_number, edit_message, "recipient")
 
 
 @router.message(MessageToRecipient.waiting_message)
@@ -47,9 +50,10 @@ async def completed_message_to_santa(message: types.Message,
     recipient = await GameResultRepo(session).get_recipient(room_id=room.number,
                                                             user_id=user_id)
 
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "root_menu",
+            return_back_button: "root_menu",
         }
     )
     recipient_language = await UserRepo(session).get_user_language(recipient.user_id)
@@ -60,10 +64,14 @@ async def completed_message_to_santa(message: types.Message,
         room_number=room.number,
         text_message=message.text,
     )
+
+    reply_button = recipient_app_lng.buttons.reply
+    menu_button = recipient_app_lng.buttons.menu
     inline_keyboard = {
-        recipient_app_lng.buttons.reply: f"room_closed-con-san_{room.number}",
-        recipient_app_lng.buttons.menu: "root_menu"
+        reply_button: f"room_closed-con-san_{room.number}",
+        menu_button: "root_menu"
     }
+
     await CommunicationRepo(session).insert(
         recipient_id=recipient.user_id,
         sender_id=user_id,

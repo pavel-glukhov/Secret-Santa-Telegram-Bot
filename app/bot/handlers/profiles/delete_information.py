@@ -20,10 +20,10 @@ async def delete_user_information(callback: types.CallbackQuery,
                                   state: FSMContext,
                                   lang: TranslationMainSchema):
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
+
     message_text = lang.messages.profile_menu.delete_information.delete_information_first_msg
 
     initial_bot_message = await callback.message.edit_text(text=message_text,
@@ -42,11 +42,12 @@ async def process_deleting_information_invalid(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
-    cancel_button = lang.buttons.cancel_button
 
+    cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
+
     message_text = lang.messages.profile_menu.delete_information.error
 
     return await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
@@ -71,11 +72,12 @@ async def process_deleting_information(message: types.Message,
         'encrypted_number': None,
     }
     await UserRepo(session).update_user(user_id=user_id, **data)
-    logger.info(f'The user [{user_id}] deleted personal information.'
-                )
+    logger.info(f'The user [{user_id}] deleted personal information.')
+
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "menu_user_profile",
+            return_back_button: "menu_user_profile",
         }
     )
     message_text = lang.messages.profile_menu.delete_information.delete_information_second_msg

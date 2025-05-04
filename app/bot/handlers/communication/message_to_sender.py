@@ -22,14 +22,19 @@ router = Router()
 @router.callback_query(F.data.startswith('room_closed-con-san_no_ed'))
 async def message_to_santa_no_edit(callback: types.CallbackQuery,
                                    state: FSMContext,
-                                   lang: TranslationMainSchema):
+                                   lang: TranslationMainSchema,
+                                   room_number: int):
     await message_to_santa(callback, state, lang, edit_message=False)
 
 
 @router.callback_query(F.data.startswith('room_closed-con-san'))
-async def message_to_santa(callback: types.CallbackQuery, state: FSMContext,
-                           lang: TranslationMainSchema, edit_message=True):
-    await send_first_message_to_user(callback, state, lang, edit_message, "sender")
+async def message_to_santa(callback: types.CallbackQuery,
+                           state: FSMContext,
+                           lang: TranslationMainSchema,
+                           room_number: int,
+                           edit_message=True):
+    await send_first_message_to_user(callback, state, lang, room_number, edit_message, "sender")
+
 
 @router.message(MessageToSanta.waiting_message)
 async def completed_message_to_santa(message: types.Message,
@@ -51,18 +56,21 @@ async def completed_message_to_santa(message: types.Message,
     first_message_text = sender_app_lng.messages.communication_menu.message_to_sender.msg_text.format(
         room_name=room.name,
         room_number=room.number,
-        text_message=message.text)
+        text_message=message.text
+    )
 
+    reply_button = sender_app_lng.buttons.reply
+    menu_button = sender_app_lng.buttons.menu
     inline_keyboard = {
-        sender_app_lng.buttons.reply: f"room_closed-con-rec_{room.number}",
-        sender_app_lng.buttons.menu: "root_menu"
+        reply_button: f"room_closed-con-rec_{room.number}",
+        menu_button: "root_menu"
     }
+
     await CommunicationRepo(session).insert(
         recipient_id=sender.user_id,
         sender_id=user_id,
         room=room,
         message=message.text
-
     )
     await send_message(user_id=sender.user_id,
                        text=first_message_text,

@@ -41,11 +41,12 @@ async def process_changing_first_name(message: types.Message,
 
     state_data = await state.get_data()
     bot_message = state_data['bot_message_id']
-    cancel_button = lang.buttons.cancel_button
 
+    cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
+
     message_text = lang.messages.profile_menu.change_name.change_name_second_msg
 
     await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
@@ -65,9 +66,10 @@ async def process_changing_last_name(message: types.Message,
 
     await message.delete()
 
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: "profile_edit",
+            return_back_button: "profile_edit",
         }
     )
     await UserRepo(session).update_user(user_id,

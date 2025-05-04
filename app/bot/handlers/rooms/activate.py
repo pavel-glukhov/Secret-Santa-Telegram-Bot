@@ -3,7 +3,6 @@ import logging
 from aiogram import F, Router, types
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.store.database.queries.rooms import RoomRepo
@@ -12,14 +11,16 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-# TODO НУЖНО ПРОВЕРИТЬ!
 @router.callback_query(F.data.startswith('room_activate'))
 async def members_list(callback: types.CallbackQuery,
                        session: Session,
-                       lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                       lang: TranslationMainSchema,
+                       room_number: int):
+    return_to_room_menu_button = lang.buttons.room_menu.main_buttons.return_to_room_menu
     keyboard_inline = generate_inline_keyboard(
-        {lang.buttons.room_menu.main_buttons.return_to_room_menu: f"room_menu_{room_number}"}
+        {
+            return_to_room_menu_button: f"room_menu_{room_number}"
+        }
     )
     await RoomRepo(session).update(room_number, closed_at=None, is_closed=False)
 

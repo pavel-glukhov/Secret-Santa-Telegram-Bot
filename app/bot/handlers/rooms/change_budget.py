@@ -5,7 +5,6 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages import TranslationMainSchema
 from app.bot.states.rooms import ChangeBudget
@@ -18,19 +17,20 @@ router = Router()
 @router.callback_query(F.data.startswith('room_change-budget'))
 async def change_room_budget(callback: types.CallbackQuery,
                              state: FSMContext,
-                             lang: TranslationMainSchema):
-    room_number = get_room_number(callback)
+                             lang: TranslationMainSchema,
+                             room_number: int):
     await state.update_data(room_number=room_number)
 
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
     message_text = lang.messages.rooms_menu.change_budget.change_budget_first_msg
 
-    initial_bot_message = await callback.message.edit_text(text=message_text,
-                                                           reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(ChangeBudget.waiting_for_budget)
@@ -46,8 +46,8 @@ async def process_change_budget_invalid(message: types.Message,
     await message.delete()
 
     bot_message = state_data['bot_message_id']
-    cancel_button = lang.buttons.cancel_button
 
+    cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
@@ -71,9 +71,10 @@ async def process_changing_budget(message: types.Message,
     bot_message = state_data['bot_message_id']
     new_budget = message.text
 
+    return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.return_back_button: f"room_config_{room_number}",
+            return_back_button: f"room_config_{room_number}",
         }
     )
     await RoomRepo(session).update(room_number, budget=new_budget)

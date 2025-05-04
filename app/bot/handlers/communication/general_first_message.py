@@ -2,7 +2,6 @@ import logging
 
 from aiogram import Router
 
-from app.bot.handlers.operations import get_room_number
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.states.communication import MessageToRecipient
 from app.bot.states.communication import MessageToSanta
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-async def send_first_message_to_user(callback, state, lang, edit_message, recipient_type):
+async def send_first_message_to_user(callback, state, lang, room_number, edit_message, recipient_type):
     cancel_button = lang.buttons.cancel_button
     keyboard_inline = generate_inline_keyboard({cancel_button: 'cancel'})
 
@@ -27,5 +26,5 @@ async def send_first_message_to_user(callback, state, lang, edit_message, recipi
     else:
         initial_bot_message = await callback.message.answer(text=message_text, reply_markup=keyboard_inline)
 
-    await state.update_data(bot_message_id=initial_bot_message, room_number=get_room_number(callback))
+    await state.update_data(bot_message_id=initial_bot_message, room_number=room_number)
     await state.set_state(next_state)

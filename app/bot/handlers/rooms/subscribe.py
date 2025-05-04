@@ -172,9 +172,10 @@ async def process_room_wishes(message: types.Message,
         room_id=room_number
     )
 
+    to_room_button = lang.buttons.room_menu.subscribe.to_room
     keyboard_inline = generate_inline_keyboard(
         {
-            lang.buttons.room_menu.subscribe.to_room: f"room_menu_{room_number}",
+            to_room_button: f"room_menu_{room_number}",
         }
     )
     message_text = lang.messages.rooms_menu.subscribe.subscribe_third_msg.format(
