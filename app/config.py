@@ -48,6 +48,8 @@ class DataBaseConfig:
     password: str
     host: str
     port: str
+    pool_size:int
+    max_overflow:int
     
     @property
     def postgres_url(self):
@@ -103,6 +105,8 @@ def load_config() -> AppConfig:
             password=os.getenv('DATABASE_PASSWORD'),
             port=os.getenv('DATABASE_PORT'),
             host=os.getenv('DATABASE_HOST'),
+            pool_size=int(os.getenv('POOL_SIZE')),
+            max_overflow=int(os.getenv('MAX_OVERFLOW')),
         ),
         redis=RedisConfig(
             db=os.getenv('REDIS_DB'),

@@ -28,28 +28,20 @@ class LanguageMiddleware(BaseMiddleware):
         self.session_factory = session_factory
 
     async def __call__(self, handler, event: Update, data: dict):
-        """
-        Main method called on each event.
 
-        Arguments:
-        handler -- event handler.
-        event -- the event that occurred.
-        data -- data passed to the handler.
-        """
-        session = next(self.session_factory())
         available_languages = self.redis_client().lrange("list_languages", 0, -1)
-
         chat_id = self._get_chat_id(event)
-        if chat_id is not None:
-            data['available_languages'] = available_languages
-            user_language = await UserRepo(session).get_user_language(chat_id)
-            if user_language:
-                data['app_text_msg'] = await language_return_dataclass(self.redis_client(), user_language)
-            else:
-                data['app_text_msg'] = None
 
+        with self.session_factory() as session:
+            if chat_id is not None:
+                data['available_languages'] = available_languages
+                user_language = await UserRepo(session).get_user_language(chat_id)
+                if user_language:
+                    data['app_text_msg'] = await language_return_dataclass(self.redis_client(), user_language)
+                else:
+                    data['app_text_msg'] = None
 
-        return await handler(event, data)
+            return await handler(event, data)
 
     def _get_chat_id(self, event: Update):
         if event.message and event.message.chat:

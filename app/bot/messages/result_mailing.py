@@ -4,14 +4,16 @@ import logging
 import random
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema, language_return_dataclass
+from app.bot.languages import language_return_dataclass
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
 from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.wishes import WishRepo
+from sqlalchemy.orm import scoped_session
 from app.store.database.sessions import get_session
+
 from app.store.redis import get_redis_client
 from app.store.scheduler.operations import remove_task
 
@@ -60,22 +62,21 @@ async def creating_active_users_pool(
 
 async def send_result_of_game(room_number,
                               semaphore) -> None:
-    session_generator = get_session()
-    session = next(session_generator)
     redis_client = get_redis_client()
 
-    async with semaphore:
-        verified_users = await creating_active_users_pool(room_number, session, redis_client)
-        
-        if not _check_sending_capability(verified_users):
-            return await _insufficient_number_players(room_number, session)
-        
-        data = await _prepare_data_to_send(verified_users, room_number, session)
-        await RoomRepo(session).update(room_number,
-                                       is_closed=True,
-                                       closed_at=datetime.datetime.now())
-        
-        return await broadcaster(data)
+    with get_session() as session:
+        async with semaphore:
+            verified_users = await creating_active_users_pool(room_number, session, redis_client)
+
+            if not _check_sending_capability(verified_users):
+                return await _insufficient_number_players(room_number, session)
+
+            data = await _prepare_data_to_send(verified_users, room_number, session)
+            await RoomRepo(session).update(room_number,
+                                           is_closed=True,
+                                           closed_at=datetime.datetime.now())
+
+            return await broadcaster(data)
 
 
 async def _prepare_data_to_send(

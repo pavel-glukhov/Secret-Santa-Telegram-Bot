@@ -1,0 +1,2 @@
+class DatabaseConfigError(Exception):
+    pass

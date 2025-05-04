@@ -3,17 +3,14 @@ import asyncio
 import logging
 from cryptography.fernet import Fernet
 import requests
-from sqlalchemy.orm import scoped_session
 
 from app.config import load_config
 from app.store.database.queries.users import UserRepo
-from app.store.database.sessions import create_session
-
+from app.store.database.sessions import get_session
 logger = logging.getLogger(__name__)
 
 
 async def update_user_permissions(telegram_user_id, is_superuser: bool):
-    get_session: scoped_session = create_session()
 
     with get_session() as session:
         user = await UserRepo(session).get_user_or_none(int(telegram_user_id))
