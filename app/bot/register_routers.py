@@ -1,6 +1,6 @@
 from app.bot.handlers.communication import (message_to_recipient,
                                             message_to_sender)
-from app.bot.handlers.game import start_game_general_menu
+from app.bot.handlers.game import startgame_main
 from app.bot.handlers.profiles import (change_address, change_name,
                                        change_number, delete_information,
                                        profile_general_menu)
@@ -29,7 +29,7 @@ def register_profile_handlers(dp) -> None:
 
 
 def register_game_handlers(dp) -> None:
-    dp.include_router(start_game_general_menu.router)
+    dp.include_router(startgame_main.router)
 
 
 def register_wishes_handlers(dp) -> None:
