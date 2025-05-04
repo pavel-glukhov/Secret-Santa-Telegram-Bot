@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 
-from sqlalchemy import func, select, update
-from sqlalchemy.orm import Session, load_only
+from sqlalchemy import select, update
+from sqlalchemy.orm import Session
 
 from app.store.database.models import Room, User
 
