@@ -17,3 +17,4 @@ aiohttp~=3.9.5
 pydantic~=2.8.2
 pytest~=8.3.4
 pytest-asyncio~=0.25.1
+python-dateutil~=2.9.0
