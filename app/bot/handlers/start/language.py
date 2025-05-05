@@ -11,7 +11,6 @@ from app.store.redis import get_redis_client
 logger = logging.getLogger(__name__)
 router = Router()
 
-
 @router.callback_query(lambda c: c.data == "profile_language")
 async def select_language(event: types.Message | types.CallbackQuery, available_languages: list):
     is_callback = isinstance(event, types.CallbackQuery)

@@ -31,9 +31,9 @@
           "error": "<b>❌Invalid number format❌\n</b>Your message: {text}, try again.\nTry again.\n\n<b>Enter your number using the format: +7|8(___)___-__-__ </b> \n<b>For example:</b> +7 700 111 11 11"
         },
         "delete_information": {
-          "delete_information_first_msg": "Write <b>confirm</b> to delete your profile data.\n\n",
+          "delete_information_first_msg": "⚠️ Tap confirm if you really want to delete all your personal data.\n\n",
           "delete_information_second_msg": "All your data has been deleted.\n\n",
-          "error": "You entered the wrong command. Try again.\n\nTo confirm, enter the word <b>\"confirm\"</b>"
+          "cancel_message": "You entered the wrong command. Try again.\n\nTo confirm, enter the word <b>\"confirm\"</b>"
         }
       },
       "rooms_menu": {
@@ -109,7 +109,15 @@
           "msg_to_send": "<b>The mailing will be sent:</b> {time_to_send}",
           "choose_date": "Ho-ho-ho! 🎅\n\nTo schedule the mailing time, please choose the desired day:",
           "choose_time": "You have selected the draw date: {date}\nNow choose the time range for result distribution:",
-          "days_short": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          "days_short": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+          ],
           "between": "Between {start} and {end}"
         }
       },
@@ -145,6 +153,7 @@
       "continue_button": "Continue",
       "menu": "Menu ◀️",
       "reply": "Reply",
+      "confirm_button": "❗️Confirm deletion❗️",
       "profile_menu": {
         "change_profile": "Edit profile \uD83D\uDC4B",
         "profile_edit_name": "Edit name",

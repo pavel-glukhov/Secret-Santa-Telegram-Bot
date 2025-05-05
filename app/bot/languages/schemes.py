@@ -37,7 +37,7 @@ class ChangeNumber(BaseModel):
 class DeleteInformation(BaseModel):
     delete_information_first_msg: str
     delete_information_second_msg: str
-    error: str
+    cancel_message: str
 
 
 class ProfileMenu(BaseModel):
@@ -251,6 +251,7 @@ class Buttons(BaseModel):
     continue_button: str
     menu: str
     reply: str
+    confirm_button: str
     profile_menu: ButtonsProfileMenu
     room_menu: RoomMenuButtons
     game_menu: GameMenuButtons
