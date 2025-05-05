@@ -46,7 +46,9 @@ async def edit_profile(callback: types.CallbackQuery,
     profile_edit_number_button = lang.buttons.profile_menu.profile_edit_number
     change_time_zone_button = lang.buttons.profile_menu.change_time_zone
     profile_edit_delete_all_button = lang.buttons.profile_menu.profile_edit_delete_all
+    change_language_button = lang.buttons.profile_menu.change_language
     return_back_button_button = lang.buttons.return_back_button
+
 
     keyboard_inline = generate_inline_keyboard(
         {
@@ -54,6 +56,7 @@ async def edit_profile(callback: types.CallbackQuery,
             profile_edit_address_button: "profile_edit_address",
             profile_edit_number_button: "profile_edit_number",
             change_time_zone_button: "change_time_zone",
+            change_language_button:"profile_language",
             profile_edit_delete_all_button: "profile_edit_delete_all",
             return_back_button_button: "menu_user_profile"
         }

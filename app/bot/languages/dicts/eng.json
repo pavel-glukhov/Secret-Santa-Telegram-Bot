@@ -152,7 +152,8 @@
         "profile_edit_address": "Edit address",
         "profile_edit_number": "Edit phone number",
         "change_time_zone": "Change time zone",
-        "profile_edit_delete_all": "Delete all information ❌"
+        "profile_edit_delete_all": "Delete all information ❌",
+        "change_language": "Change Language"
       },
       "room_menu": {
         "main_buttons": {

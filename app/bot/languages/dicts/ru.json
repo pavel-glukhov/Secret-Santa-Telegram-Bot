@@ -153,7 +153,8 @@
         "profile_edit_address": "Изменить адрес",
         "profile_edit_number": "Изменить номер телефона",
         "change_time_zone": "Изменить часовой пояс",
-        "profile_edit_delete_all": "Удалить всю информацию ❌"
+        "profile_edit_delete_all": "Удалить всю информацию ❌",
+        "change_language": "Сменить язык"
       },
       "room_menu": {
         "main_buttons": {

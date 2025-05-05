@@ -191,6 +191,7 @@ class ButtonsProfileMenu(BaseModel):
     profile_edit_number: str
     change_time_zone: str
     profile_edit_delete_all: str
+    change_language: str
 
 
 class RoomMenuMainButtons(BaseModel):

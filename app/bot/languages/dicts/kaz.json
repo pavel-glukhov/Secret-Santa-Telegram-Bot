@@ -152,7 +152,8 @@
         "profile_edit_address": "Мекенжайды өзгерту",
         "profile_edit_number": "Телефон нөмірін өзгерту",
         "change_time_zone": "Уақыт белдеуін өзгерту",
-        "profile_edit_delete_all": "Барлық ақпаратты жою ❌"
+        "profile_edit_delete_all": "Барлық ақпаратты жою ❌",
+        "change_language": "Тілді ауыстыру"
       },
       "room_menu": {
         "main_buttons": {
