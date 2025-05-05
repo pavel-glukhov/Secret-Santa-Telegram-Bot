@@ -116,7 +116,7 @@
 
     -  ```pip install -r requirements.txt ```
     -  ```alembic upgrade head ```
-    -  ```uvicorn app.cli:create_app --reload ```
+    -  ```uvicorn app.core.cli:create_app --reload ```
     
 
 
