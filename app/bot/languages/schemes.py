@@ -141,7 +141,6 @@ class StartGame(BaseModel):
     time_set_to: str
     expired_datetime: str
     msg_to_send: str
-    start_game_first_msg: str
     choose_date: str
     choose_time: str
     days_short: list
