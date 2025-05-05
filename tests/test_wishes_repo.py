@@ -1,6 +1,6 @@
 import pytest
 from app.store.database.models import User, Room, WishRoom
-from app.store.database.queries.wishes import WishRepo
+from app.store.database.repo.wishes import WishRepo
 from tests.conftest import add_and_commit
 
 

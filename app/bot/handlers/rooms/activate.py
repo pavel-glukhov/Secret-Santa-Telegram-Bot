@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.queries.rooms import RoomRepo
+from app.store.database.repo.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

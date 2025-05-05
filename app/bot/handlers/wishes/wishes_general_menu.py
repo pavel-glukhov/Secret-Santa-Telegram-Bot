@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.states.wishes import ChangeWish
-from app.store.database.queries.rooms import RoomRepo
-from app.store.database.queries.wishes import WishRepo
+from app.bot.states.wishes_states import ChangeWish
+from app.store.database.repo.rooms import RoomRepo
+from app.store.database.repo.wishes import WishRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

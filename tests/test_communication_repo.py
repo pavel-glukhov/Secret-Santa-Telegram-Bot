@@ -1,5 +1,5 @@
 import pytest
-from app.store.database.queries.communication import CommunicationRepo
+from app.store.database.repo.communication import CommunicationRepo
 from app.store.database.models import UsersMessages, Room, User
 from datetime import datetime
 

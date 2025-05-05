@@ -5,6 +5,7 @@ from app.store.database.sessions import get_session
 from app.store.redis import get_redis_client
 
 
+# noinspection PyTypeChecker
 def register_middlewares(dp) -> None:
     dp.update.middleware(DatabaseMiddleware(get_session))
     dp.update.middleware(LanguageMiddleware(get_redis_client, get_session))

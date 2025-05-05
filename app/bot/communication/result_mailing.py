@@ -5,12 +5,12 @@ import random
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
-from app.bot.messages.forrmatter import message_formatter
-from app.bot.messages.send_messages import broadcaster, send_message
-from app.bot.messages.users_checker import checking_user_is_active
-from app.store.database.queries.game_result import GameResultRepo
-from app.store.database.queries.rooms import RoomRepo
-from app.store.database.queries.wishes import WishRepo
+from app.bot.communication.forrmatter import message_formatter
+from app.bot.communication.telegram_messaging import broadcaster, safe_send_message
+from app.bot.communication.users_checker import checking_user_is_active
+from app.store.database.repo.game_result import GameResultRepo
+from app.store.database.repo.rooms import RoomRepo
+from app.store.database.repo.wishes import WishRepo
 from app.store.database.sessions import get_session
 from app.store.redis import get_redis_client
 from app.store.scheduler.operations import TaskScheduler
@@ -148,7 +148,7 @@ async def _insufficient_number_players(room_number: int,
         room_name=room.name
     )
     
-    await send_message(
+    await safe_send_message(
         user_id=owner.user_id,
         text=message_text,
         reply_markup=generate_inline_keyboard(keyboard_inline)

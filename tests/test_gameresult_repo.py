@@ -2,7 +2,7 @@ import pytest
 
 from tests.conftest import add_and_commit
 from app.store.database.models import Room, User, GameResult
-from app.store.database.queries.game_result import GameResultRepo
+from app.store.database.repo.game_result import GameResultRepo
 
 
 @pytest.fixture

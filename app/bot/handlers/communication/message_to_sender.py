@@ -9,12 +9,12 @@ from app.bot.handlers.communication.general_first_message import \
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.messages.send_messages import send_message
-from app.bot.states.communication import MessageToSanta
-from app.store.database.queries.communication import CommunicationRepo
-from app.store.database.queries.game_result import GameResultRepo
-from app.store.database.queries.rooms import RoomRepo
-from app.store.database.queries.users import UserRepo
+from app.bot.communication.telegram_messaging import safe_send_message
+from app.bot.states.communication_states import MessageToSanta
+from app.store.database.repo.communication import CommunicationRepo
+from app.store.database.repo.game_result import GameResultRepo
+from app.store.database.repo.rooms import RoomRepo
+from app.store.database.repo.users import UserRepo
 from app.store.redis import get_redis_client
 
 logger = logging.getLogger(__name__)
@@ -74,13 +74,13 @@ async def completed_message_to_santa(message: types.Message,
         room=room,
         message=message.text
     )
-    await send_message(user_id=sender.user_id,
-                       text=first_message_text,
-                       )
-    await send_message(user_id=sender.user_id,
-                       text=sender_app_lng.messages.main_menu.allowed_actions,
-                       reply_markup=generate_inline_keyboard(inline_keyboard)
-                       )
+    await safe_send_message(user_id=sender.user_id,
+                            text=first_message_text,
+                            )
+    await safe_send_message(user_id=sender.user_id,
+                            text=sender_app_lng.messages.main_menu.allowed_actions,
+                            reply_markup=generate_inline_keyboard(inline_keyboard)
+                            )
     second_message_text = lang.messages.communication_menu.message_to_sender.msg_was_sent
 
     keyboard_inline = generate_inline_keyboard(

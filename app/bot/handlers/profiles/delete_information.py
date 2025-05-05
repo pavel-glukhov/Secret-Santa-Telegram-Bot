@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.states.profiles import DeleteUserInformation
-from app.store.database.queries.users import UserRepo
+from app.bot.states.profiles_states import DeleteUserInformation
+from app.store.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 

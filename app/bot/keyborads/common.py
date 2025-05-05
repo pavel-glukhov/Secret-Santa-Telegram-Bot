@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.bot.languages.schemes import TranslationMainSchema
 from app.config import load_config
 from app.store.database.models import Room
-from app.store.database.queries.rooms import RoomRepo
+from app.store.database.repo.rooms import RoomRepo
 from app.store.scheduler.operations import TaskScheduler
 
 

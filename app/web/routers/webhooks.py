@@ -6,7 +6,7 @@ from app.bot.loader import bot, dp
 from app.config import load_config, webhook_settings
 
 router = APIRouter()
-webhook_path = webhook_settings(load_config)['webhook_path']
+webhook_path = webhook_settings(load_config())['webhook_path']
 
 
 @router.post(webhook_path)

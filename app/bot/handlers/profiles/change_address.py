@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.states.profiles import ChangeAddress
+from app.bot.states.profiles_states import ChangeAddress
 from app.config import load_config
-from app.store.database.queries.users import UserRepo
+from app.store.database.repo.users import UserRepo
 from app.store.encryption import CryptData
 
 logger = logging.getLogger(__name__)

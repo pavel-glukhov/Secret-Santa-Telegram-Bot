@@ -131,17 +131,16 @@ def load_config() -> AppConfig:
     )
 
 
-def webhook_settings(config) -> dict:
-    webhook_path = f"/bot/{config().bot.token}"
-    webhook_url = 'https://' + config().web.domain_name + webhook_path
+def webhook_settings(config: AppConfig) -> dict:
+    webhook_path = f"/bot/{config.bot.token}"
+    webhook_url = 'https://' + config.web.domain_name + webhook_path
     return {
         'webhook_path': webhook_path,
         'webhook_url': webhook_url
     }
 
 
-def setup_logging() -> None:
-    config = load_config()
+def setup_logging(config: AppConfig) -> None:
     configuration_file = os.path.join(ROOT_PATH, config.log.config_file)
 
     if not os.path.exists(config.log.log_path):

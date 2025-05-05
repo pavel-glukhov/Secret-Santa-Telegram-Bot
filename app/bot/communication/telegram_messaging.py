@@ -12,11 +12,11 @@ from app.bot.loader import bot
 logger = logging.getLogger(__name__)
 
 
-async def send_message(user_id: int,
-                       text: str,
-                       disable_notification: bool = False,
-                       max_retries: int = 3,
-                       **kwargs) -> bool:
+async def safe_send_message(user_id: int,
+                            text: str,
+                            disable_notification: bool = False,
+                            max_retries: int = 3,
+                            **kwargs) -> bool:
     if len(text) > 4096:
         logger.error(f"Text too long: {len(text)} characters. Telegram limit is 4096")
         return False
@@ -26,7 +26,7 @@ async def send_message(user_id: int,
         try:
             valid_kwargs = {'reply_markup', 'parse_mode', 'disable_web_page_preview', 'entities'}
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_kwargs}
-            await bot.send_message(user_id, text, disable_notification=disable_notification, **filtered_kwargs)
+            await bot.safe_send_message(user_id, text, disable_notification=disable_notification, **filtered_kwargs)
             logger.info(f"Message sent [ID:{user_id}]: successful")
             return True
 
@@ -102,9 +102,9 @@ async def broadcaster(list_users: list) -> None:
                     or 'text' not in user):
                 logger.error(f"Incorrect user data: {user}")
                 continue
-            tasks.append(send_message(user_id=user['user_id'],
-                                      text=user['text'],
-                                      reply_markup={user['player_language'].buttons.menu: "start_menu"}))
+            tasks.append(safe_send_message(user_id=user['user_id'],
+                                           text=user['text'],
+                                           reply_markup={user['player_language'].buttons.menu: "start_menu"}))
             await asyncio.sleep(.05)  # 20 messages per second
         results = await asyncio.gather(*tasks, return_exceptions=True)
         for result in results:

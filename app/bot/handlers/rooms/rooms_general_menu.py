@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.queries.game_result import GameResultRepo
-from app.store.database.queries.rooms import RoomRepo
+from app.store.database.repo.game_result import GameResultRepo
+from app.store.database.repo.rooms import RoomRepo
 from app.store.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)

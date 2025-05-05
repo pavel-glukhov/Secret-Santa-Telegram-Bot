@@ -14,12 +14,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.game.states import DateTimePicker
+from app.bot.states.start_game_states import DateTimePicker
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.messages.result_mailing import send_result_of_game
-from app.store.database.queries.rooms import RoomRepo
-from app.store.database.queries.users import UserRepo
+from app.bot.communication.result_mailing import send_result_of_game
+from app.store.database.repo.rooms import RoomRepo
+from app.store.database.repo.users import UserRepo
 from app.store.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)

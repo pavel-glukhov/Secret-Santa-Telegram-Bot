@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.store.database.models import User, Room
-from app.store.database.queries.users import UserRepo
+from app.store.database.repo.users import UserRepo
 
 from tests.conftest import add_and_commit
 
