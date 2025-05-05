@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import Update
 from sqlalchemy.orm import scoped_session
 
-from app.bot.languages import language_return_dataclass
+from app.bot.languages.loader import language_return_dataclass
 from app.store.database.queries.users import UserRepo
 
 

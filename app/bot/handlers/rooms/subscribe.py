@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms import JoinRoom
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.wishes import WishRepo

@@ -1,29 +1,26 @@
 import asyncio
 import datetime
+import logging
+import random
 from calendar import monthrange
+from datetime import date
 
 import pytz
 from aiogram import F, Router, types
-from aiogram.types import CallbackQuery
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 from aiogram.fsm.context import FSMContext
+from aiogram.types import (CallbackQuery, InlineKeyboardButton,
+                           InlineKeyboardMarkup)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-import logging
-
-from datetime import date
 from dateutil.relativedelta import relativedelta
-import random
-
 from sqlalchemy.orm import Session
 
 from app.bot.handlers.game.states import DateTimePicker
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.messages.result_mailing import send_result_of_game
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.users import UserRepo
-from app.store.scheduler.operations import add_task, get_task
+from app.store.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +32,7 @@ async def start_game(callback: types.CallbackQuery,
                      session: Session,
                      lang: TranslationMainSchema,
                      room_number: int):
-    task = get_task(task_id=room_number)
+    task = TaskScheduler().get_task(task_id=room_number)
     room_members = await RoomRepo(session).get_list_members(room_number)
     user = await UserRepo(session).get_user_or_none(callback.message.chat.id)
     timezone = user.timezone or lang.messages.game_menu.start_game.time_zone_inf
@@ -85,7 +82,8 @@ async def start_datetime(callback: types.CallbackQuery,
     )
 
 
-@router.callback_query(DateTimePicker.picking_date, F.data.startswith("prev_"))
+@router.callback_query(DateTimePicker.picking_date,
+                       F.data.startswith("prev_"))
 async def calendar_prev(callback: CallbackQuery,
                         lang: TranslationMainSchema):
     _, year, month = callback.data.split("_")
@@ -96,7 +94,8 @@ async def calendar_prev(callback: CallbackQuery,
     await callback.answer()
 
 
-@router.callback_query(DateTimePicker.picking_date, F.data.startswith("next_"))
+@router.callback_query(DateTimePicker.picking_date,
+                       F.data.startswith("next_"))
 async def calendar_next(callback: CallbackQuery,
                         lang: TranslationMainSchema):
     _, year, month = callback.data.split("_")
@@ -125,7 +124,8 @@ async def date_selected(callback: CallbackQuery,
     )
 
 
-@router.callback_query(DateTimePicker.picking_time, F.data.startswith("time_"))
+@router.callback_query(DateTimePicker.picking_time,
+                       F.data.startswith("time_"))
 async def time_selected(callback: CallbackQuery,
                         state: FSMContext,
                         session: Session,
@@ -155,10 +155,10 @@ async def time_selected(callback: CallbackQuery,
 
     if datetime_obj:
         if datetime_obj > current_time:
-            if task := get_task(task_id=room_number):
+            if task := TaskScheduler().get_task(task_id=room_number):
                 task.remove()
 
-            add_task(
+            TaskScheduler().add_task(
                 task_func=send_result_of_game,
                 date_time=selected_date_time,
                 task_id=room_number,
@@ -230,7 +230,9 @@ def _convert_datetime_with_timezone(datetime_obj: datetime,
     return timezone.localize(datetime_obj)
 
 
-def _generate_calendar(year: int, month: int, lang: TranslationMainSchema) -> InlineKeyboardMarkup:
+def _generate_calendar(year: int,
+                       month: int,
+                       lang: TranslationMainSchema) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     month_name = date(year, month, 1).strftime("%B %Y")
 

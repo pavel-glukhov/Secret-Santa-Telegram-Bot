@@ -3,8 +3,7 @@ import logging
 from aiogram import Router
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.states.communication import MessageToRecipient
-from app.bot.states.communication import MessageToSanta
+from app.bot.states.communication import MessageToRecipient, MessageToSanta
 
 logger = logging.getLogger(__name__)
 router = Router()

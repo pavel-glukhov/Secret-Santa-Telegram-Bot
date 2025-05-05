@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import language_return_dataclass
+from app.bot.languages.loader import language_return_dataclass
 from app.store.database.queries.users import UserRepo
 from app.store.redis import get_redis_client
 

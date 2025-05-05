@@ -1,7 +1,8 @@
 import logging
+from typing import Any, Awaitable, Callable, Dict
+
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
-from typing import Callable, Dict, Any, Awaitable
 
 logger = logging.getLogger(__name__)
 

@@ -4,9 +4,11 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
-from app.bot.handlers.communication.general_first_message import send_first_message_to_user
+from app.bot.handlers.communication.general_first_message import \
+    send_first_message_to_user
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema, language_return_dataclass
+from app.bot.languages.loader import language_return_dataclass
+from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.messages.send_messages import send_message
 from app.bot.states.communication import MessageToSanta
 from app.store.database.queries.communication import CommunicationRepo

@@ -1,12 +1,13 @@
 import logging
+
 from fastapi import FastAPI
 
-from app.store.redis import get_redis_client
-from app.bot.languages import load_language_files_to_redis
+from app.bot.languages.loader import load_language_files_to_redis
 from app.bot.loader import bot, dp
 from app.bot.register_middlewares import register_middlewares
 from app.bot.register_routers import register_routers
 from app.config import load_config, setup_logging, webhook_settings
+from app.store.redis import get_redis_client
 from app.store.scheduler import scheduler
 from app.web.register_routers import register_fastapi_routers
 

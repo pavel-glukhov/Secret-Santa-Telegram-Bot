@@ -4,7 +4,7 @@ from aiogram import F, Router, types
 from aiogram.filters import Command
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.config import load_config
 
 logger = logging.getLogger(__name__)

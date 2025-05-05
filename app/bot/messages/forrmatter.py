@@ -1,4 +1,4 @@
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 
 
 def message_formatter(

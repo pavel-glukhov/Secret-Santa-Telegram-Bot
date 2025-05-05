@@ -1,12 +1,13 @@
 from contextlib import contextmanager
 from functools import lru_cache
 from typing import Generator, Optional
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+
 from app.config import load_config
 from app.exceptions import DatabaseConfigError
-
 
 config = load_config().db
 

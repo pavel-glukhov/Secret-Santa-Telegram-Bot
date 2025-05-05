@@ -1,4 +1,5 @@
-from redis import Redis, ConnectionPool
+from redis import ConnectionPool, Redis
+
 from app.config import load_config
 
 

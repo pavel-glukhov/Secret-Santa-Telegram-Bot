@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.bot.handlers.pagination import Pagination
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.time_zones import TimeZoneStates
 from app.store.database.queries.users import UserRepo
 

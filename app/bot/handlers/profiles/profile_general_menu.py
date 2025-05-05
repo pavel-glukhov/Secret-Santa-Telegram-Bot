@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.store.database.queries.users import UserRepo
 
 logger = logging.getLogger(__name__)

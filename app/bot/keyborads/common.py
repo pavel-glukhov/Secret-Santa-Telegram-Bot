@@ -2,11 +2,11 @@ from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.orm import Session
 
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.config import load_config
 from app.store.database.models import Room
 from app.store.database.queries.rooms import RoomRepo
-from app.store.scheduler.operations import get_task
+from app.store.scheduler.operations import TaskScheduler
 
 
 async def create_common_keyboards(message: types.Message, session: Session,
@@ -67,7 +67,7 @@ def personal_room_keyboard_formatter(
     :return:
     """
     owner_tag = ' 🤴' if is_owner else ''
-    scheduler_tag = '⏱' if get_task(room.number) else ''
+    scheduler_tag = '⏱' if TaskScheduler().get_task(room.number) else ''
     closed_tag = '✅' if room.is_closed else ''
     
     return (f'{text_message}: {room.name} ({room.number})'

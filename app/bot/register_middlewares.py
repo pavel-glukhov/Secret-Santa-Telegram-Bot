@@ -1,6 +1,6 @@
 from app.bot.middlewares.database_middleware import DatabaseMiddleware
-from app.bot.middlewares.room_number_middleware import RoomNumberMiddleware
 from app.bot.middlewares.languages_middleware import LanguageMiddleware
+from app.bot.middlewares.room_number_middleware import RoomNumberMiddleware
 from app.store.database.sessions import get_session
 from app.store.redis import get_redis_client
 

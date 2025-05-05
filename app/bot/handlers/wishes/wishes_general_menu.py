@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import Session
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.wishes import ChangeWish
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.wishes import WishRepo

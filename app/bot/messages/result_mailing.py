@@ -4,18 +4,16 @@ import logging
 import random
 
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import language_return_dataclass
+from app.bot.languages.loader import language_return_dataclass
 from app.bot.messages.forrmatter import message_formatter
 from app.bot.messages.send_messages import broadcaster, send_message
 from app.bot.messages.users_checker import checking_user_is_active
 from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
 from app.store.database.queries.wishes import WishRepo
-from sqlalchemy.orm import scoped_session
 from app.store.database.sessions import get_session
-
 from app.store.redis import get_redis_client
-from app.store.scheduler.operations import remove_task
+from app.store.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +143,7 @@ async def _insufficient_number_players(room_number: int,
                                    is_closed=True,
                                    closed_at=datetime.datetime.now())
     
-    remove_task(room_number)
+    TaskScheduler().remove_task(room_number)
     message_text = app_language.result_mailing.message_text.format(
         room_name=room.name
     )

@@ -2,6 +2,7 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+
 from app.store.database.models import Room, User, WishRoom
 
 logger = logging.getLogger(__name__)

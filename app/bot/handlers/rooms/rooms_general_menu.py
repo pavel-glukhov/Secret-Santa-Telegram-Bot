@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
-from app.bot.languages import TranslationMainSchema
+from app.bot.languages.schemes import TranslationMainSchema
 from app.store.database.queries.game_result import GameResultRepo
 from app.store.database.queries.rooms import RoomRepo
-from app.store.scheduler.operations import get_task
+from app.store.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -29,7 +29,7 @@ async def my_room(callback: types.CallbackQuery,
         await _room_is_closed(callback, room.number, user_id, session, lang)
         return
 
-    scheduler_task = get_task(room_number)
+    scheduler_task = TaskScheduler().get_task(room_number)
     keyboard_dict = _generate_keyboard_dict(
         room_number, is_room_owner, scheduler_task, lang)
 

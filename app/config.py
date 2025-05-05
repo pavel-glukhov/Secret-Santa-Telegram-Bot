@@ -94,7 +94,7 @@ def load_config() -> AppConfig:
         bot=BotConfig(
             token=os.getenv('TELEGRAM_TOKEN'),
             telegram_login=os.getenv('TELEGRAM_LOGIN'),
-            language_folder=os.path.join(ROOT_PATH, 'app\\bot\\languages')
+            language_folder=os.path.join(ROOT_PATH, 'app\\bot\\languages\\dicts')
         ),
         web=WebSettings(
             domain_name=os.getenv('DOMAIN_NAME'),

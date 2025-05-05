@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.store.database.models import UsersMessages, Room
+from app.store.database.models import Room, UsersMessages
 
 
 class CommunicationRepo:
