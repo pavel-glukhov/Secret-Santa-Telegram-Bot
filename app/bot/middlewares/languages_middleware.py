@@ -32,7 +32,7 @@ class LanguageMiddleware(BaseMiddleware):
         available_languages = self.redis_client().lrange("list_languages", 0, -1)
         chat_id = self._get_chat_id(event)
 
-        with self.session_factory() as session:
+        async with self.session_factory() as session:
             if chat_id is not None:
                 data['available_languages'] = available_languages
                 user_language = await UserRepo(session).get_user_language(chat_id)

@@ -3,7 +3,7 @@ import re
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -38,7 +38,7 @@ async def change_phone_number(callback: types.CallbackQuery,
 @router.message(ChangePhoneNuber.waiting_for_phone_number)
 async def process_changing_owner(message: types.Message,
                                  state: FSMContext,
-                                 session: Session,
+                                 session: AsyncSession,
                                  lang: TranslationMainSchema):
     state_data = await state.get_data()
     phone_number = message.text

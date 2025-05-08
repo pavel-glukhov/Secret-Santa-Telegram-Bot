@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -18,12 +18,19 @@ router = Router()
 @router.callback_query(F.data == 'menu_create_new_room')
 async def create_room(callback: types.CallbackQuery,
                       state: FSMContext,
-                      session: Session,
+                      session: AsyncSession,
                       lang: TranslationMainSchema):
-    count_user_rooms = await RoomRepo(session).get_count_user_rooms(
-        callback.message.chat.id)
+    user_id = callback.message.chat.id
+    user_rooms_limit = load_config().room.user_rooms_count
 
-    if count_user_rooms >= load_config().room.user_rooms_count:
+    cancel_button = lang.buttons.cancel_button
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'})
+
+    count_user_rooms = await RoomRepo(session).get_count_user_rooms(
+        user_id)
+
+    if count_user_rooms >= user_rooms_limit:
         return_back_button = lang.buttons.return_back_button
         keyboard_inline = generate_inline_keyboard(
             {
@@ -31,21 +38,20 @@ async def create_room(callback: types.CallbackQuery,
             }
         )
         message_text = lang.messages.rooms_menu.create_new_room.limit.format(
-            maximal_count_rooms=load_config().room.user_rooms_count
+            maximal_count_rooms=user_rooms_limit
         )
 
         return await callback.message.edit_text(
             text=message_text,
             reply_markup=keyboard_inline
         )
-    cancel_button = lang.buttons.cancel_button
-    keyboard_inline = generate_inline_keyboard(
-        {cancel_button: 'cancel'})
 
     message_text = lang.messages.rooms_menu.create_new_room.create_new_room_first_msg
 
-    initial_bot_message = await callback.message.edit_text(text=message_text,
-                                                           reply_markup=keyboard_inline)
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
 
     await state.update_data(bot_message_id=initial_bot_message)
     await state.set_state(CreateRoom.waiting_for_room_name)
@@ -140,7 +146,9 @@ async def process_budget(message: types.Message,
 
 
 @router.message(CreateRoom.waiting_for_room_wishes)
-async def process_wishes(message: types.Message, state: FSMContext, session: Session,
+async def process_wishes(message: types.Message,
+                         state: FSMContext,
+                         session: AsyncSession,
                          lang: TranslationMainSchema):
     user_wishes = message.text
     state_data = await state.get_data()

@@ -2,7 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -16,7 +16,7 @@ router = Router()
 
 @router.callback_query(F.data.startswith('room_show-wish'))
 async def show_wishes(callback: types.CallbackQuery,
-                      session: Session,
+                      session: AsyncSession,
                       lang: TranslationMainSchema,
                       room_number: int):
     change_wish_button = lang.buttons.wishes_menu.change_wish
@@ -65,7 +65,7 @@ async def update_wishes(callback: types.CallbackQuery,
 async def process_updating_wishes(
         message: types.Message,
         state: FSMContext,
-        session: Session,
+        session: AsyncSession,
         lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']

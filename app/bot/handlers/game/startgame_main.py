@@ -12,7 +12,7 @@ from aiogram.types import (CallbackQuery, InlineKeyboardButton,
                            InlineKeyboardMarkup)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dateutil.relativedelta import relativedelta
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.states.start_game_states import DateTimePicker
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -29,7 +29,7 @@ router = Router()
 
 @router.callback_query(F.data.startswith('room_start-game'))
 async def start_game(callback: types.CallbackQuery,
-                     session: Session,
+                     session: AsyncSession,
                      lang: TranslationMainSchema,
                      room_number: int):
     task = TaskScheduler().get_task(task_id=room_number)
@@ -128,7 +128,7 @@ async def date_selected(callback: CallbackQuery,
                        F.data.startswith("time_"))
 async def time_selected(callback: CallbackQuery,
                         state: FSMContext,
-                        session: Session,
+                        session: AsyncSession,
                         lang: TranslationMainSchema):
     semaphore = asyncio.Semaphore(1)
 

@@ -2,7 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.communication.general_first_message import \
     send_first_message_to_user
@@ -25,7 +25,7 @@ router = Router()
 async def message_to_santa_no_edit(callback: types.CallbackQuery,
                                    state: FSMContext,
                                    lang: TranslationMainSchema,
-                                   room_number: int):
+                                   ):
     await message_to_santa(callback, state, lang, edit_message=False)
 
 
@@ -40,7 +40,7 @@ async def message_to_santa(callback: types.CallbackQuery,
 
 @router.message(MessageToSanta.waiting_message)
 async def completed_message_to_santa(message: types.Message,
-                                     state: FSMContext, session: Session,
+                                     state: FSMContext, session: AsyncSession,
                                      lang: TranslationMainSchema):
     state_data = await state.get_data()
     user_id = message.chat.id

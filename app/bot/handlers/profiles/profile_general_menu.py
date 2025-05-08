@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router, types
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -14,7 +14,7 @@ router = Router()
 
 @router.callback_query(F.data == 'menu_user_profile')
 async def my_profile(callback: types.CallbackQuery,
-                     session: Session,
+                     session: AsyncSession,
                      lang: TranslationMainSchema):
     change_profile_button = lang.buttons.profile_menu.change_profile
     return_back_button = lang.buttons.return_back_button

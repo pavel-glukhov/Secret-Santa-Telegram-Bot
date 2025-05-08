@@ -53,7 +53,7 @@ class DataBaseConfig:
     
     @property
     def postgres_url(self):
-        return (f'postgresql://'
+        return (f'postgresql+asyncpg://'
                 f'{self.user}:'
                 f'{self.password}'
                 f'@{self.host}/'

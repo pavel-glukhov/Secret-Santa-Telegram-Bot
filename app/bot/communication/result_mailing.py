@@ -62,7 +62,7 @@ async def send_result_of_game(room_number,
                               semaphore) -> None:
     redis_client = get_redis_client()
 
-    with get_session() as session:
+    async with get_session() as session:
         async with semaphore:
             verified_users = await creating_active_users_pool(room_number, session, redis_client)
 

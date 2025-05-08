@@ -2,7 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -39,7 +39,7 @@ async def change_room_owner(callback: types.CallbackQuery,
 @router.message(ChangeOwner.waiting_for_owner_name)
 async def process_changing_owner(message: types.Message,
                                  state: FSMContext,
-                                 session: Session, lang: TranslationMainSchema):
+                                 session: AsyncSession, lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
     previous_owner = message.chat.id

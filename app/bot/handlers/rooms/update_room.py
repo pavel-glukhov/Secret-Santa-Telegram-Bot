@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -63,7 +63,7 @@ async def process_change_room_name_invalid(message: types.Message,
 @router.message(ChangeRoomName.waiting_for_room_name)
 async def update_room_name_get_value(message: types.Message,
                                      state: FSMContext,
-                                     session: Session,
+                                     session: AsyncSession,
                                      lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']

@@ -7,7 +7,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.pagination import Pagination
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -89,7 +89,7 @@ async def process_country_callback(
                        StateFilter(TimeZoneStates.confirmation))
 async def process_timezone_callback(callback: types.CallbackQuery,
                                     state: FSMContext,
-                                    session: Session,
+                                    session: AsyncSession,
                                     lang: TranslationMainSchema):
     timezone = callback.data.split(':')[-1]
     state_data = await state.get_data()

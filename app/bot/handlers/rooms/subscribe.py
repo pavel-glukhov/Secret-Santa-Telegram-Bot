@@ -2,7 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
@@ -20,7 +20,6 @@ async def join_room(callback: types.CallbackQuery,
                     state: FSMContext,
                     lang: TranslationMainSchema):
     cancel_button = lang.buttons.cancel_button
-
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
@@ -37,7 +36,7 @@ async def join_room(callback: types.CallbackQuery,
 @router.message(JoinRoom.waiting_for_room_number)
 async def process_room_number(message: types.Message,
                               state: FSMContext,
-                              session: Session,
+                              session: AsyncSession,
                               lang: TranslationMainSchema):
     room_number = message.text
     state_data = await state.get_data()
@@ -151,19 +150,20 @@ async def _is_not_exists_room(message,
 @router.message(JoinRoom.waiting_for_wishes)
 async def process_room_wishes(message: types.Message,
                               state: FSMContext,
-                              session: Session,
+                              session: AsyncSession,
                               lang: TranslationMainSchema):
     state_data = await state.get_data()
     wishes = message.text
     chat_id = message.chat.id
-    room_number = state_data['room_number']
+    room_number = int(state_data['room_number'])
     bot_message = state_data.get('bot_message_id')
 
     await message.delete()
 
     await RoomRepo(session).add_member(
         user_id=chat_id,
-        room_number=room_number
+        room_number=room_number,
+        user_wish=wishes
     )
 
     await WishRepo(session).create_or_update_wish_for_room(

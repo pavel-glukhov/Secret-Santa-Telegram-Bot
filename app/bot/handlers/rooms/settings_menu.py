@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router, types
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -13,7 +13,7 @@ router = Router()
 
 @router.callback_query(F.data.startswith('room_config'))
 async def configuration_room(callback: types.CallbackQuery,
-                             session: Session,
+                             session: AsyncSession,
                              lang: TranslationMainSchema,
                              room_number: int):
 

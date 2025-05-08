@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.languages.schemes import TranslationMainSchema
 from app.config import load_config
@@ -9,7 +9,8 @@ from app.store.database.repo.rooms import RoomRepo
 from app.store.scheduler.operations import TaskScheduler
 
 
-async def create_common_keyboards(message: types.Message, session: Session,
+async def create_common_keyboards(message: types.Message,
+                                  session: AsyncSession,
                                   text: TranslationMainSchema) -> types.InlineKeyboardMarkup:
     """
     Generating main buttons

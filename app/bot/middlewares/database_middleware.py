@@ -1,13 +1,10 @@
-from contextlib import AbstractContextManager
-from typing import Any, Awaitable, Callable
-
+from typing import Any, Awaitable, Callable, AsyncGenerator
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from sqlalchemy.orm import scoped_session
-
+from sqlalchemy.ext.asyncio import async_scoped_session
 
 class DatabaseMiddleware(BaseMiddleware):
-    def __init__(self, session_factory: Callable[[], AbstractContextManager[scoped_session]]) -> None:
+    def __init__(self, session_factory: Callable[[], AsyncGenerator[async_scoped_session, None]]) -> None:
         self.session_factory = session_factory
 
     async def __call__(
@@ -16,6 +13,6 @@ class DatabaseMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        with self.session_factory() as session:
+        async with self.session_factory() as session:
             data["session"] = session
             return await handler(event, data)

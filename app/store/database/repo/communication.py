@@ -1,15 +1,18 @@
 from datetime import datetime
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.store.database.models import Room, UsersMessages
 
 
 class CommunicationRepo:
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
-    
-    async def insert(self, room: Room, recipient_id: int, sender_id: int, message: str) -> None:
+
+    async def insert(self, room: Room,
+                     recipient_id: int,
+                     sender_id: int,
+                     message: str) -> None:
         new_message = UsersMessages(
             recipient_id=recipient_id,
             sender_id=sender_id,
@@ -17,6 +20,6 @@ class CommunicationRepo:
             message=message,
             sent_at=datetime.now()
         )
-        
+
         self.session.add(new_message)
-        self.session.commit()
+        await self.session.commit()

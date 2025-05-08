@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -40,7 +40,7 @@ async def delete_user_information(callback: types.CallbackQuery,
                       StateFilter(DeleteUserInformation.waiting_for_conformation))
 async def process_deleting_information(callback: types.CallbackQuery,
                                       state: FSMContext,
-                                      session: Session,
+                                      session: AsyncSession,
                                       lang: TranslationMainSchema):
     user_id = callback.message.chat.id
     state_data = await state.get_data()

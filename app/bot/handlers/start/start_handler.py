@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.start.language import select_language
 from app.bot.keyborads.common import create_common_keyboards
@@ -17,7 +17,7 @@ router = Router()
 @router.callback_query(F.data == "cancel")
 async def cancel_handler(callback: types.CallbackQuery,
                          state: FSMContext,
-                         session: Session,
+                         session: AsyncSession,
                          lang: TranslationMainSchema):
     await state.clear()
     await root_menu(callback.message, session, lang)
@@ -26,7 +26,7 @@ async def cancel_handler(callback: types.CallbackQuery,
 @router.callback_query(F.data == 'start_menu')
 @router.message(Command(commands=["start"]))
 async def start(message: types.Message, state: FSMContext,
-                session: Session,
+                session: AsyncSession,
                 lang: TranslationMainSchema,
                 available_languages: list):
     if not lang:
@@ -43,7 +43,7 @@ async def start(message: types.Message, state: FSMContext,
 
 @router.callback_query(F.data == 'root_menu')
 async def root_menu(data: types.Message | types.CallbackQuery,
-                    session: Session,
+                    session: AsyncSession,
                     lang: TranslationMainSchema,
                     edit_message=True):
     message = data.message if isinstance(data, types.CallbackQuery) else data
@@ -68,7 +68,8 @@ async def root_menu(data: types.Message | types.CallbackQuery,
         await message.answer(text=message_text, reply_markup=keyboard)
 
 
-async def create_user_or_enable(message: types.Message, session: Session):
+async def create_user_or_enable(message: types.Message,
+                                session: AsyncSession):
     user_id = message.chat.id
     username = message.chat.username
     first_name = message.chat.first_name

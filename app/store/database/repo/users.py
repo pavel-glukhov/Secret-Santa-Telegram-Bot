@@ -1,13 +1,13 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, Sequence
 
 from sqlalchemy import select, update
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.store.database.models import Room, User
 
 
 class UserRepo:
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def get_or_create(self, user_id, **kwargs) -> Tuple[User, bool]:
@@ -17,11 +17,14 @@ class UserRepo:
         :param kwargs:
         :return: [User Instance, Bool: Created - True, else False]
         """
-        user = self.session.query(User).filter(User.user_id == user_id).first()
+        result = await self.session.execute(
+            select(User).filter(User.user_id == user_id)
+        )
+        user = result.scalar_one_or_none()
         if user is None:
             instance = User(user_id=user_id, **kwargs)
             self.session.add(instance)
-            self.session.commit()
+            await self.session.commit()
             return instance, True
         return user, False
 
@@ -34,36 +37,43 @@ class UserRepo:
         :return: User instance or None
         """
         if isinstance(user, int):
-            result = self.session.execute(select(User).filter_by(user_id=user))
+            result = await self.session.execute(
+                select(User).filter_by(user_id=user)
+            )
         else:
-            result = self.session.execute(select(User).filter_by(username=user))
-        user = result.scalars().first()
+            result = await self.session.execute(
+                select(User).filter_by(username=user)
+            )
+        user = result.scalar_one_or_none()
         return user
 
     async def update_user(self, user_id: int, **kwargs) -> None:
         """
         Update any field of user instance
         """
-        self.session.execute(
-            update(User).filter_by(user_id=user_id).values(**kwargs))
-        self.session.commit()
+        await self.session.execute(
+            update(User).filter_by(user_id=user_id).values(**kwargs)
+        )
+        await self.session.commit()
 
-    async def list_rooms_where_owner(self, user: User) -> list[Room]:
+    async def list_rooms_where_owner(self, user: User) -> Sequence[Room]:
         """
         Get list of rooms where user is owner
         """
-        user_rooms = self.session.execute(
-            select(Room).filter_by(owner_id=user.user_id))
-        return user_rooms.scalars().all()
+        result = await self.session.execute(
+            select(Room).filter_by(owner_id=user.user_id)
+        )
+        return result.scalars().all()
 
     async def is_room_owner(self, user: User, room_number) -> bool:
         """
         Check if user is owner of room
         """
         user_rooms = await self.list_rooms_where_owner(user)
-        room = self.session.execute(
-            select(Room).filter_by(number=room_number))
-        room = room.scalars().first()
+        result = await self.session.execute(
+            select(Room).filter_by(number=room_number)
+        )
+        room = result.scalar_one_or_none()
         return room in user_rooms
 
     async def disable_user(self, user_id: int) -> None:
@@ -82,16 +92,19 @@ class UserRepo:
         """
         Delete user
         """
-        user = self.session.get(User, user_id)
+        user = await self.session.get(User, user_id)
         if user:
-            self.session.delete(user)
-            self.session.commit()
+            await self.session.delete(user)
+            await self.session.commit()
 
     async def get_user_language(self, user_id):
-        user = self.session.query(
-            User).filter(
-            User.user_id == user_id
-        ).first()
+        """
+        Get user's language
+        """
+        result = await self.session.execute(
+            select(User).filter(User.user_id == user_id)
+        )
+        user = result.scalar_one_or_none()
         if user is not None:
             return user.language
         return None

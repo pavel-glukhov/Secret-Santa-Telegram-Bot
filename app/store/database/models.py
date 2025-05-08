@@ -68,7 +68,7 @@ class Room(Base):
     owner_id = Column(BigInteger, ForeignKey('users.user_id'))
     
     owner = relationship("User", back_populates="room_owner")
-    members = relationship("User", secondary=rooms_users, back_populates="members")
+    members = relationship("User", secondary=rooms_users, back_populates="members", lazy="selectin")
     wishes = relationship("WishRoom", back_populates="room", cascade="all, delete-orphan")
     results_of_rooms = relationship("GameResult", back_populates="room")
     

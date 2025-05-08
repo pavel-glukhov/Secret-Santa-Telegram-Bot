@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router, types
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
@@ -16,7 +16,7 @@ router = Router()
 
 @router.callback_query(F.data.startswith('room_menu'))
 async def my_room(callback: types.CallbackQuery,
-                  session: Session,
+                  session: AsyncSession,
                   lang: TranslationMainSchema,
                   room_number: int):
     user_id = callback.message.chat.id
@@ -96,7 +96,7 @@ def _generate_message_text(room, scheduler_task, lang) -> str:
 async def _room_is_closed(callback: types.CallbackQuery,
                           room_number: int,
                           user_id: int,
-                          session: Session,
+                          session: AsyncSession,
                           lang: TranslationMainSchema) -> None:
     game_result_repo = GameResultRepo(session)
     room_repo = RoomRepo(session)

@@ -2,7 +2,7 @@ import logging
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.handlers.communication.general_first_message import \
     send_first_message_to_user
@@ -19,7 +19,6 @@ from app.store.redis import get_redis_client
 
 logger = logging.getLogger(__name__)
 router = Router()
-
 
 @router.callback_query(F.data.startswith('room_closed-con-rec_no_ed'))
 async def message_to_santa_no_edit(callback: types.CallbackQuery,
@@ -40,7 +39,7 @@ async def message_to_recipient(callback: types.CallbackQuery,
 @router.message(MessageToRecipient.waiting_message)
 async def completed_message_to_santa(message: types.Message,
                                      state: FSMContext,
-                                     session: Session,
+                                     session: AsyncSession,
                                      lang: TranslationMainSchema):
     state_data = await state.get_data()
     room = await RoomRepo(session).get(state_data['room_number'])

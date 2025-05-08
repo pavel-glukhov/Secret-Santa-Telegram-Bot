@@ -26,6 +26,7 @@ async def load_languages_to_redis(config) -> None:
         logger.error(f"Failed to load languages to Redis: {str(e)}")
         raise
 
+
 async def setup_webhook(config) -> None:
     """Set up the Telegram webhook if it differs from the configured URL."""
     try:
@@ -46,14 +47,17 @@ async def setup_webhook(config) -> None:
 
 
 async def on_startup():
-    config = load_config()
-    setup_logging(config)
-    await load_languages_to_redis(config)
-    register_routers(dp)
-    register_middlewares(dp)
-    scheduler.start()
-    await setup_webhook(config)
-    logger.info("App has been started")
+    try:
+        config = load_config()
+        setup_logging(config)
+        await load_languages_to_redis(config)
+        register_routers(dp)
+        register_middlewares(dp)
+        scheduler.start()
+        await setup_webhook(config)
+        logger.info("App has been started")
+    except  ConnectionError as e:
+        logger.error(f"Failed to start app: {str(e)}")
 
 
 async def on_shutdown():
@@ -71,6 +75,7 @@ def configure_fastapi() -> FastAPI:
     register_event_handlers(app)
     register_fastapi_routers(app)
     return app
+
 
 def create_app() -> FastAPI:
     return configure_fastapi()

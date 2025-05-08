@@ -1,7 +1,7 @@
 import logging
 
 from aiogram import F, Router, types
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
@@ -41,7 +41,8 @@ async def select_language(event: types.Message | types.CallbackQuery, available_
 
 
 @router.callback_query(F.data.startswith('select_lang_'))
-async def update_language(callback: types.CallbackQuery, session: Session):
+async def update_language(callback: types.CallbackQuery,
+                          session: AsyncSession):
     callback_parts = callback.data.split('_')
     selected_language = callback_parts[2]
     source_menu = (callback_parts[4]
