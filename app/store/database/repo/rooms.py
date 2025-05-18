@@ -1,7 +1,7 @@
 import random
 from typing import Optional, List, Any, Sequence
 
-from sqlalchemy import delete, select, insert, func, Boolean, Row, RowMapping
+from sqlalchemy import delete, select, insert, func, Row, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import exists
 
@@ -293,8 +293,17 @@ class RoomRepo:
     @staticmethod
     async def _get_room_unique_number(list_of_rooms) -> int:
         length = load_config().room.room_number_length
-        min_number = int("1" + "0" * (length - 1))
-        max_number = int("9" + "9" * (length - 1))
-        candidate = random.randint(min_number, max_number)
-        if candidate not in list_of_rooms:
-            return candidate
+
+        min_number = 10 ** (length - 1)
+        max_number = 10 ** length - 1
+
+        used_numbers = set(list_of_rooms)
+
+        if len(used_numbers) >= max_number - min_number + 1:
+            raise ValueError("There are no unique room numbers available. The pool of numbers has ended."
+                             "Solution: it is necessary to expand the range.")
+
+        while True:
+            number = random.randint(min_number, max_number)
+            if number not in used_numbers:
+                return number

@@ -29,38 +29,38 @@ loggers:
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   fastapi:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   aiogram.event:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   sqlalchemy:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   sqlalchemy.engine:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   sqlalchemy.orm:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   apscheduler:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   redis:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   asyncio:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
   asyncpg:
-    level: WARNING
+    level: INFO
     handlers: [console_handler, timed_rotating_handler]
     propagate: no
