@@ -87,6 +87,7 @@ class CreateNewRoom(BaseModel):
     create_new_room_third_msg: str
     create_new_room_forth_msg: str
     create_new_room_additional_msg: str
+    join_room_url: str
 
 
 class DeleteRoom(BaseModel):
@@ -104,9 +105,11 @@ class Subscribe(BaseModel):
     already_joined: str
     number_error: str
     room_is_not_exist_or_closed: str
+    room_is_not_exist_or_closed_invitation: str
     subscribe_first_msg: str
     subscribe_second_msg: str
     subscribe_third_msg: str
+    room_invitation: str
 
 
 class Unsubscribe(BaseModel):
@@ -246,6 +249,7 @@ class MainAppMenu(BaseModel):
 
 
 class Buttons(BaseModel):
+    enter_to_joined_room: str
     return_back_button: str
     cancel_button: str
     continue_button: str

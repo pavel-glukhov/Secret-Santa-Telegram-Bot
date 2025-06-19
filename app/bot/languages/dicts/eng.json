@@ -70,7 +70,8 @@
           "create_new_room_second_msg": "Accepted! Your room name is <b>{room_name}</b>\n\nNow specify the maximum budget for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
           "create_new_room_third_msg": "Accepted! Your budget is <b>{room_budget}</b>\n\nAnd the last question.\nWrite your gift preferences. Perhaps you have a hobby, and you'd like something special?\n",
           "create_new_room_forth_msg": "Ho-ho-ho! \uD83C\uDF85\n\nThe room <b>\"{room_name}\"</b> has been created.\nHere is the room number <b>{room_number}</b>\nShare this code with your friends so they can join your game.\n\n",
-          "create_new_room_additional_msg": "In the meantime, you can go back and update your profile."
+          "create_new_room_additional_msg": "In the meantime, you can go back and update your profile.",
+          "join_room_url":"Or share this link with friends to join the room\n\n{url}"
         },
         "delete_room": {
           "delete_room_first_msg": "❌<b>The room will be deleted without the possibility of recovery</b>.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n ",
@@ -85,9 +86,11 @@
           "already_joined": "You are already in this room.",
           "number_error": "The room number can contain only digits, try again.",
           "room_is_not_exist_or_closed": "The room you entered does not exist, or the game is over.\nEnter a valid room number.",
+          "room_is_not_exist_or_closed_invitation": "The room you entered does not exist, or the game is over.",
           "subscribe_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nEnter the room number you want to join.\n",
-          "subscribe_second_msg": "Now write your gift preferences. Perhaps you have a hobby, and you'd like something special?\nYour comments will help Secret Santa choose a gift for you.\n",
-          "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room <b>{room_number}</b>.\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B"
+          "subscribe_second_msg": "To join the room, write your wishes for the gift.\n\nMaybe you have a hobby and want something special?\n\nYour comments will help Secret Santa choose a gift for you.\n",
+          "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room <b>{room_number}</b>.\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B",
+          "room_invitation": "Ho Ho Ho! You've been invited to the room: <b>{room_name} ({room_id})</b> \uD83C\uDF85\n\nJoin the game by clicking enter and specifying your gift wishes."
         },
         "unsubscribe": {
           "unsubscribe_first_msg": "You left the room <b>{room_number}</b>.",
@@ -148,6 +151,7 @@
       }
     },
     "buttons": {
+      "enter_to_joined_room": "Enter the invited room",
       "return_back_button": "Return back ◀️",
       "cancel_button": "Cancel",
       "continue_button": "Continue",
