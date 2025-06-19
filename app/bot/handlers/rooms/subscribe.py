@@ -3,7 +3,7 @@ import logging
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
-
+import re
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.bot.languages.schemes import TranslationMainSchema
@@ -15,7 +15,47 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.callback_query(F.data == 'menu_join_room')
+@router.callback_query(F.data.regexp(r"^room_invite_(\d+)$"))
+async def join_via_room_invitation(callback: types.CallbackQuery,
+                                   state: FSMContext,
+                                   lang: TranslationMainSchema,
+                                   session: AsyncSession):
+    data = callback.data
+    match = re.match(r"^room_invite_(\d+)$", data)
+    room_number = match.group(1)
+    cancel_button = lang.buttons.cancel_button
+    room = await RoomRepo(session).get(room_number=int(room_number))
+
+    if not room or room.is_closed:
+        await callback.message.answer(
+            lang.messages.rooms_menu.subscribe.room_is_not_exist_or_closed_invitation
+        )
+        return None
+
+    members = [user.user_id for user in room.members]
+    if callback.message.chat.id in members:
+        await callback.answer()
+        await callback.message.answer(lang.messages.rooms_menu.subscribe.already_joined)
+        return None
+
+    keyboard_inline = generate_inline_keyboard(
+        {cancel_button: 'cancel'}
+    )
+
+
+
+    message_text = lang.messages.rooms_menu.subscribe.subscribe_second_msg
+
+    initial_bot_message = await callback.message.edit_text(
+        text=message_text,
+        reply_markup=keyboard_inline
+    )
+    await state.update_data(bot_message_id=initial_bot_message)
+    await state.update_data(room_number=room_number)
+    await state.set_state(JoinRoom.waiting_for_wishes)
+
+
+@router.callback_query(F.data.in_(['menu_join_room']))
 async def join_room(callback: types.CallbackQuery,
                     state: FSMContext,
                     lang: TranslationMainSchema):

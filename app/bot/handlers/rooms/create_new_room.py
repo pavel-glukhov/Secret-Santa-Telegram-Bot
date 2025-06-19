@@ -153,7 +153,7 @@ async def process_wishes(message: types.Message,
     user_wishes = message.text
     state_data = await state.get_data()
     await message.delete()
-
+    app_config = load_config()
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
         {lang.buttons.room_menu.main_buttons.menu: 'root_menu'}
@@ -171,8 +171,16 @@ async def process_wishes(message: types.Message,
         room_name=room.name,
         room_number=room.number
     )
-
     await bot_message.edit_text(text=message_text)
+
+    message_text = (
+        lang.messages.rooms_menu.create_new_room.join_room_url.format(
+            url=f"https://t.me/{app_config.bot.telegram_login}?start=room_{room.number}"
+        )
+    )
+
+    await bot_message.answer(text=message_text)
+
     message_text = lang.messages.rooms_menu.create_new_room.create_new_room_additional_msg
 
     await bot_message.answer(
