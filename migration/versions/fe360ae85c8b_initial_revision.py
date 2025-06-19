@@ -1,8 +1,8 @@
-"""init
+"""Initial revision
 
-Revision ID: 8e28a9b00efb
+Revision ID: fe360ae85c8b
 Revises: 
-Create Date: 2024-11-19 12:53:22.706076
+Create Date: 2025-06-19 18:44:02.677915
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '8e28a9b00efb'
+revision: str = 'fe360ae85c8b'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -46,7 +46,7 @@ def upgrade() -> None:
     sa.Column('started_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('closed_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('owner_id', sa.BigInteger(), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['owner_id'], ['users.user_id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('number')
     )
@@ -57,15 +57,15 @@ def upgrade() -> None:
     sa.Column('sender_id', sa.BigInteger(), nullable=True),
     sa.Column('assigned_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['recipient_id'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('rooms_users',
     sa.Column('room_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('room_id', 'user_id')
     )
     op.create_table('users_messages',
@@ -75,17 +75,17 @@ def upgrade() -> None:
     sa.Column('room_id', sa.Integer(), nullable=True),
     sa.Column('message', sa.String(), nullable=True),
     sa.Column('sent_at', sa.DateTime(timezone=True), nullable=True),
-    sa.ForeignKeyConstraint(['recipient_id'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
-    sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['recipient_id'], ['users.user_id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('wishes_rooms',
     sa.Column('room_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
     sa.Column('wish', sa.String(length=256), nullable=False),
-    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('room_id', 'user_id')
     )
     # ### end Alembic commands ###
