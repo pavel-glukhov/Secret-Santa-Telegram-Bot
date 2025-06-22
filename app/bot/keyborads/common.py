@@ -59,7 +59,7 @@ async def create_common_keyboards(message: types.Message,
 def personal_room_keyboard_formatter(
         room: Room, is_owner: bool, text_message: str) -> str:
     """
-    Formatter for user's room button.
+    Formatter of user's room buttons.
     Showing different message if user is owner of room.
 
     :param room:

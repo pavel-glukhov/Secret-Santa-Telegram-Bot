@@ -38,7 +38,7 @@
       },
       "rooms_menu": {
         "main": {
-          "text_control_room": "<b>Управління кімнатою {room_name} ({room_number})</b>\n\n<b>Бюджет</b>: {room_budget}\n\n",
+          "text_control_room": "<b>Управління кімнатою: {room_name} ({room_number})</b>\n\n<b>Бюджет</b>: {room_budget}\n\n",
           "text_control_room_not_scheduler": "<b>Час жеребкування ще не призначено.</b>",
           "text_control_room_scheduler": "<b>\uD83D\uDD53 Гра в поточній кімнаті запланована на {next_time_run}</b>\n\n",
           "room_closed_uns": "<b>Гра в кімнаті {room_number} завершена!</b>\n\nНа жаль, кількість гравців виявилася недостатньою для повноцінного жеребкування.\n",

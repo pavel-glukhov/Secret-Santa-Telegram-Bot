@@ -29,11 +29,12 @@ async def select_language(event: types.Message | types.CallbackQuery,
         await event.answer(text=message_text, reply_markup=keyboard_inline)
 
 
-@router.callback_query(F.data.startswith('select_lang_'))
+@router.callback_query(F.data.startswith('slct_lang_'))
 async def update_language(callback: types.CallbackQuery,
                           session: AsyncSession):
     result = get_source_to_next_callback(callback.data)
     selected_language = result.get('language', 'eng')
+    print(result)
     continue_callback = result.get('source', "root_menu")
 
     await UserRepo(session).update_user(
@@ -51,6 +52,7 @@ async def update_language(callback: types.CallbackQuery,
     message_text = app_language.messages.main_menu.select_language_answer.format(
         language=selected_language.upper()
     )
+
     await callback.answer()
     await callback.message.edit_text(
         text=message_text,
@@ -60,25 +62,25 @@ async def update_language(callback: types.CallbackQuery,
 
 def determine_source_menu(event: types.Message | types.CallbackQuery, room_id: str | None) -> str | None:
     if room_id:
-        return f"room_invite_{room_id}"
+        return f"inv_wlc_msg_{room_id}"
     elif isinstance(event, types.CallbackQuery):
-        return "profile"
+        return "profile_edit"
     return None
 
 
 def build_language_dict(available_languages: list[str], source_menu: str | None) -> dict[str, str]:
     return {
-        lang.upper(): f"select_lang_{lang}_from_{source_menu}" if source_menu else f"select_lang_{lang}"
+        lang.upper(): f"slct_lang_{lang}_f_{source_menu}" if source_menu else f"slct_lang_{lang}"
         for lang in available_languages
     }
 
 
 def get_source_to_next_callback(string: str):
-    pattern = r"select_lang_([a-z]{2})(?:_from_(profile|room_invite_\d+))?$"
+    pattern = r"slct_lang_([a-z]{2,3})(?:_f_((?:profile_edit|room_invite_\d+|inv_wlc_msg_\d+)))?"
     match = re.match(pattern, string)
 
     if not match:
-        return "root_menu"
+        return {"language": None, "source": "root_menu"}
 
     language = match.group(1)
     source = match.group(2) if match.group(2) else "root_menu"

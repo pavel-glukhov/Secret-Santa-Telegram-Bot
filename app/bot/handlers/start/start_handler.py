@@ -5,11 +5,11 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.bot.handlers.rooms.subscribe import join_to_room_inv_welcome_message
 from app.bot.handlers.start.language import select_language
-from app.bot.keyborads.common import create_common_keyboards, generate_inline_keyboard
+from app.bot.keyborads.common import create_common_keyboards
 from app.bot.languages.schemes import TranslationMainSchema
 from app.store.database.repo.users import UserRepo
-from app.store.database.repo.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -32,13 +32,14 @@ async def start(message: types.Message, state: FSMContext,
                 available_languages: list):
     await state.clear()
 
-    if payload_data:= check_payload(message):
+    if payload_data := check_payload(message):
         await room_invitation(payload_data, lang, message, session, available_languages)
         return None
 
     if not lang:
         await create_user_or_enable(message, session)
         await select_language(message, available_languages)
+
         return None
 
     await message.answer(text=lang.messages.main_menu.start_message)
@@ -59,22 +60,12 @@ def check_payload(message):
 
 async def room_invitation(data, lang, message, session, available_languages):
     room_id = data.get("room_id")
-    room = await RoomRepo(session).get(room_number=room_id)
 
     if not lang:
         await create_user_or_enable(message, session)
         await select_language(message, available_languages, **data)
         return None
-
-    keyboard_inline = generate_inline_keyboard(
-        {lang.buttons.enter_to_joined_room: f'room_invite_{room_id}'}
-    )
-
-    await message.answer(text=lang.messages.rooms_menu.subscribe.room_invitation.format(
-        room_name=room.name,
-        room_id=room_id),
-        reply_markup=keyboard_inline)
-
+    await join_to_room_inv_welcome_message(message, lang, session, room_id)
 
 
 @router.callback_query(F.data == 'root_menu')

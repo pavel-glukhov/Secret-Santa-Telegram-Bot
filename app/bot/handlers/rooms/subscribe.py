@@ -14,9 +14,36 @@ from app.store.database.repo.wishes import WishRepo
 logger = logging.getLogger(__name__)
 router = Router()
 
+@router.callback_query(F.data.regexp(r"^inv_wlc_msg_(\d+)$"))
+async def join_to_room_inv_welcome_message(event: types.Message | types.CallbackQuery,
+                                        lang,
+                                        session,
+                                        room_id=None):
+    if not room_id:
+        data = event.data
+        match = re.match(r"^inv_wlc_msg_(\d+)$", data)
+        room_id = int(match.group(1))
+
+    room = await RoomRepo(session).get(room_number=room_id)
+    keyboard_inline = generate_inline_keyboard(
+        {lang.buttons.enter_to_joined_room: f'room_invite_{room_id}'}
+    )
+
+    if isinstance(event, types.CallbackQuery):
+        await event.message.edit_text(text=lang.messages.rooms_menu.subscribe.room_invitation.format(
+        room_name=room.name,
+        room_id=room_id),
+        reply_markup=keyboard_inline)
+        await event.answer()
+    else:
+        await event.answer(text=lang.messages.rooms_menu.subscribe.room_invitation.format(
+        room_name=room.name,
+        room_id=room_id),
+        reply_markup=keyboard_inline)
+
 
 @router.callback_query(F.data.regexp(r"^room_invite_(\d+)$"))
-async def join_via_room_invitation(callback: types.CallbackQuery,
+async def room_invitation(callback: types.CallbackQuery,
                                    state: FSMContext,
                                    lang: TranslationMainSchema,
                                    session: AsyncSession):
@@ -41,8 +68,6 @@ async def join_via_room_invitation(callback: types.CallbackQuery,
     keyboard_inline = generate_inline_keyboard(
         {cancel_button: 'cancel'}
     )
-
-
 
     message_text = lang.messages.rooms_menu.subscribe.subscribe_second_msg
 
