@@ -24,22 +24,32 @@ def create_db_engine(postgres_url: str,
             echo=False,
         )
     except Exception as ex:
-        raise DatabaseConfigError(f"Couldn't create database engine: {str(ex)}")
+        raise DatabaseConfigError(
+            f"Couldn't create database engine: {str(ex)}"
+        )
 
 
 try:
     pool_size = int(config.pool_size)
     max_overflow = int(config.max_overflow)
 except (ValueError, TypeError) as e:
-    raise DatabaseConfigError(f"Invalid pool_size or max_overflow values: {str(e)}") from e
+    raise DatabaseConfigError(
+        f"Invalid pool_size or max_overflow values: {str(e)}"
+    ) from e
 
-engine = create_db_engine(config.postgres_url, pool_size=pool_size, max_overflow=max_overflow)
+engine = create_db_engine(
+    config.postgres_url,
+    pool_size=pool_size,
+    max_overflow=max_overflow
+)
 
 
 @lru_cache(maxsize=1)
 def create_session_factory() -> sessionmaker:
     if engine is None:
-        raise DatabaseConfigError("The database engine is not initialized.")
+        raise DatabaseConfigError(
+            "The database engine is not initialized."
+        )
     return sessionmaker(
         autocommit=False,
         autoflush=False,
@@ -51,7 +61,10 @@ def create_session_factory() -> sessionmaker:
 
 def get_scoped_session() -> async_scoped_session:
     session_factory = create_session_factory()
-    return async_scoped_session(session_factory, scopefunc=lambda: None)
+    return async_scoped_session(
+        session_factory,
+        scopefunc=lambda: None
+    )
 
 
 @asynccontextmanager
