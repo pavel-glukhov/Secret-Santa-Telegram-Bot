@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.profiles_states import ChangeUserName
-from app.store.database.repo.users import UserRepo
+from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 

@@ -14,13 +14,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dateutil.relativedelta import relativedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.bot.states.start_game_states import DateTimePicker
+from app.bot.communication.result_mailing import send_result_of_game
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.communication.result_mailing import send_result_of_game
-from app.store.database.repo.rooms import RoomRepo
-from app.store.database.repo.users import UserRepo
-from app.store.scheduler.operations import TaskScheduler
+from app.bot.states.start_game_states import DateTimePicker
+from app.core.database.repo.rooms import RoomRepo
+from app.core.database.repo.users import UserRepo
+from app.core.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 

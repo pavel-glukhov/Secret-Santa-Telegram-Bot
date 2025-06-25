@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
-from app.store.database.repo.users import UserRepo
-from app.store.redis import get_redis_client
+from app.core.database.repo.users import UserRepo
+from app.core.redis import get_redis_client
 
 logger = logging.getLogger(__name__)
 router = Router()

@@ -9,8 +9,8 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.profiles_states import ChangePhoneNuber
 from app.config import load_config
-from app.store.database.repo.users import UserRepo
-from app.store.encryption import CryptData
+from app.core.database.repo.users import UserRepo
+from app.core.encryption import CryptData
 
 logger = logging.getLogger(__name__)
 

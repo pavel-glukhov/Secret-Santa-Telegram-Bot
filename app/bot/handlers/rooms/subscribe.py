@@ -1,15 +1,16 @@
 import logging
+import re
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
-import re
+
 from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import JoinRoom
-from app.store.database.repo.rooms import RoomRepo
-from app.store.database.repo.wishes import WishRepo
+from app.core.database.repo.rooms import RoomRepo
+from app.core.database.repo.wishes import WishRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

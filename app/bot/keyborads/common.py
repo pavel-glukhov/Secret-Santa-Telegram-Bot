@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.languages.schemes import TranslationMainSchema
 from app.config import load_config
-from app.store.database.models import Room
-from app.store.database.repo.rooms import RoomRepo
-from app.store.scheduler.operations import TaskScheduler
+from app.core.database.models import Room
+from app.core.database.repo.rooms import RoomRepo
+from app.core.scheduler.operations import TaskScheduler
 
 
 async def create_common_keyboards(message: types.Message,

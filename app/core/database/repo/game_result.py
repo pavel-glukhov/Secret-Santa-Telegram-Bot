@@ -1,8 +1,8 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.store.database.models import GameResult, Room, User
+from app.core.database.models import GameResult, Room, User
 
 
 class GameResultRepo:

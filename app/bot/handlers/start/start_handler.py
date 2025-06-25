@@ -9,7 +9,7 @@ from app.bot.handlers.rooms.subscribe import join_to_room_inv_welcome_message
 from app.bot.handlers.start.language import select_language
 from app.bot.keyborads.common import create_common_keyboards
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.repo.users import UserRepo
+from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

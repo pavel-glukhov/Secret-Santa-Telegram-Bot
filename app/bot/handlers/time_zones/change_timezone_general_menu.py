@@ -13,7 +13,7 @@ from app.bot.handlers.pagination import Pagination
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.time_zones_states import TimeZoneStates
-from app.store.database.repo.users import UserRepo
+from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 

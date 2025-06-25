@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.repo.game_result import GameResultRepo
-from app.store.database.repo.rooms import RoomRepo
-from app.store.scheduler.operations import TaskScheduler
+from app.core.database.repo.game_result import GameResultRepo
+from app.core.database.repo.rooms import RoomRepo
+from app.core.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 router = Router()

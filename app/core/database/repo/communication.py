@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.store.database.models import Room, UsersMessages
+from app.core.database.models import Room, UsersMessages
 
 
 class CommunicationRepo:

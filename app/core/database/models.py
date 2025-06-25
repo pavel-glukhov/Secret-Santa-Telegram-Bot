@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.sql import func
 
 from app.config import load_config
-from app.store.encryption import CryptData
+from app.core.encryption import CryptData
 
 
 class Base(DeclarativeBase):

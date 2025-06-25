@@ -8,8 +8,8 @@ from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import ChangeOwner
 from app.config import load_config
-from app.store.database.repo.rooms import RoomRepo
-from app.store.database.repo.users import UserRepo
+from app.core.database.repo.rooms import RoomRepo
+from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

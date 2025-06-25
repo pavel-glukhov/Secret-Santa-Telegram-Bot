@@ -1,7 +1,9 @@
-from typing import Any, Awaitable, Callable, AsyncGenerator
+from typing import Any, AsyncGenerator, Awaitable, Callable
+
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from sqlalchemy.ext.asyncio import async_scoped_session
+
 
 class DatabaseMiddleware(BaseMiddleware):
     def __init__(self, session_factory: Callable[[], AsyncGenerator[async_scoped_session, None]]) -> None:

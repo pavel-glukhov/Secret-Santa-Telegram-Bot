@@ -1,5 +1,5 @@
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.models import User
+from app.core.database.models import User
 
 
 def get_full_name(user: User) -> str | None:

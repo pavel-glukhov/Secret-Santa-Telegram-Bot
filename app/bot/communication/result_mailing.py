@@ -3,17 +3,18 @@ import datetime
 import logging
 import random
 
+from app.bot.communication.forrmatter import message_formatter
+from app.bot.communication.telegram_messaging import (broadcaster,
+                                                      safe_send_message)
+from app.bot.communication.users_checker import checking_user_is_active
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
-from app.bot.communication.forrmatter import message_formatter
-from app.bot.communication.telegram_messaging import broadcaster, safe_send_message
-from app.bot.communication.users_checker import checking_user_is_active
-from app.store.database.repo.game_result import GameResultRepo
-from app.store.database.repo.rooms import RoomRepo
-from app.store.database.repo.wishes import WishRepo
-from app.store.database.sessions import get_session
-from app.store.redis import get_redis_client
-from app.store.scheduler.operations import TaskScheduler
+from app.core.database.repo.game_result import GameResultRepo
+from app.core.database.repo.rooms import RoomRepo
+from app.core.database.repo.wishes import WishRepo
+from app.core.database.sessions import get_session
+from app.core.redis import get_redis_client
+from app.core.scheduler.operations import TaskScheduler
 
 logger = logging.getLogger(__name__)
 

@@ -9,8 +9,8 @@ from app.bot.loader import bot, dp
 from app.bot.register_middlewares import register_middlewares
 from app.bot.register_routers import register_routers
 from app.config import load_config, setup_logging, webhook_settings
-from app.store.redis import get_redis_client
-from app.store.scheduler import scheduler
+from app.core.redis import get_redis_client
+from app.core.scheduler import scheduler
 from app.web.register_routers import register_fastapi_routers
 
 logger = logging.getLogger(__name__)

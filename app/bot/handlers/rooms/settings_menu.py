@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
-from app.store.database.repo.rooms import RoomRepo
+from app.core.database.repo.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
 router = Router()

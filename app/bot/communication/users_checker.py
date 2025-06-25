@@ -6,7 +6,7 @@ from aiogram.exceptions import (TelegramAPIError, TelegramBadRequest,
 from aiohttp import ClientError
 
 from app.bot.loader import bot
-from app.store.database.repo.users import UserRepo
+from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
 

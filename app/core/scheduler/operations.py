@@ -4,7 +4,7 @@ from typing import Callable
 
 from apscheduler.job import Job
 
-from app.store.scheduler import scheduler
+from app.core.scheduler import scheduler
 
 logger = logging.getLogger(__name__)
 

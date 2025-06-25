@@ -1,9 +1,9 @@
-from typing import Tuple, Union, Sequence
+from typing import Sequence, Tuple, Union
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.store.database.models import Room, User
+from app.core.database.models import Room, User
 
 
 class UserRepo:

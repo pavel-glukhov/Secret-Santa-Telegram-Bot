@@ -1,10 +1,10 @@
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-from app.store.database.models import Room, User, WishRoom
+from app.core.database.models import Room, User, WishRoom
 
 logger = logging.getLogger(__name__)
 

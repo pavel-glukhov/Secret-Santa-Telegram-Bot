@@ -4,18 +4,18 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.bot.communication.telegram_messaging import safe_send_message
 from app.bot.handlers.communication.general_first_message import \
     send_first_message_to_user
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.loader import language_return_dataclass
 from app.bot.languages.schemes import TranslationMainSchema
-from app.bot.communication.telegram_messaging import safe_send_message
 from app.bot.states.communication_states import MessageToSanta
-from app.store.database.repo.communication import CommunicationRepo
-from app.store.database.repo.game_result import GameResultRepo
-from app.store.database.repo.rooms import RoomRepo
-from app.store.database.repo.users import UserRepo
-from app.store.redis import get_redis_client
+from app.core.database.repo.communication import CommunicationRepo
+from app.core.database.repo.game_result import GameResultRepo
+from app.core.database.repo.rooms import RoomRepo
+from app.core.database.repo.users import UserRepo
+from app.core.redis import get_redis_client
 
 logger = logging.getLogger(__name__)
 router = Router()

@@ -5,8 +5,8 @@ from cryptography.fernet import Fernet
 import requests
 
 from app.config import load_config
-from app.store.database.repo.users import UserRepo
-from app.store.database.sessions import get_session
+from app.core.database.repo.users import UserRepo
+from app.core.database.sessions import get_session
 logger = logging.getLogger(__name__)
 
 
