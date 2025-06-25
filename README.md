@@ -1,6 +1,6 @@
 ## Secret Santa Telegram Bot 
-[![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/tree/main/blob/master/README.md)
-[![ru](https://img.shields.io/badge/lang-ru-yelow.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/tree/main/blob/master/README.ru.md)
+[![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/blob/main/README.md)
+[![ru](https://img.shields.io/badge/lang-ru-yelow.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/blob/main/README.ru.md)
 
 ## Description
 A bot for organizing a Secret Santa game via Telegram. It allows participants to easily conduct the draw,
