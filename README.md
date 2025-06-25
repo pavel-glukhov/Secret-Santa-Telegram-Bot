@@ -1,124 +1,124 @@
-## Secret Santa Telegram Bot
+## Secret Santa Telegram Bot 
+[![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/tree/main/blob/master/README.md)
+[![ru](https://img.shields.io/badge/lang-ru-yelow.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/tree/main/blob/master/README.ru.md)
 
-## Описание
-Бот для организации игры в Тайного Санту через Telegram. Позволяет участникам удобно проводить жеребьёвку, 
-обмениваться пожеланиями и получать результаты. Бот так же позволяет анонимно вести переписку между получателем подарка и тайным Сантой.
+## Description
+A bot for organizing a Secret Santa game via Telegram. It allows participants to easily conduct the draw,
+exchange wishes, and receive results. The bot also allows anonymous communication between the gift recipient and the Secret Santa.
 
-Поддержка 4-х языков, перевод был осуществлен машинным способом.
-Включенные языки:
+Supports 4 languages, translated using machine translation.
+Included languages:
 
 1. RU
 2. ENG
 3. KAZ
 4. UK
 
-### Текущая версия: 0.4.1
+### Current version: 0.4.1
 
 ---
-## История изменений
+## Changelog
 
-**v 0.4.1** 
-* Добавлена возможность подключаться к комнате используя URL.
-* Внесены изменения в диалоги.
-* Исправлена логика приложения. 
+**v 0.4.1**
+* Added the ability to join a room using a URL.
+* Dialogues updated.
+* Application logic fixed.
 
-**v 0.4** 
-* Все ORM запросы были переписаны на async.
-* Исправлены некоторые баги связанные с интерфейсом.
+**v 0.4**
+* All ORM queries were rewritten to async.
+* Some interface-related bugs fixed.
 
-**v 0.3** 
-* Убран старый способ указания даты жеребьевки.
-* Добавлен интерактивный календарь и выбор случайного времени рассылки результатов между периодами времени.
-* Исправлены некоторые баги и недочеты. 
+**v 0.3**
+* Removed the old method of specifying the draw date.
+* Added an interactive calendar and random result-sending time selection within time periods.
+* Some bugs and issues fixed.
 
-**v 0.2.2** 
-* Исправлены некоторые баги связанные с отправкой сообщений.
-* Оптимизированы некоторые SQL запросы.
+**v 0.2.2**
+* Fixed some bugs related to message sending.
+* Some SQL queries optimized.
 
-**v 0.2.1** 
-* Исправлен баг с получением желаний игрока в комнате.
-* Обновлены словари с языками.
+**v 0.2.1**
+* Fixed a bug with retrieving player wishes in the room.
+* Updated language dictionaries.
 
 **v 0.2**
-* Приложение переписано с Aiogram 2 на 3 версию.
-* SQL запросы перенесены с Tortoise ORM на SQLAlchemy.
-* Добавлена поддержка других языков.
-* Исправлены различные баги.
+* The application was rewritten from Aiogram 2 to version 3.
+* SQL queries migrated from Tortoise ORM to SQLAlchemy.
+* Added support for other languages.
+* Various bugs fixed.
 
 **v 0.1**
-* Выпуск пробной версии бота.
+* Beta version of the bot released.
 
 ---
 
-Схема: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
+Diagram: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 
-
-### Стек
+### Stack
 
 1. Aiogram 3
 2. FastAPI
 3. SQLAlchemy 2
-4. Alemnic
+4. Alembic
 5. PostgreSQL
 6. Redis
 
-1. #### Создание персональных комнат
+1. #### Creating personal rooms
 
-    - Каждый желающий может создать комнату для неограниченного количества людей.
-        - При создании нужно указать:
-            - **Имя комнаты**
-            - **Бюджет для своей компании игроков**
-            - **Свои пожелания для подарка**
+    - Anyone can create a room for an unlimited number of people.
+        - When creating, you need to specify:
+            - **Room name**
+            - **Budget for your group of players**
+            - **Your gift wishes**
 
-      ```Переменная окружения USER_ROOMS_LIMIT задает лимит колличества комнат, которыми может управлять один игрок.```
+      ```The USER_ROOMS_LIMIT environment variable sets the limit on the number of rooms one player can manage.```
 
-      ```При создании комнаты, генерируется случайный уникальный номер, длина номеера задается параметром ROOM_NUBER_LENGTH. ```
-2. #### Вход в существующую комнату по ID комнаты
-3. #### Управление своим профилем
-    - Бот позволяет внести и изменить такие данные как:
-        - **Имя и Фамилия**
-        - **Домашний Адрес**
-        - **Номер Телефона**
-        - **Часовой пояс**
-        - **Разрешено полное удаление внесенных данных**
+      ```When a room is created, a random unique number is generated, its length is set by the ROOM_NUMBER_LENGTH parameter. ```
+2. #### Joining an existing room by room ID
+3. #### Managing your profile
+    - The bot allows you to enter and change the following data:
+        - **First and Last Name**
+        - **Home Address**
+        - **Phone Number**
+        - **Time Zone**
+        - **Full deletion of entered data is allowed**
 
-   ```Адрес и номер телефона шифруется в базе Fernet алгоритмом в целях безопасности.```
+   ```Address and phone number are encrypted in the database using the Fernet algorithm for security.```
 
-4. #### Управление комнатами
-    - Меню управления комнатами для обычного пользователя:
-        - **Выйти из комнаты**
-        - **Изменить пожелания**
-    - Меню управления комнатами для владельца:
-        - **Начать игру** - позволяет установить время рассылки
-            - **Указать часовой пояс** - Установить часовой пояс для конкретной зоны
-        - **Изменить пожелания**
-        - **Настройки**
-            - **Удалить комнату**
-            - **Изменить имя комнаты**
-            - **Изменить владельца**
-            - **Изменить бюджет комнаты**
+4. #### Room management
+    - Room management menu for regular users:
+        - **Leave room**
+        - **Change wishes**
+    - Room management menu for the owner:
+        - **Start game** – allows setting the distribution time
+            - **Set time zone** – Set time zone for a specific region
+        - **Change wishes**
+        - **Settings**
+            - **Delete room**
+            - **Change room name**
+            - **Change owner**
+            - **Change room budget**
 
-      ```Администратор комнаты не может выйти из нее, пока не передаст управление другому. Комната может быть только окончательно удалена.```
+      ```The room administrator cannot leave the room until management is transferred to someone else. A room can only be permanently deleted.```
 
-      ```Если при жеребьевке не оказалось нужного колличества игроков, комнату можно активировать повторно.```
-5. #### Коммуникация
-   После разыгрывания ролей в игре, в комнатах доступны 2 опции, позволяющие коммуницировать анонимно между получателем
-   и отправителем посредством бота.
-    - **Отправка сообщения Тайному Санте**
-    - **Отправка сообщения получателю**
+      ```If there are not enough players during the draw, the room can be reactivated.```
+5. #### Communication
+   After the roles are drawn in the game, two options become available in rooms allowing anonymous communication between
+   the recipient and the sender through the bot.
+    - **Send message to Secret Santa**
+    - **Send message to recipient**
 
-### Запуск Бота:
-- Создать свой .env файл по шаблону .env.example
-- Для генерации параметра **ENCRYPT_SECRET_KEY** в **.env** файле, используйте: 
+### Running the Bot:
+- Create your own .env file based on the .env.example template
+- To generate the **ENCRYPT_SECRET_KEY** parameter in the **.env** file, use:
      ```
         python .\manage.py generate_key
     ```
 
-#### Ручной запуск:
+#### Manual launch:
 
-
-- Установить PostgreSQL и Redis, сконфигурировать и создать БД.
-    - Redis требует включения доступа по паролю:
+- Install PostgreSQL and Redis, configure them, and create the database.
+    - Redis requires enabling password access:
        ```
       sudo nano /etc/redis/redis.conf
       # requirepass foobared
@@ -128,56 +128,49 @@
     -  ```uvicorn app.core.cli:create_app ```
     
 
+#### In Docker container:
 
-#### В Docker контейнере:
-
-- Установить Docker https://docs.docker.com/engine/install/ubuntu/
-    - Создать свой .env файл по шаблону .env.example
+- Install Docker https://docs.docker.com/engine/install/ubuntu/
+    - Create your own .env file based on the .env.example template
   
-- Запуск Docker Compose
+- Run Docker Compose
     -  ```docker-compose up -d ```
-- Пересборка при обновлении кода
+- Rebuild after code updates
     -  ```docker-compose build ```
-- Перезапуск контейнеров с пересобранными образами:
+- Restart containers with rebuilt images:
     -  ```docker-compose up -d --build ```
 
 
-
-
-  Миграции
+  Migrations
      ```console
        docker exec -t <backend container> alembic upgrade head
      ```
 
-### Права доступа:
+### Access rights:
 
-- Что бы добавить Superuser права пользователю, выполните:
+- To grant Superuser rights to a user, run:
      ```console
         python .\manage.py set_superuser <telegram_user_id>
      ```
-- Что бы удалить их, выполните ****
+- To remove them, run:
      ```console
          python .\manage.py remove_superuser <telegram_user_id>
      ```
-- ### Регистрация вебхука
+- ### Webhook registration
     ```console
       python .\manage.py register_webhook
     ```
 
-  Или сформируйте и сделайте GET запрос
+  Or create and make a GET request
    ```https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/ ```
 
-  Пример:
+  Example:
    ```https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/ ```
 
-- Так же, для работы **Telegram Login Widget**, требуется зарегистрировать домен вашего сайта в **@BotFather** используя
-  команду **/setdomain**
+### Backups
 
-### Бекапы
-
-Бекапить базу данных можно с помощью команды ниже, добавленной в cron:
-``docker exec -t <имя_контейнера> pg_dump -U <имя_пользователя> <имя_базы_данных> > <имя_файла>.sql
+The database can be backed up using the command below, added to cron:
+``docker exec -t <container_name> pg_dump -U <username> <database_name> > <file_name>.sql
 ``
 
-``Или добавить готовый скрипт в cron находящийся в deploy\backup. Нужно будет внести настройки под себя.
- ``
+```Or add the ready-made script from deploy\backup to cron. You will need to adjust the settings for yourself. ```
