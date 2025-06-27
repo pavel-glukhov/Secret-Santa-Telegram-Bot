@@ -81,6 +81,7 @@ Diagram: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
         - **Home Address**
         - **Phone Number**
         - **Time Zone**
+        - **Change Language**
         - **Full deletion of entered data is allowed**
 
    ```Address and phone number are encrypted in the database using the Fernet algorithm for security.```
