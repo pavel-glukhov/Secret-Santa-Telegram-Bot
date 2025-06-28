@@ -8,7 +8,7 @@
         "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
         "start_message": "Ho-ho-ho! It's time to play Secret Santa!\n\nCreate your room for friends, or join an existing one.",
         "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile settings</b>.\n\n❗ <b>Otherwise, Santa won't be able to send you a gift.</b>\n\n",
-        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room_user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
+        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room_user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
       },
       "profile_menu": {
         "main_menu": {
@@ -125,7 +125,7 @@
         }
       },
       "wishes_menu": {
-        "your_wishes": "Your secret wishes \uD83D\uDE4A:\n{wishes}\n",
+        "your_wishes": "Your secret wishes \uD83D\uDE4A:\n\n{wishes}\n",
         "new_wishes": "<b>Write a new wish:</b>\n",
         "changed_wishes": "Your wishes in the room <b>{room_name}</b> have been changed to:\n\n{wish}\n\nSanta will definitely take your wishes into account! \uD83C\uDF85"
       },
@@ -160,12 +160,12 @@
       "confirm_button": "❗️Confirm deletion❗️",
       "profile_menu": {
         "change_profile": "Edit profile \uD83D\uDC4B",
-        "profile_edit_name": "Edit name",
-        "profile_edit_address": "Edit address",
-        "profile_edit_number": "Edit phone number",
-        "change_time_zone": "Change time zone",
+        "profile_edit_name": "Edit name \uD83D\uDDE3",
+        "profile_edit_address": "Edit address \uD83C\uDFE0",
+        "profile_edit_number": "Edit phone number \uD83D\uDCDE",
+        "change_time_zone": "Change time zone \uD83D\uDD64",
         "profile_edit_delete_all": "Delete all information ❌",
-        "change_language": "Change Language"
+        "change_language": "Change Language \uD83C\uDDF0\uD83C\uDDFF"
       },
       "room_menu": {
         "main_buttons": {

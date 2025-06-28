@@ -179,7 +179,7 @@ async def time_selected(callback: CallbackQuery,
                 }
             )
             message_text = lang.messages.game_menu.start_game.time_set_to.format(
-                datetime_set_to=selected_date_time.strftime("%d %b %Y %H:%M")
+                datetime_set_to=selected_date_time.strftime("%d %b %Y")
             )
 
             await callback.message.edit_text(
