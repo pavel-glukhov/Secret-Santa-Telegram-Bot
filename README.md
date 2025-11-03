@@ -24,11 +24,11 @@ Included languages:
 * Dialogues updated.
 * Application logic fixed.
 
-**v 0.4**
+**v 0.4.0**
 * All ORM queries were rewritten to async.
 * Some interface-related bugs fixed.
 
-**v 0.3**
+**v 0.3.0**
 * Removed the old method of specifying the draw date.
 * Added an interactive calendar and random result-sending time selection within time periods.
 * Some bugs and issues fixed.
@@ -41,13 +41,13 @@ Included languages:
 * Fixed a bug with retrieving player wishes in the room.
 * Updated language dictionaries.
 
-**v 0.2**
+**v 0.2.0**
 * The application was rewritten from Aiogram 2 to version 3.
 * SQL queries migrated from Tortoise ORM to SQLAlchemy.
 * Added support for other languages.
 * Various bugs fixed.
 
-**v 0.1**
+**v 0.1.0**
 * Beta version of the bot released.
 
 ---
