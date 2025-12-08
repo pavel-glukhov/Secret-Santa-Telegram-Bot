@@ -93,20 +93,16 @@ async def root_menu(data: types.Message | types.CallbackQuery,
 
 async def create_user_or_enable(message: types.Message,
                                 session: AsyncSession):
-    user_id = message.chat.id
-    username = message.chat.username
-    first_name = message.chat.first_name
-    last_name = message.chat.last_name
     user, created = await UserRepo(session).get_or_create(
-        user_id=user_id,
-        username=username,
-        first_name=first_name,
-        last_name=last_name
+        user_id=message.chat.id,
+        username=message.chat.username,
+        first_name=message.chat.first_name,
+        last_name=message.chat.last_name
     )
     if created:
-        logger.info(f'The new user "{user_id}" has been created')
+        logger.info(f'The new user "{message.chat.id}" has been created')
 
     if not user.is_active:
         await UserRepo(session).enable_user(message.chat.id)
-        logger.info(f'The new user "{user_id}" has been enabled')
+        logger.info(f'The new user "{message.chat.id}" has been enabled')
     return user
