@@ -4,6 +4,7 @@ from aiogram import F, Router, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.bot.utils import safe_delete_message
 
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
@@ -43,8 +44,7 @@ async def process_change_budget_invalid(message: types.Message,
                                         state: FSMContext,
                                         lang: TranslationMainSchema):
     state_data = await state.get_data()
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_change_budget_invalid")
     bot_message = state_data['bot_message_id']
 
     cancel_button = lang.buttons.cancel_button
@@ -66,8 +66,7 @@ async def process_changing_budget(message: types.Message,
                                   lang: TranslationMainSchema):
     state_data = await state.get_data()
     room_number = state_data['room_number']
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_changing_budget")
     bot_message = state_data['bot_message_id']
     new_budget = message.text
 

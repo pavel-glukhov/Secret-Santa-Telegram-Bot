@@ -9,6 +9,7 @@ from app.bot.keyborads.common import (create_common_keyboards,
                                       generate_inline_keyboard)
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import JoinRoom
+from app.bot.utils import safe_delete_message
 from app.core.database.repo.rooms import RoomRepo
 from app.core.database.repo.wishes import WishRepo
 
@@ -109,8 +110,7 @@ async def process_room_number(message: types.Message,
     await state.update_data(room_number=room_number)
     bot_message_id = state_data.get('bot_message_id')
 
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_room_number")
     if not room_number.isdigit():
         text_message = lang.messages.rooms_menu.subscribe.number_error
         cancel_button = lang.buttons.cancel_button
@@ -224,7 +224,7 @@ async def process_room_wishes(message: types.Message,
     room_number = int(state_data['room_number'])
     bot_message = state_data.get('bot_message_id')
 
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_room_wishes")
 
     await RoomRepo(session).add_member(
         user_id=chat_id,

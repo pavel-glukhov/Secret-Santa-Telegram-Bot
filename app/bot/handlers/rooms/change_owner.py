@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import ChangeOwner
+from app.bot.utils import safe_delete_message
 from app.config import load_config
 from app.core.database.repo.rooms import RoomRepo
 from app.core.database.repo.users import UserRepo
@@ -44,8 +45,7 @@ async def process_changing_owner(message: types.Message,
     room_number = state_data['room_number']
     previous_owner = message.chat.id
     new_owner = message.text
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_changing_owner")
     bot_message = state_data['bot_message_id']
     return_back_button = lang.buttons.return_back_button
 

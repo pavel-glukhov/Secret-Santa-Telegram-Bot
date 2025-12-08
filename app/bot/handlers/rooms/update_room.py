@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import ChangeRoomName
+from app.bot.utils import safe_delete_message
 from app.core.database.repo.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
@@ -41,8 +42,7 @@ async def process_change_room_name_invalid(message: types.Message,
                                            state: FSMContext,
                                            lang: TranslationMainSchema):
     state_data = await state.get_data()
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_change_room_name_invalid")
     bot_message = state_data['bot_message_id']
 
     cancel_button = lang.buttons.cancel_button
@@ -68,7 +68,7 @@ async def update_room_name_get_value(message: types.Message,
     state_data = await state.get_data()
     room_number = state_data['room_number']
     new_room_name = message.text
-    await message.delete()
+    await safe_delete_message(message, log_prefix="update_room_name_get_value")
 
     bot_message = state_data['bot_message_id']
 

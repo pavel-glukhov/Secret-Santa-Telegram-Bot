@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import DeleteRoom
+from app.bot.utils import safe_delete_message
 from app.core.database.repo.rooms import RoomRepo
 
 logger = logging.getLogger(__name__)
@@ -52,7 +53,7 @@ async def process_delete_room_invalid(message: types.Message,
 
     logger.info('Incorrect confirmation'
                 f' command from [{message.from_user.id}]')
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_delete_room_invalid")
     bot_message = state_data['bot_message_id']
 
     message_text = lang.messages.rooms_menu.delete_room.error_command_verif.format(
@@ -72,8 +73,7 @@ async def completed_process_delete_room(message: types.Message,
                                         session: AsyncSession,
                                         lang: TranslationMainSchema):
     state_data = await state.get_data()
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="completed_process_delete_room")
     bot_message = state_data['bot_message_id']
     room_number = state_data['room_number']
 

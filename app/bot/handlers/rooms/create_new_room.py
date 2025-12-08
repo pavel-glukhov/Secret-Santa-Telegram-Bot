@@ -10,6 +10,7 @@ from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import CreateRoom
 from app.config import load_config
 from app.core.database.repo.rooms import RoomRepo
+from app.bot.utils import safe_delete_message
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -63,8 +64,7 @@ async def process_name(message: types.Message,
                        lang: TranslationMainSchema):
     room_name = message.text
     state_data = await state.get_data()
-    await message.delete()
-
+    await safe_delete_message(message, log_prefix="process_name")
     bot_message = state_data['bot_message_id']
     await state.update_data(room_name=room_name)
     await state.update_data(budget_question_id=message.message_id)
@@ -94,13 +94,14 @@ async def process_name(message: types.Message,
 
 
 @router.message(lambda message:
-                len(message.text.lower()) > 16,
+                len(message.text) > 16,
                 StateFilter(CreateRoom.waiting_for_room_budget))
 async def process_budget_invalid(message: types.Message,
                                  state: FSMContext,
                                  lang: TranslationMainSchema):
     state_data = await state.get_data()
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_budget_invalid")
+
 
     bot_message = state_data['bot_message_id']
     cancel_button = lang.buttons.cancel_button
@@ -124,7 +125,7 @@ async def process_budget(message: types.Message,
                          lang: TranslationMainSchema):
     await state.update_data(wishes_question_message_id=message.message_id)
     state_data = await state.get_data()
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_budget")
 
     bot_message = state_data['bot_message_id']
     cancel_button = lang.buttons.cancel_button
@@ -152,7 +153,7 @@ async def process_wishes(message: types.Message,
                          lang: TranslationMainSchema):
     user_wishes = message.text
     state_data = await state.get_data()
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_wishes")
     app_config = load_config()
     bot_message = state_data['bot_message_id']
     keyboard_inline = generate_inline_keyboard(
