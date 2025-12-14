@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.profiles_states import ChangePhoneNuber
-from app.config import load_config
+from app.bot.utils import safe_delete_message
+from app.core.config.app_config import load_config
 from app.core.database.repo.users import UserRepo
 from app.core.encryption import CryptData
 
@@ -45,7 +46,7 @@ async def process_changing_owner(message: types.Message,
     user_id = message.chat.id
     bot_message = state_data['bot_message_id']
 
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_changing_owner")
 
     cancel_button = lang.buttons.cancel_button
     cancel_keyboard_inline = generate_inline_keyboard(

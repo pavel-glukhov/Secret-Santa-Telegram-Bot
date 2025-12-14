@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.profiles_states import ChangeUserName
+from app.bot.utils import safe_delete_message
 from app.core.database.repo.users import UserRepo
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ async def process_changing_first_name(message: types.Message,
     first_name = message.text
     await state.update_data(first_name=first_name)
 
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_changing_first_name")
 
     state_data = await state.get_data()
     bot_message = state_data['bot_message_id']
@@ -64,7 +65,7 @@ async def process_changing_last_name(message: types.Message,
     user_id = message.chat.id
     bot_message = state_data.get('bot_message_id')
 
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_changing_last_name")
 
     return_back_button = lang.buttons.return_back_button
     keyboard_inline = generate_inline_keyboard(

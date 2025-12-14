@@ -5,7 +5,7 @@ from sqlalchemy import Row, RowMapping, delete, func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import exists
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.database.models import Room, User, WishRoom, rooms_users
 from app.core.database.repo.wishes import WishRepo
 

@@ -7,9 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.profiles_states import ChangeAddress
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.database.repo.users import UserRepo
 from app.core.encryption import CryptData
+from app.bot.utils import safe_delete_message
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -42,7 +43,7 @@ async def process_changing_owner(message: types.Message,
     address = message.text
     user_id = message.chat.id
 
-    await message.delete()
+    await safe_delete_message(message, log_prefix="process_changing_owner")
 
     bot_message = state_data['bot_message_id']
 

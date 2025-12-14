@@ -8,11 +8,11 @@ from app.bot.languages.loader import load_language_files_to_redis
 from app.bot.loader import bot, dp
 from app.bot.register_middlewares import register_middlewares
 from app.bot.register_routers import register_routers
-from app.config import load_config, setup_logging, webhook_settings
+from app.core.config.app_config import load_config, setup_logging, webhook_settings
 from app.core.redis import get_redis_client
 from app.core.scheduler import scheduler
 from app.web.register_routers import register_fastapi_routers
-
+from app.core.config.app_config_validation import validate_room_length_value
 logger = logging.getLogger(__name__)
 
 
@@ -78,4 +78,5 @@ def configure_fastapi() -> FastAPI:
 
 
 def create_app() -> FastAPI:
+    validate_room_length_value(load_config())
     return configure_fastapi()

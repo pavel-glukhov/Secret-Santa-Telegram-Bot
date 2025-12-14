@@ -1,7 +1,7 @@
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 
 JOB_STORES = {
     'default': RedisJobStore(

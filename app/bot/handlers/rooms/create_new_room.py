@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
 from app.bot.states.rooms_states import CreateRoom
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.database.repo.rooms import RoomRepo
 from app.bot.utils import safe_delete_message
 

@@ -1,6 +1,6 @@
 from redis import ConnectionPool, Redis
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 
 
 def create_redis_pool():

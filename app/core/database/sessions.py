@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession,
                                     async_scoped_session, create_async_engine)
 from sqlalchemy.orm import sessionmaker
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.exceptions import DatabaseConfigError
 
 config = load_config().db

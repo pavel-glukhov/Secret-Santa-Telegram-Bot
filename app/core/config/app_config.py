@@ -6,7 +6,7 @@ from functools import lru_cache
 import yaml
 from dotenv import load_dotenv
 
-ROOT_PATH = os.path.dirname(os.path.dirname(__file__))
+ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 dotenv_path = os.path.join(ROOT_PATH, '.env')
 load_dotenv(dotenv_path)
 

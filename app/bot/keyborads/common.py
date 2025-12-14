@@ -3,7 +3,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.languages.schemes import TranslationMainSchema
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.database.models import Room
 from app.core.database.repo.rooms import RoomRepo
 from app.core.scheduler.operations import TaskScheduler

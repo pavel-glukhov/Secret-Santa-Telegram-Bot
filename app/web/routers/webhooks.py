@@ -3,7 +3,7 @@ from aiohttp import web
 from fastapi import APIRouter, HTTPException, Request
 
 from app.bot.loader import bot, dp
-from app.config import load_config, webhook_settings
+from app.core.config.app_config import load_config, webhook_settings
 
 router = APIRouter()
 webhook_path = webhook_settings(load_config())['webhook_path']

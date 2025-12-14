@@ -3,7 +3,7 @@ from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey,
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.sql import func
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.encryption import CryptData
 
 
