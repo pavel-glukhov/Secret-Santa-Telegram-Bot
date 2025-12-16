@@ -23,8 +23,6 @@ class WebSettings:
 
 @dataclass
 class LoggingConfig:
-    log_path: str
-    log_file: str
     config_file: str
 
 
@@ -48,9 +46,9 @@ class DataBaseConfig:
     password: str
     host: str
     port: str
-    pool_size:int
-    max_overflow:int
-    
+    pool_size: int
+    max_overflow: int
+
     @property
     def postgres_url(self):
         return (f'postgresql+asyncpg://'
@@ -119,15 +117,13 @@ def load_config() -> AppConfig:
             user_rooms_count=int(os.getenv('USER_ROOMS_LIMIT'))
         ),
         log=LoggingConfig(
-            log_path=os.path.join(ROOT_PATH, 'logs'),
-            log_file='logs.log',
             config_file='logging.yaml'
         ),
         encryption=Encryption(
             key=os.getenv('ENCRYPT_SECRET_KEY')
         ),
         support_account=os.getenv('SUPPORT_ACCOUNT')
-    
+
     )
 
 
@@ -143,15 +139,7 @@ def webhook_settings(config: AppConfig) -> dict:
 def setup_logging(config: AppConfig) -> None:
     configuration_file = os.path.join(ROOT_PATH, config.log.config_file)
 
-    if not os.path.exists(config.log.log_path):
-        os.makedirs(config.log.log_path)
-
     with open(configuration_file, 'r') as stream:
         logging_cfg = yaml.load(stream, Loader=yaml.FullLoader)
-    
-    logging_cfg['handlers'][
-        'timed_rotating_handler']['filename'] = os.path.join(
-        config.log.log_path,
-        config.log.log_file
-    )
+
     logging.config.dictConfig(logging_cfg)

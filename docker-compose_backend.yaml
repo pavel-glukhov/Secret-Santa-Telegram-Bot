@@ -56,10 +56,6 @@ services:
     build: .
     restart: always
     command: "uvicorn app.core.cli:create_app --reload --host 0.0.0.0 --port 8000"
-    volumes:
-      - type: bind
-        source: ${LOGS_MOUNT_FOLDER}
-        target: /code/logs/
     ports:
       - "8000:8000"
     environment:
@@ -74,4 +70,3 @@ services:
 volumes:
   postgres_data:
   redis_data:
-  log_value:

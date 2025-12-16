@@ -12,72 +12,72 @@ formatters:
 handlers:
   console_handler:
     class: logging.StreamHandler
-    level: INFO
+    level: DEBUG
     formatter: json
     stream: ext://sys.stdout
 
 loggers:
   app:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   fastapi:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   aiogram.event:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   sqlalchemy:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   sqlalchemy.engine:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   sqlalchemy.orm:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   apscheduler:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   redis:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   asyncio:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   asyncpg:
-    level: WARNING
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   uvicorn:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   uvicorn.error:
-    level: ERROR
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
 
   uvicorn.access:
-    level: INFO
+    level: DEBUG
     handlers: [console_handler]
     propagate: no
