@@ -1,8 +1,9 @@
 import logging
-
+import sys
+from app.core.database.health import check_database
 from aiogram.exceptions import TelegramAPIError
 from fastapi import FastAPI
-from redis import RedisError
+from redis.exceptions import RedisError, ConnectionError as RedisConnectionError
 
 from app.bot.languages.loader import load_language_files_to_redis
 from app.bot.loader import bot, dp
@@ -16,15 +17,23 @@ from app.core.config.app_config_validation import validate_room_length_value
 logger = logging.getLogger(__name__)
 
 
-async def load_languages_to_redis(config) -> None:
-    """Load language files from the configured folder into Redis."""
+async def load_languages_to_redis(config) -> bool:
+    """Load language dicts to redis"""
     try:
         languages_folder = config.bot.language_folder
-        await load_language_files_to_redis(languages_folder, get_redis_client())
-        logger.info("Data from languages folder have been loaded to Redis.")
-    except RedisError as e:
-        logger.error(f"Failed to load languages to Redis: {str(e)}")
-        raise
+        await load_language_files_to_redis(
+            languages_folder,
+            get_redis_client()
+        )
+        logger.info("Languages successfully loaded into Redis.")
+        return True
+    except (RedisConnectionError, RedisError) as e:
+        logger.critical(
+            "Redis is unavailable. "
+            "Make sure Redis is running and accessible at localhost:6379"
+        )
+        logger.debug("Redis error details", exc_info=e)
+        return False
 
 
 async def setup_webhook(config) -> None:
@@ -47,22 +56,41 @@ async def setup_webhook(config) -> None:
 
 
 async def on_startup():
+    config = load_config()
+    setup_logging(config)
+
+    redis_ok = await load_languages_to_redis(config)
+    db_ok = await check_database()
+
+    if not redis_ok or not db_ok:
+        if not redis_ok:
+            logger.critical(
+                "Application startup aborted: Redis dependency is unavailable"
+            )
+        if not db_ok:
+            logger.critical(
+                "Application startup aborted: PostgreSQL dependency is unavailable"
+            )
+        return
+
     try:
-        config = load_config()
-        setup_logging(config)
-        await load_languages_to_redis(config)
         register_routers(dp)
         register_middlewares(dp)
+
         scheduler.start()
         await setup_webhook(config)
-        logger.info("App has been started")
-    except  ConnectionError as e:
-        logger.error(f"Failed to start app: {str(e)}")
+
+        logger.info("Application started successfully")
+
+    except TelegramAPIError as e:
+        logger.critical("Application startup failed: Telegram API error")
+        logger.debug("Telegram error details", exc_info=e)
+        return
 
 
 async def on_shutdown():
     await bot.session.close()
-    logger.info("App has been stopped")
+    logger.info("Application shutdown completed")
 
 
 def register_event_handlers(app: FastAPI) -> None:
