@@ -111,6 +111,7 @@ async def process_room_number(message: types.Message,
     bot_message_id = state_data.get('bot_message_id')
 
     await safe_delete_message(message, log_prefix="process_room_number")
+
     if not room_number.isdigit():
         text_message = lang.messages.rooms_menu.subscribe.number_error
         cancel_button = lang.buttons.cancel_button
@@ -124,10 +125,11 @@ async def process_room_number(message: types.Message,
     room = await RoomRepo(session).get(room_number=int(room_number))
     cancel_button = lang.buttons.cancel_button
 
+
     if not room or room.is_closed:
         return await _is_not_exists_room(bot_message_id,
                                          room_number,
-                                         {cancel_button: 'cancel'},
+                                         generate_inline_keyboard({cancel_button: 'cancel'}),
                                          lang)
 
     is_member_of_room = await RoomRepo(session).is_member(
