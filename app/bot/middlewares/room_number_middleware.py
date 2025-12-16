@@ -17,11 +17,12 @@ class RoomNumberMiddleware(BaseMiddleware):
 
         if event.data and '_' in event.data:
             potential_number = event.data.rsplit('_', 1)[-1]
-            try:
-                data["room_number"] = int(potential_number)
-            except ValueError:
-                logger.warning(
-                    "Failed to parse room number from callback data: %s", event.data
-                )
+            if potential_number.isdigit():
+                try:
+                    data["room_number"] = int(potential_number)
+                except ValueError:
+                    logger.warning(
+                        "Failed to parse room number from callback data: %s", event.data
+                    )
 
         return await handler(event, data)
