@@ -27,7 +27,7 @@ async def safe_send_message(user_id: int,
             valid_kwargs = {'reply_markup', 'parse_mode', 'disable_web_page_preview', 'entities'}
             filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_kwargs}
             await bot.send_message(user_id, text, disable_notification=disable_notification, **filtered_kwargs)
-            logger.info(f"Message sent [ID:{user_id}]: successful")
+            logger.debug(f"Message to [ID:{user_id}] has been sent successfully.")
             return True
 
         except TelegramForbiddenError:

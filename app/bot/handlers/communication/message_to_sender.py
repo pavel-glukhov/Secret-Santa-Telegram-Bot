@@ -81,6 +81,7 @@ async def completed_message_to_santa(message: types.Message,
                             text=sender_app_lng.messages.main_menu.allowed_actions,
                             reply_markup=generate_inline_keyboard(inline_keyboard)
                             )
+    logger.debug(f"Message from [ID:{user_id}] to [ID:{sender.user_id}]: has been sent.")
     second_message_text = lang.messages.communication_menu.message_to_sender.msg_was_sent
 
     keyboard_inline = generate_inline_keyboard(

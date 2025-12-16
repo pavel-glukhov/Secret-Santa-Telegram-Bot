@@ -87,6 +87,7 @@ async def completed_message_to_santa(message: types.Message,
                             text=recipient_app_lng.messages.main_menu.allowed_actions,
                             reply_markup=generate_inline_keyboard(inline_keyboard)
                             )
+    logger.info(f"Message from [ID:{user_id}] to [ID:{recipient.user_id}]: has been sent.")
     second_message_text = lang.messages.communication_menu.message_to_recipient.msg_was_sent
 
     await bot_message.edit_text(text=second_message_text, reply_markup=keyboard_inline)

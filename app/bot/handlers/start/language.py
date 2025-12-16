@@ -34,7 +34,6 @@ async def update_language(callback: types.CallbackQuery,
                           session: AsyncSession):
     result = get_source_to_next_callback(callback.data)
     selected_language = result.get('language', 'eng')
-    print(result)
     continue_callback = result.get('source', "root_menu")
 
     await UserRepo(session).update_user(

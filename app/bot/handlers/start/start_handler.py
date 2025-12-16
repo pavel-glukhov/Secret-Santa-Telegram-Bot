@@ -100,9 +100,9 @@ async def create_user_or_enable(message: types.Message,
         last_name=message.chat.last_name
     )
     if created:
-        logger.info(f'The new user "{message.chat.id}" has been created')
+        logger.info(f'The new user [ID:{message.chat.id}] has been created')
 
     if not user.is_active:
         await UserRepo(session).enable_user(message.chat.id)
-        logger.info(f'The new user "{message.chat.id}" has been enabled')
+        logger.info(f'The user [ID:{message.chat.id}] has been enabled')
     return user

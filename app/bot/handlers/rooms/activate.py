@@ -12,7 +12,7 @@ router = Router()
 
 
 @router.callback_query(F.data.startswith('room_activate'))
-async def members_list(callback: types.CallbackQuery,
+async def activate_room(callback: types.CallbackQuery,
                        session: AsyncSession,
                        lang: TranslationMainSchema,
                        room_number: int):
