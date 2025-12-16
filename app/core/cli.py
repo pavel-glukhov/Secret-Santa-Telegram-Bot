@@ -1,5 +1,4 @@
 import logging
-import sys
 from app.core.database.health import check_database
 from aiogram.exceptions import TelegramAPIError
 from fastapi import FastAPI
