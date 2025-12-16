@@ -4,7 +4,7 @@ import logging
 from cryptography.fernet import Fernet
 import requests
 
-from app.config import load_config
+from app.core.config.app_config import load_config
 from app.core.database.repo.users import UserRepo
 from app.core.database.sessions import get_session
 logger = logging.getLogger(__name__)
