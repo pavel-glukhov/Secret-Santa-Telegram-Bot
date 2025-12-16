@@ -28,7 +28,7 @@ loggers:
     propagate: no
 
   aiogram.event:
-    level: INFO
+    level: WARNING
     handlers: [console_handler]
     propagate: no
 
@@ -78,6 +78,6 @@ loggers:
     propagate: no
 
   uvicorn.access:
-    level: INFO
+    level: WARNING
     handlers: [console_handler]
     propagate: no
