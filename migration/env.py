@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.core.database.models import Base
 
 from alembic import context
-from app.config import load_config
+from app.core.config.app_config import load_config
 
 config = context.config
 section = config.config_ini_section

@@ -10,7 +10,6 @@ redis~=5.2.0
 pytz~=2024.2
 SQLAlchemy==2.0.35
 alembic~=1.14.0
-#psycopg2
 pycountry~=24.6.1
 requests~=2.32.3
 aiohttp~=3.9.5

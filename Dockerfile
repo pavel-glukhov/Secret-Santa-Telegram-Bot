@@ -1,10 +1,11 @@
-FROM python:3.12
+FROM python:3.12-slim
 
-RUN mkdir /code
-RUN mkdir /code/logs
-COPY requirements.txt /code
-RUN pip install --upgrade setuptools
-RUN pip install --upgrade pip
-RUN pip install -r /code/requirements.txt --no-cache-dir
-COPY . /code
 WORKDIR /code
+
+COPY requirements.txt /code
+RUN pip install --upgrade pip setuptools
+RUN pip install -r requirements.txt --no-cache-dir
+
+COPY . /code
+
+CMD ["python", "-m", "app.runtimes.polling"]

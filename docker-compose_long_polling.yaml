@@ -2,7 +2,7 @@ version: '3.10'
 
 services:
   db:
-    image: postgres:16.1
+    image: postgres:17.7
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -21,17 +21,10 @@ services:
       retries: 5
 
   redis:
-    image: redis:7.2.3
+    image: redis:8.4.0
     command:
       - redis-server
       - --loglevel ${REDIS_LOGLEVEL:-warning}
-      - --save 900 1
-      - --save 300 10
-      - --save 60 10000
-      - --dbfilename dump.rdb
-      - --dir /data
-      - --maxmemory ${REDIS_MAXMEM:-300mb}
-      - --maxmemory-policy ${REDIS_POLICY:-noeviction}
       - --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -39,26 +32,34 @@ services:
       - .env
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  backend:
+  migrate:
     build: .
-    restart: always
-    command: python -m app.runtimes.polling
-    ports:
-      - "8000:8000"
-    environment:
-      - TZ=${SERVER_TIMEZONE}
+    command: alembic upgrade head
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build: .
+    command: python -m app.runtimes.polling
+    environment:
+      - TZ=${SERVER_TIMEZONE}
     env_file:
       - .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: always
 
 volumes:
   postgres_data:
