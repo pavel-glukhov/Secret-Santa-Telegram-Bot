@@ -87,7 +87,7 @@ services:
   backend:
     build: .
     restart: always
-    command: uvicorn app.core.cli:create_app --host 0.0.0.0 --port 8000
+    command: uvicorn app.runtimes.webhook:create_app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
     environment:
