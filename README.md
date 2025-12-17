@@ -1,4 +1,4 @@
-## Secret Santa Telegram Bot 
+## Secret Santa Telegram Bot
 [![en](https://img.shields.io/badge/lang-en-green.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/blob/main/README.md)
 [![ru](https://img.shields.io/badge/lang-ru-yelow.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/blob/main/README.ru.md)
 
@@ -14,10 +14,16 @@ Included languages:
 3. KAZ
 4. UK
 
-### Current version: 0.4.1
+### Current version: 0.4.2
 
 ---
 ## Changelog
+
+**v 0.4.2**
+* Application startup logic has been reworked and separated from runtime logic.
+  * Added independent runtimes for different deployment scenarios:
+    - Polling runtime — for local development, testing.
+    - Webhook runtime — for production environments with HTTPS.
 
 **v 0.4.1**
 * Added the ability to join a room using a URL.
@@ -54,7 +60,7 @@ Included languages:
 
 Diagram: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 
-### Stack
+## Stack
 
 1. Aiogram 3
 2. FastAPI
@@ -63,115 +69,182 @@ Diagram: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 5. PostgreSQL
 6. Redis
 
-1. #### Creating personal rooms
+## Features
 
-    - Anyone can create a room for an unlimited number of people.
-        - When creating, you need to specify:
-            - **Room name**
-            - **Budget for your group of players**
-            - **Your gift wishes**
+### 1. Creating personal rooms
 
-      ```The USER_ROOMS_LIMIT environment variable sets the limit on the number of rooms one player can manage.```
+- Anyone can create a room for an unlimited number of people.
+    - When creating, you need to specify:
+        - **Room name**
+        - **Budget for your group of players**
+        - **Your gift wishes**
 
-      ```When a room is created, a random unique number is generated, its length is set by the ROOM_NUMBER_LENGTH parameter. ```
-2. #### Joining an existing room by room ID
-3. #### Managing your profile
-    - The bot allows you to enter and change the following data:
-        - **First and Last Name**
-        - **Home Address**
-        - **Phone Number**
-        - **Time Zone**
-        - **Change Language**
-        - **Full deletion of entered data is allowed**
+```
+The USER_ROOMS_LIMIT environment variable sets the limit on the number of rooms one player can manage.
+```
 
-   ```Address and phone number are encrypted in the database using the Fernet algorithm for security.```
+```
+When a room is created, a random unique number is generated, its length is set by the ROOM_NUMBER_LENGTH parameter.
+```
 
-4. #### Room management
-    - Room management menu for regular users:
-        - **Leave room**
-        - **Change wishes**
-    - Room management menu for the owner:
-        - **Start game** – allows setting the distribution time
-            - **Set time zone** – Set time zone for a specific region
-        - **Change wishes**
-        - **Settings**
-            - **Delete room**
-            - **Change room name**
-            - **Change owner**
-            - **Change room budget**
+### 2. Joining an existing room by room ID
 
-      ```The room administrator cannot leave the room until management is transferred to someone else. A room can only be permanently deleted.```
+### 3. Managing your profile
 
-      ```If there are not enough players during the draw, the room can be reactivated.```
-5. #### Communication
-   After the roles are drawn in the game, two options become available in rooms allowing anonymous communication between
-   the recipient and the sender through the bot.
-    - **Send message to Secret Santa**
-    - **Send message to recipient**
+- The bot allows you to enter and change the following data:
+    - **First and Last Name**
+    - **Home Address**
+    - **Phone Number**
+    - **Time Zone**
+    - **Change Language**
+    - **Full deletion of entered data is allowed**
 
-### Running the Bot:
-- Create your own .env file based on the .env.example template
-- To generate the **ENCRYPT_SECRET_KEY** parameter in the **.env** file, use:
-     ```
-        python .\manage.py generate_key
-    ```
+```
+Address and phone number are encrypted in the database using the Fernet algorithm for security.
+```
 
-#### Manual launch:
+### 4. Room management
 
-- Install PostgreSQL and Redis, configure them, and create the database.
+- Room management menu for regular users:
+    - **Leave room**
+    - **Change wishes**
+- Room management menu for the owner:
+    - **Start game** – allows setting the distribution time
+        - **Set time zone** – Set time zone for a specific region
+    - **Change wishes**
+    - **Settings**
+        - **Delete room**
+        - **Change room name**
+        - **Change owner**
+        - **Change room budget**
+
+```
+The room administrator cannot leave the room until management is transferred to someone else. A room can only be permanently deleted.
+```
+
+```
+If there are not enough players during the draw, the room can be reactivated.
+```
+
+### 5. Communication
+
+After the roles are drawn in the game, two options become available in rooms allowing anonymous communication between
+the recipient and the sender through the bot.
+
+- **Send message to Secret Santa**
+- **Send message to recipient**
+
+---
+
+## Application runtimes
+
+The bot supports two independent runtime modes:
+
+### 🔹 Polling runtime
+- Designed for local development, testing, and small deployments
+- Does not require HTTPS or public access
+- Uses long polling to receive updates from Telegram
+
+Run command:
+```
+python -m app.runtimes.polling
+```
+
+### 🔹 Webhook runtime
+- Designed for production environments
+- Requires a public HTTPS endpoint
+- Uses FastAPI as an ASGI application
+
+Run command:
+```
+uvicorn app.runtimes.webhook:create_app
+```
+
+Each runtime is isolated and uses the same application core and business logic.
+
+---
+
+## Running the Bot
+
+- Create your own `.env` file based on the `.env.example` template
+- To generate the **ENCRYPT_SECRET_KEY** parameter in the `.env` file, use:
+```
+python .\manage.py generate_key
+```
+
+### Manual launch
+
+- Install PostgreSQL and Redis, configure them, and create the database
     - Redis requires enabling password access:
-       ```
-      sudo nano /etc/redis/redis.conf
-      # requirepass foobared
+```
+sudo nano /etc/redis/redis.conf
+# requirepass foobared
+```
 
-    -  ```pip install -r requirements.txt ```
-    -  ```alembic upgrade head ```
-    -  ```uvicorn app.core.cli:create_app ```
-    
+- Install dependencies:
+```
+pip install -r requirements.txt
+```
 
-#### In Docker container:
+- Apply migrations:
+```
+alembic upgrade head
+```
 
-- Install Docker https://docs.docker.com/engine/install/ubuntu/
-    - Create your own .env file based on the .env.example template
-  
-- Run Docker Compose
-    -  ```docker-compose up -d ```
-- Rebuild after code updates
-    -  ```docker-compose build ```
-- Restart containers with rebuilt images:
-    -  ```docker-compose up -d --build ```
+### Running in Polling mode (development / tests)
 
+```
+python -m app.runtimes.polling
+```
 
-  Migrations
-     ```console
-       docker exec -t <backend container> alembic upgrade head
-     ```
+### Running in Webhook mode (production)
 
-### Access rights:
+```
+uvicorn app.runtimes.webhook:create_app
+```
 
-- To grant Superuser rights to a user, run:
-     ```console
-        python .\manage.py set_superuser <telegram_user_id>
-     ```
-- To remove them, run:
-     ```console
-         python .\manage.py remove_superuser <telegram_user_id>
-     ```
-- ### Webhook registration
-    ```console
-      python .\manage.py register_webhook
-    ```
+---
 
-  Or create and make a GET request
-   ```https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/ ```
+## Webhook registration
 
-  Example:
-   ```https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://e87d-5-76-101-111.ngrok-free.app/bot/ ```
+When running in **webhook mode**, the webhook is registered automatically on application startup.
 
-### Backups
+You can also register it manually:
+```
+python .\manage.py register_webhook
+```
+
+Or create and make a GET request:
+```
+https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
+```
+
+Example:
+```
+https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://example.ngrok-free.app/bot/
+```
+
+---
+
+## Backups
 
 The database can be backed up using the command below, added to cron:
-``docker exec -t <container_name> pg_dump -U <username> <database_name> > <file_name>.sql
-``
+```
+docker exec -t <container_name> pg_dump -U <username> <database_name> > <file_name>.sql
+```
 
-```Or add the ready-made script from deploy\backup to cron. You will need to adjust the settings for yourself. ```
+Or add the ready-made script from `deploy/backup` to cron (adjust settings as needed).
+
+---
+
+## Access rights
+
+To grant Superuser rights to a user:
+```
+python .\manage.py set_superuser <telegram_user_id>
+```
+
+To remove them:
+```
+python .\manage.py remove_superuser <telegram_user_id>
+```
