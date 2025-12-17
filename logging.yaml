@@ -20,12 +20,12 @@ loggers:
   app:
     level: INFO
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   fastapi:
     level: INFO
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   aiogram.event:
     level: WARNING
@@ -35,7 +35,7 @@ loggers:
   sqlalchemy:
     level: WARNING
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   sqlalchemy.engine:
     level: WARNING
@@ -50,17 +50,17 @@ loggers:
   apscheduler:
     level: INFO
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   redis:
     level: WARNING
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   asyncio:
     level: WARNING
     handlers: [console_handler]
-    propagate: no
+    propagate: yes
 
   asyncpg:
     level: WARNING
