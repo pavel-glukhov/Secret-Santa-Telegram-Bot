@@ -1,0 +1,65 @@
+version: '3.10'
+
+services:
+  db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./deploy/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2.3
+    command:
+      - redis-server
+      - --loglevel ${REDIS_LOGLEVEL:-warning}
+      - --save 900 1
+      - --save 300 10
+      - --save 60 10000
+      - --dbfilename dump.rdb
+      - --dir /data
+      - --maxmemory ${REDIS_MAXMEM:-300mb}
+      - --maxmemory-policy ${REDIS_POLICY:-noeviction}
+      - --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    restart: always
+    command: python -m app.runtimes.polling
+    ports:
+      - "8000:8000"
+    environment:
+      - TZ=${SERVER_TIMEZONE}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  redis_data:
