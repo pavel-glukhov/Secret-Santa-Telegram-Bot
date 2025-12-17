@@ -159,7 +159,7 @@ python -m app.runtimes.polling
 ```
 - Or with Docker:
 ```bash
-docker-compose -f docker-compose_long_pulling.yaml up
+docker-compose -f docker-compose_long_polling.yaml up
 ```
 
 #### Webhook Mode (optional local test)
@@ -185,10 +185,10 @@ https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name
 ```
 
 ### 🔧 Docker Runtimes
-| Runtime | Command |
-|---------|---------|
-| Polling | `docker-compose -f docker-compose_long_pulling.yaml up` |
-| Webhook | `docker-compose up` |
+| Runtime | Command                                                 |
+|---------|---------------------------------------------------------|
+| Polling | `docker-compose -f docker-compose_long_polling.yaml up` |
+| Webhook | `docker-compose up`                                     |
 
 ---
 
