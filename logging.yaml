@@ -22,6 +22,11 @@ loggers:
     handlers: [console_handler]
     propagate: yes
 
+  app.runtimes:
+    level: INFO
+    handlers: [ console_handler ]
+    propagate: yes
+
   fastapi:
     level: INFO
     handlers: [console_handler]
