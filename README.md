@@ -3,16 +3,13 @@
 [![ru](https://img.shields.io/badge/lang-ru-yelow.svg)](https://github.com/pavel-glukhov/Secret-Santa-Telegram-Bot/blob/main/README.ru.md)
 
 ## Description
-A bot for organizing a Secret Santa game via Telegram. It allows participants to easily conduct the draw,
-exchange wishes, and receive results. The bot also allows anonymous communication between the gift recipient and the Secret Santa.
+A bot for organizing a Secret Santa game via Telegram. It allows participants to easily conduct the draw, exchange wishes, and receive results. The bot also allows anonymous communication between the gift recipient and the Secret Santa.
 
-Supports 4 languages, translated using machine translation.
-Included languages:
-
-1. RU
-2. ENG
-3. KAZ
-4. UK
+Supports 4 languages:
+- RU
+- ENG
+- KAZ
+- UK
 
 ### Current version: 0.4.2
 
@@ -20,41 +17,40 @@ Included languages:
 ## Changelog
 
 **v 0.4.2**
-* Application startup logic has been reworked and separated from runtime logic.
-  * Added independent runtimes for different deployment scenarios:
-    - Polling runtime — for local development, testing.
-    - Webhook runtime — for production environments with HTTPS.
+* Application startup logic reworked and separated from runtime logic.
+  - Added independent runtimes for different deployment scenarios:
+    - Polling runtime — for local development and testing.
+    - Webhook runtime — for production with HTTPS.
 
 **v 0.4.1**
-* Added the ability to join a room using a URL.
+* Ability to join a room using a URL.
 * Dialogues updated.
 * Application logic fixed.
 
 **v 0.4.0**
-* All ORM queries were rewritten to async.
-* Some interface-related bugs fixed.
+* All ORM queries rewritten to async.
+* Interface-related bugs fixed.
 
 **v 0.3.0**
-* Removed the old method of specifying the draw date.
-* Added an interactive calendar and random result-sending time selection within time periods.
-* Some bugs and issues fixed.
-
-**v 0.2.2**
-* Fixed some bugs related to message sending.
-* Some SQL queries optimized.
-
-**v 0.2.1**
-* Fixed a bug with retrieving player wishes in the room.
-* Updated language dictionaries.
-
-**v 0.2.0**
-* The application was rewritten from Aiogram 2 to version 3.
-* SQL queries migrated from Tortoise ORM to SQLAlchemy.
-* Added support for other languages.
+* Interactive calendar added for draw scheduling.
+* Random result-sending time selection implemented.
 * Various bugs fixed.
 
+**v 0.2.2**
+* Fixed message sending bugs.
+* SQL queries optimized.
+
+**v 0.2.1**
+* Fixed bug with retrieving player wishes.
+* Language dictionaries updated.
+
+**v 0.2.0**
+* Migration from Aiogram 2 to 3.
+* SQLAlchemy replaced Tortoise ORM.
+* Multi-language support added.
+
 **v 0.1.0**
-* Beta version of the bot released.
+* Beta release.
 
 ---
 
@@ -62,12 +58,12 @@ Diagram: https://miro.com/app/board/uXjVNxWmMtE=/?share_link_id=603886678614
 
 ## Stack
 
-1. Aiogram 3
-2. FastAPI
-3. SQLAlchemy 2
-4. Alembic
-5. PostgreSQL
-6. Redis
+- Aiogram 3
+- FastAPI
+- SQLAlchemy 2
+- Alembic
+- PostgreSQL
+- Redis
 
 ## Features
 
@@ -136,115 +132,82 @@ the recipient and the sender through the bot.
 
 ---
 
-## Application runtimes
-
-The bot supports two independent runtime modes:
-
-### 🔹 Polling runtime
-- Designed for local development, testing, and small deployments
-- Does not require HTTPS or public access
-- Uses long polling to receive updates from Telegram
-
-Run command:
-```
-python -m app.runtimes.polling
-```
-
-### 🔹 Webhook runtime
-- Designed for production environments
-- Requires a public HTTPS endpoint
-- Uses FastAPI as an ASGI application
-
-Run command:
-```
-uvicorn app.runtimes.webhook:create_app
-```
-
-Each runtime is isolated and uses the same application core and business logic.
-
----
-
 ## Running the Bot
 
-- Create your own `.env` file based on the `.env.example` template
-- To generate the **ENCRYPT_SECRET_KEY** parameter in the `.env` file, use:
-```
+### 📂 Preparation
+1. Create `.env` based on `.env.example`.
+2. Generate encryption key:
+```bash
 python .\manage.py generate_key
 ```
-
-### Manual launch
-
-- Install PostgreSQL and Redis, configure them, and create the database
-    - Redis requires enabling password access:
-```
-sudo nano /etc/redis/redis.conf
-# requirepass foobared
-```
-
-- Install dependencies:
-```
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
-
-- Apply migrations:
-```
+4. Apply migrations:
+```bash
 alembic upgrade head
 ```
 
-### Running in Polling mode (development / tests)
+### 🖥 Local Development / Testing
 
-```
+#### Polling Mode
+- Suitable for development and small bots
+- No HTTPS needed
+```bash
 python -m app.runtimes.polling
 ```
-
-### Running in Webhook mode (production)
-
+- Or with Docker:
+```bash
+docker-compose -f docker-compose_long_pulling.yaml up
 ```
+
+#### Webhook Mode (optional local test)
+- Can be tested with ngrok:
+```bash
+uvicorn app.runtimes.webhook:create_app --reload
+```
+
+### 🌐 Production
+
+#### Webhook Mode
+- Requires public HTTPS endpoint
+```bash
 uvicorn app.runtimes.webhook:create_app
 ```
-
----
-
-## Webhook registration
-
-When running in **webhook mode**, the webhook is registered automatically on application startup.
-
-You can also register it manually:
-```
+- Webhook registers automatically, or manually:
+```bash
 python .\manage.py register_webhook
 ```
-
-Or create and make a GET request:
-```
+- Or via GET request:
+```bash
 https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
 ```
 
-Example:
-```
-https://api.telegram.org/bot1234567890:AAABBBCCCDDDEEEFFF0000000_FFFFF/setWebhook?url=https://example.ngrok-free.app/bot/
-```
+### 🔧 Docker Runtimes
+| Runtime | Command |
+|---------|---------|
+| Polling | `docker-compose -f docker-compose_long_pulling.yaml up` |
+| Webhook | `docker-compose up` |
 
 ---
 
 ## Backups
-
-The database can be backed up using the command below, added to cron:
-```
+- Backup via Docker:
+```bash
 docker exec -t <container_name> pg_dump -U <username> <database_name> > <file_name>.sql
 ```
-
-Or add the ready-made script from `deploy/backup` to cron (adjust settings as needed).
+- Or use `deploy/backup` scripts.
 
 ---
 
-## Access rights
-
-To grant Superuser rights to a user:
-```
+## Access Rights
+- Grant superuser:
+```bash
 python .\manage.py set_superuser <telegram_user_id>
 ```
-
-To remove them:
-```
+- Remove superuser:
+```bash
 python .\manage.py remove_superuser <telegram_user_id>
 ```
+
