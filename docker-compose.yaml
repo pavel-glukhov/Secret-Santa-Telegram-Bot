@@ -1,8 +1,9 @@
-version: '3.10'
-
 services:
   db:
     image: postgres:16.1
+    restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -11,9 +12,6 @@ services:
     volumes:
       - ./deploy/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql
       - postgres_data:/var/lib/postgresql/data/pgdata
-    env_file:
-      - .env
-    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
       interval: 10s
@@ -22,84 +20,54 @@ services:
 
   redis:
     image: redis:7.2.3
+    restart: always
+    env_file:
+      - .env
     command:
       - redis-server
       - --loglevel ${REDIS_LOGLEVEL:-warning}
-      - --save 900 1
-      - --save 300 10
-      - --save 60 10000
-      - --dbfilename dump.rdb
-      - --dir /data
       - --maxmemory ${REDIS_MAXMEM:-300mb}
       - --maxmemory-policy ${REDIS_POLICY:-noeviction}
       - --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
-    env_file:
-      - .env
-    restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  nginx:
-    image: nginx:1.25.3
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./deploy/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./deploy/certbot/www:/var/www/certbot:ro
-      - ./deploy/certbot/conf:/etc/nginx/ssl:ro
-    environment:
-      - NGINX_HOST_NAME=${DOMAIN_NAME}
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD", "nginx", "-t"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      backend:
-        condition: service_healthy
-
-  certbot:
-    image: certbot/certbot:v4.0.0
-    entrypoint: ""
-    command: >
-      sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
-      --email ${EMAIL} --agree-tos --no-eff-email
-      ${CERTBOT_ENV:- --staging} -d ${DOMAIN_NAME} -d www.${DOMAIN_NAME}
-      && cp -r /etc/letsencrypt/* /etc/letsencrypt.bak/"
-    volumes:
-      - ./deploy/certbot/www:/var/www/certbot:rw
-      - ./deploy/certbot/conf:/etc/letsencrypt:rw
-    depends_on:
-      nginx:
-        condition: service_healthy
-    env_file:
-      - .env
-
   backend:
     build: .
     restart: always
+    env_file:
+      - .env
     command: uvicorn app.runtimes.webhook:create_app --host 0.0.0.0 --port 8000
-    ports:
-      - "8000:8000"
-    environment:
-      - TZ=${SERVER_TIMEZONE}
+    expose:
+      - "8000"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  caddy:
+    image: caddy:2.8
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
     env_file:
       - .env
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:
