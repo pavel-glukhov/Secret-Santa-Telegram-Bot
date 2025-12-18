@@ -151,65 +151,167 @@ alembic upgrade head
 
 ### Deployment Modes
 
-The bot supports two independent run modes:
+The bot supports two independent run modes. Choose the mode depending on traffic level, infrastructure, and whether you have a public HTTPS endpoint.
 
-#### Polling Mode
-- No HTTPS needed
-- Good for low-traffic bots.
+---
+
+## 🔁 Polling Mode
+
+**Description**
+- Uses Telegram long polling
+- Does **not** require a public HTTPS endpoint
+- Simplest setup
+- Best suited for:
+  - development
+  - low-traffic bots
+  - private servers without a domain
+
+**Run locally**
 ```bash
 python -m app.runtimes.polling
 ```
-- Or with Docker:
+
+**Run with Docker**
 ```bash
 docker-compose -f docker-compose_long_polling.yaml up
 ```
 
-#### Webhook Mode (optional local test)
-- Can be tested with ngrok:
+**Notes**
+- Telegram servers actively poll your bot
+- Slightly higher latency compared to webhooks
+- Only one polling instance should run at a time
+
+---
+
+## 🌐 Webhook Mode
+
+**Description**
+- Uses Telegram webhooks
+- Requires a **public HTTPS endpoint**
+- Recommended for production
+- Lower latency and better scalability
+
+---
+
+### Local Webhook Testing
+
+You can test webhook mode locally using a tunnel (for example, `ngrok`).
+
 ```bash
 uvicorn app.runtimes.webhook:create_app --reload
 ```
 
-### 🌐 Production
+Then expose the local port and register the webhook with the generated HTTPS URL.
 
-#### Webhook Mode
-- Requires public HTTPS endpoint
+---
+
+## 🚀 Production Deployment (Webhook)
+
+### Requirements
+- Public domain name
+- Open ports **80** and **443**
+- Valid HTTPS certificate
+
+### Runtime Command
 ```bash
 uvicorn app.runtimes.webhook:create_app
 ```
-- Webhook registers automatically, or manually:
+
+### Webhook Registration
+
+The webhook can be registered in several ways:
+
+**Automatically**  
+The application registers the webhook on startup (recommended).
+
+**Via management command**
 ```bash
-python .\manage.py register_webhook
+python manage.py register_webhook
 ```
-- Or via GET request:
-```bash
+
+**Manually via Telegram API**
+```text
 https://api.telegram.org/bot{telegram_token}/setWebhook?url=https://{domain_name}/bot/
 ```
 
-### 🔧 Docker Runtimes
-| Runtime | Command                                                 |
-|---------|---------------------------------------------------------|
+---
+
+## HTTPS & Caddy
+
+In production, the webhook is exposed **through Caddy**.
+
+- Acts as a reverse proxy
+- Automatically obtains and renews SSL certificates (Let’s Encrypt)
+- Forwards HTTPS traffic to the backend container
+
+Traffic flow:
+
+```
+Telegram → HTTPS → Caddy → backend
+```
+
+---
+
+## 🐳 Docker Runtimes
+
+| Runtime  | Command |
+|--------|---------|
 | Polling | `docker-compose -f docker-compose_long_polling.yaml up` |
-| Webhook | `docker-compose up`                                     |
+| Webhook | `docker-compose up` |
+
+---
+
+## Docker Installation
+
+Docker **must be installed** before running any deployment mode.
+
+### Install Docker Engine
+
+Follow the official installation guide for your OS:
+
+👉 https://docs.docker.com/engine/install/
+
+After installation, verify:
+```bash
+docker --version
+docker compose version
+```
+
+Make sure the Docker daemon is running.
 
 ---
 
 ## Backups
-- Backup via Docker:
+
+### Database Backup via Docker
+
 ```bash
 docker exec -t <container_name> pg_dump -U <username> <database_name> > <file_name>.sql
 ```
-- Or use `deploy/backup` scripts.
+
+### Automated Backups
+
+You can also use scripts located in:
+```
+deploy/backup
+```
+
+Recommended:
+- Schedule backups via cron
+- Store backups outside the VPS
 
 ---
 
-## Access Rights
-- Grant superuser:
+## Access Rights Management
+
+### Grant Superuser
+
 ```bash
-python .\manage.py set_superuser <telegram_user_id>
-```
-- Remove superuser:
-```bash
-python .\manage.py remove_superuser <telegram_user_id>
+python manage.py set_superuser <telegram_user_id>
 ```
 
+### Remove Superuser
+
+```bash
+python manage.py remove_superuser <telegram_user_id>
+```
