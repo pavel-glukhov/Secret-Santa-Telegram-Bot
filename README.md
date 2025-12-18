@@ -149,11 +149,13 @@ pip install -r requirements.txt
 alembic upgrade head
 ```
 
-### 🖥 Local Development / Testing
+### Deployment Modes
+
+The bot supports two independent run modes:
 
 #### Polling Mode
-- Suitable for development and small bots
 - No HTTPS needed
+- Good for low-traffic bots.
 ```bash
 python -m app.runtimes.polling
 ```
