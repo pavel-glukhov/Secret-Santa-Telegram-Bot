@@ -134,20 +134,36 @@ the recipient and the sender through the bot.
 
 ## Running the Bot
 
-### 📂 Preparation
-1. Create `.env` based on `.env.example`.
-2. Generate encryption key:
-```bash
-python .\manage.py generate_key
-```
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-4. Apply migrations:
-```bash
-alembic upgrade head
-```
+### Preparation
+Create `.env` based on `.env.example`.
+
+## Environment Variables
+
+| Category | Variable | Description | Default Value | Notes |
+|--------|----------|-------------|---------------|-------|
+| **Security** | `ENCRYPT_SECRET_KEY` | Base64-encoded 32-byte secret key used for data encryption | ❌ *none* | Required. Generate via `python manage.py generate_key` |
+| **Telegram Bot** | `TELEGRAM_TOKEN` | Telegram bot token from @BotFather | ❌ *none* | Required |
+|  | `TELEGRAM_LOGIN` | Bot username without `@` | ❌ *none* | Example: `my_bot_name` |
+|  | `SUPPORT_ACCOUNT` | Support contact (Telegram username) | ❌ *none* | Shown on About page |
+| **Room Configuration** | `ROOM_NUMBER_LENGTH` | Length of generated room ID | `6` | Allowed: `5–8` |
+|  | `USER_ROOMS_LIMIT` | Maximum rooms per user | `3` | |
+| **Database (PostgreSQL)** | `DATABASE_NAME` | PostgreSQL database name | ❌ *none* | |
+|  | `DATABASE_USER` | Database user | ❌ *none* | |
+|  | `DATABASE_PASSWORD` | Database password | ❌ *none* | ⚠️ keep secret |
+|  | `DATABASE_HOST` | Database host | `db` | `db` for Docker, `localhost` for local |
+|  | `DATABASE_PORT` | PostgreSQL port | `5432` | |
+|  | `POOL_SIZE` | Number of persistent DB connections | `5` | |
+|  | `MAX_OVERFLOW` | Max temporary connections beyond pool | `10` | |
+| **Redis** | `REDIS_HOST` | Redis host | `redis` | |
+|  | `REDIS_PORT` | Redis port | `6379` | |
+|  | `REDIS_DB` | Redis database index | `0` | |
+|  | `REDIS_PASSWORD` | Redis password | *(empty)* | If auth is disabled |
+| **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Domain name for webhook (no http/https) | ❌ *none* | Required for webhook |
+|  | `EMAIL` | Email for SSL certificates | ❌ *none* | Required for webhook |
+|  | `CERTBOT_ENV` | Certbot environment | *(empty)* | Use `--staging` for testing |
+| **System** | `SERVER_TIMEZONE` | Server timezone | `Asia/Almaty` | |
+
+
 
 ### Deployment Modes
 
