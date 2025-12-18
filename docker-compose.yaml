@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: postgres:16.1
@@ -37,6 +39,16 @@ services:
       timeout: 5s
       retries: 5
 
+  migrate:
+    build: .
+    command: alembic upgrade head
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
   backend:
     build: .
     restart: always
@@ -46,8 +58,8 @@ services:
     expose:
       - "8000"
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
 
