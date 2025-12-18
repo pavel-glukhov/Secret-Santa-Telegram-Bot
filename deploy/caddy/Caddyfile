@@ -1,0 +1,8 @@
+{
+	email {$EMAIL}
+}
+
+{$DOMAIN_NAME} {
+	encode gzip
+	reverse_proxy backend:8000
+}

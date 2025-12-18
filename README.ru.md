@@ -158,7 +158,6 @@
 |  | `REDIS_PASSWORD` | Пароль Redis | *(пусто)* | Если не используется |
 | **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Домен для webhook (без http/https) | ❌ *нет* | Обязателен для webhook |
 |  | `EMAIL` | Email для Certbot | ❌ *нет* | Обязателен для webhook |
-|  | `CERTBOT_ENV` | Режим Certbot | *(пусто)* | `--staging` для тестов |
 | **System** | `SERVER_TIMEZONE` | Таймзона сервера | `Asia/Almaty` ||
 
 
@@ -267,11 +266,11 @@ Telegram → HTTPS → Caddy → backend
 
 ## 🐳 Docker-режимы
 
-| Режим   | Команда |
-|--------|---------|
-| Polling | `docker-compose -f docker-compose_long_polling.yaml up` |
-| Webhook | `docker-compose up` |
-
+| Режим           | Команда |
+|-----------------|---------|
+| Polling         | `docker-compose -f docker-compose_long_polling.yaml up` |
+| Webhook (Caddy) | `docker-compose up` |
+| Webhook (Nginx) | `chmod +x nginx-entrypoint.sh`<br/>`docker-compose up -f docker-compose_nginx.yaml up`|
 ---
 
 ## Установка Docker

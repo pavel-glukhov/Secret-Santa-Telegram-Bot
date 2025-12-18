@@ -1,0 +1,129 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./deploy/postgres/create_schema.sql:/docker-entrypoint-initdb.d/create_schema.sql:ro
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2.3
+    command:
+      - redis-server
+      - --loglevel ${REDIS_LOGLEVEL:-warning}
+      - --save 900 1
+      - --save 300 10
+      - --save 60 10000
+      - --dbfilename dump.rdb
+      - --dir /data
+      - --maxmemory ${REDIS_MAXMEM:-300mb}
+      - --maxmemory-policy ${REDIS_POLICY:-noeviction}
+      - --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    env_file:
+      - .env
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    restart: always
+    command: uvicorn app.runtimes.webhook:create_app --host 0.0.0.0 --port 8000
+    expose:
+      - "8000"
+    environment:
+      - TZ=${SERVER_TIMEZONE}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: .
+    command: alembic upgrade head
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  nginx:
+    image: nginx:1.25.3
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/prod/default.conf.template:/etc/nginx/conf.d/default.conf.template:ro
+      - ./deploy/certbot/www:/var/www/certbot:ro
+      - ./deploy/certbot/conf:/etc/nginx/ssl:ro
+      - ./nginx-entrypoint.sh:/nginx-entrypoint.sh:ro
+    environment:
+      - NGINX_HOST_NAME=${DOMAIN_NAME}
+    entrypoint: ["/nginx-entrypoint.sh"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  certbot:
+    image: certbot/certbot:v4.0.0
+    entrypoint: ""
+    command: >
+      sh -c "
+      certbot certonly --webroot
+      --webroot-path=/var/www/certbot
+      --email ${EMAIL}
+      --agree-tos
+      --no-eff-email
+      -d ${DOMAIN_NAME}
+      -d www.${DOMAIN_NAME}
+      --non-interactive
+      --force-renewal
+      "
+    volumes:
+      - ./deploy/certbot/www:/var/www/certbot:rw
+      - ./deploy/certbot/conf:/etc/letsencrypt:rw
+    depends_on:
+      nginx:
+        condition: service_healthy
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  redis_data:

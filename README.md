@@ -160,7 +160,6 @@ Create `.env` based on `.env.example`.
 |  | `REDIS_PASSWORD` | Redis password | *(empty)* | If auth is disabled|
 | **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Domain name for webhook (no http/https) | ❌ *none* | Required for webhook |
 |  | `EMAIL` | Email for SSL certificates | ❌ *none* | Required for webhook |
-|  | `CERTBOT_ENV` | Certbot environment | *(empty)* | Use `--staging` for testing|
 | **System** | `SERVER_TIMEZONE` | Server timezone | `Asia/Almaty` ||
 
 
@@ -270,11 +269,11 @@ Telegram → HTTPS → Caddy → backend
 
 ## 🐳 Docker Runtimes
 
-| Runtime  | Command |
-|--------|---------|
-| Polling | `docker-compose -f docker-compose_long_polling.yaml up` |
-| Webhook | `docker-compose up` |
-
+| Runtime         | Command                                                 |
+|-----------------|---------------------------------------------------------|
+| Polling         | `docker-compose -f docker-compose_long_polling.yaml up` |
+| Webhook (Caddy) | `docker-compose up`                                     |
+| Webhook (Nginx) | `chmod +x nginx-entrypoint.sh`<br/>`docker-compose up -f docker-compose_nginx.yaml up`|
 ---
 
 ## Docker Installation
