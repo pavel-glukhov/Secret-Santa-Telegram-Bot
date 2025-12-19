@@ -1,0 +1,27 @@
+.idea
+.pytest_cache
+.venv
+deploy
+logs
+ngrok
+.dockerignore
+.env.dev
+.env.example
+.env_prod
+.env_stage
+.gitignore
+docker test
+docker-compose.yaml
+docker-compose_backend.yaml
+docker-compose_long_polling.yaml
+docker-compose_nginx.yaml
+docker-compose_ssl.yaml
+Dockerfile
+future.txt
+log.txt
+logging_dev.yaml
+README.md
+README.ru.md
+README_old.md
+run_via_ngrok.py
+start.ps1
