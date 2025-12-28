@@ -108,6 +108,8 @@ Address and phone number are encrypted in the database using the Fernet algorith
     - **Start game** – allows setting the distribution time
         - **Set time zone** – Set time zone for a specific region
     - **Change wishes**
+    - **Participant list**
+    - **Invite friend**
     - **Settings**
         - **Delete room**
         - **Change room name**
