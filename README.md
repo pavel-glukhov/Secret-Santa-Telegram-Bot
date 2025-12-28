@@ -16,6 +16,11 @@ Supports 4 languages:
 ---
 ## Changelog
 
+`**v 0.4.3**
+- Updated dialogues
+- Added 'invite friend' button in room's menu
+- Fixed some bugs`
+
 **v 0.4.2**
 * Application startup logic reworked and separated from runtime logic.
   - Added independent runtimes for different deployment scenarios:
