@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import select
 from app.core.database.repo.communication import CommunicationRepo
-from app.core.database import UsersMessages, Room, User
+from app.core.database.models import UsersMessages, Room, User
 from datetime import datetime
 
 from tests.conftest import add_and_commit # Assuming this helper is well-defined

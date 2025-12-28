@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import select
 
-from app.core.database import User, Room, WishRoom
-from app.core.database.repo import WishRepo
+from app.core.database.models import User, Room, WishRoom
+from app.core.database.repo.wishes import WishRepo
 from tests.conftest import add_and_commit
 
 

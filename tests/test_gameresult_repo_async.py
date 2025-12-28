@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import select
 
-from app.core.database import Room, User, GameResult
-from app.core.database.repo import GameResultRepo
+from app.core.database.models import Room, User, GameResult
+from app.core.database.repo.game_result import GameResultRepo
 from tests.conftest import add_and_commit
 
 

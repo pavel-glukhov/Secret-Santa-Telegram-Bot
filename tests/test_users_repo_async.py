@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.core.database import User, Room
-from app.core.database.repo import UserRepo
+from app.core.database.models import User, Room
+from app.core.database.repo.users import UserRepo
 from tests.conftest import add_and_commit
 
 

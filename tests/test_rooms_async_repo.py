@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import select
 
-from app.core.database import Room, User
-from app.core.database.repo import RoomRepo
+from app.core.database.models import Room, User
+from app.core.database.repo.rooms import RoomRepo
 from tests.conftest import add_and_commit
 
 
