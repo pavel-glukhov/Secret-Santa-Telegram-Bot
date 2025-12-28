@@ -78,9 +78,18 @@ def personal_room_keyboard_formatter(
 def generate_inline_keyboard(buttons: dict) -> types.InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for key, val in buttons.items():
-        button = types.InlineKeyboardButton(
-            text=key,
-            callback_data=val
-        )
+        if isinstance(val, dict) and val.get("is_invite"):
+            button = types.InlineKeyboardButton(
+                text=key,
+                switch_inline_query_chosen_chat=types.SwitchInlineQueryChosenChat(
+                    query=val.get("query", ""),
+                    allow_user_chats=True,
+                    allow_group_chats=True
+                )
+            )
+        else:
+            params = val if isinstance(val, dict) else {"callback_data": val}
+            button = types.InlineKeyboardButton(text=key, **params)
+
         builder.row(button)
     return builder.as_markup()

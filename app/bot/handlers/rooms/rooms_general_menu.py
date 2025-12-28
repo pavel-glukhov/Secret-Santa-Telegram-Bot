@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.bot.handlers.formatters import profile_information_formatter
 from app.bot.keyborads.common import generate_inline_keyboard
 from app.bot.languages.schemes import TranslationMainSchema
+from app.core.config.app_config import load_config
 from app.core.database.repo.game_result import GameResultRepo
 from app.core.database.repo.rooms import RoomRepo
 from app.core.scheduler.operations import TaskScheduler
@@ -33,7 +34,7 @@ async def my_room(callback: types.CallbackQuery,
     keyboard_dict = _generate_keyboard_dict(
         room_number, is_room_owner, scheduler_task, lang)
 
-    message_text = _generate_message_text(room, scheduler_task, lang)
+    message_text = _generate_message_text(room, scheduler_task, lang, user_id)
 
     await callback.message.edit_text(
         text=message_text,
@@ -45,6 +46,8 @@ def _generate_keyboard_dict(room_number: int,
                             is_room_owner: bool,
                             scheduler_task,
                             lang: TranslationMainSchema) -> dict:
+    app_config = load_config()
+
     show_wishes_button = lang.buttons.room_menu.user_room_buttons.room_show_wish
     leave_room_button = lang.buttons.room_menu.user_room_buttons.room_exit
     return_back_button = lang.buttons.return_back_button
@@ -62,12 +65,20 @@ def _generate_keyboard_dict(room_number: int,
         start_game_button_name = (lang.buttons.room_menu.user_room_buttons.started_game
                                   if scheduler_task
                                   else lang.buttons.room_menu.user_room_buttons.start_game)
-        member_list_button =  lang.buttons.room_menu.user_room_buttons.room_member_list
+        member_list_button = lang.buttons.room_menu.user_room_buttons.room_member_list
         room_settings_button = lang.buttons.room_menu.user_room_buttons.configuration
+        invite_friend = lang.buttons.room_menu.user_room_buttons.invite_friend
+
+        room_url = f'https://t.me/{app_config.bot.telegram_login}?start=room_{room_number}'
+        invite_msg = lang.messages.rooms_menu.subscribe.invited_from_room_menu.format(room_url=room_url)
 
         owner_keyboard = {
             start_game_button_name: f'room_start-game_{room_number}',
             member_list_button: f'room_member-list_{room_number}',
+            invite_friend: {
+                "is_invite": True,
+                "query": invite_msg
+            },
             room_settings_button: f'room_config_{room_number}'
         }
         owner_keyboard.update(is_not_owner_keyboard)
@@ -75,12 +86,18 @@ def _generate_keyboard_dict(room_number: int,
     return is_not_owner_keyboard
 
 
-def _generate_message_text(room, scheduler_task, lang) -> str:
+def _generate_message_text(room, scheduler_task, lang, user_id) -> str:
+    app_config = load_config()
     text_control_room = lang.messages.rooms_menu.main.text_control_room.format(
         room_name=room.name,
         room_number=room.number,
-        room_budget=room.budget
+        room_budget=room.budget,
     )
+    if user_id == room.owner_id:
+        room_url = lang.messages.rooms_menu.main.text_control_room_url.format(
+        room_url=f"https://t.me/{app_config.bot.telegram_login}?start=room_{room.number}"
+        )
+        text_control_room += room_url
 
     if scheduler_task:
         next_time_run = scheduler_task.next_run_time.strftime("%Y-%b-%d")
@@ -118,7 +135,6 @@ async def _room_is_closed(callback: types.CallbackQuery,
 def _generate_inactive_room_response(room_number: int,
                                      room_owner: bool,
                                      lang: TranslationMainSchema) -> tuple[str, dict]:
-
     activate_room_button = lang.buttons.room_menu.user_room_buttons.room_activate
     room_settings_button = lang.buttons.room_menu.user_room_buttons.configuration
     return_back_button = lang.buttons.return_back_button
@@ -146,7 +162,6 @@ def _generate_inactive_room_response(room_number: int,
 def _generate_active_room_response(room_number: int,
                                    recipient,
                                    lang: TranslationMainSchema) -> tuple[str, dict]:
-
     contact_to_santa_button = lang.buttons.room_menu.user_room_buttons.room_closed_con_san
     contact_to_recipient = lang.buttons.room_menu.user_room_buttons.room_closed_con_rec
     return_back_button = lang.buttons.return_back_button

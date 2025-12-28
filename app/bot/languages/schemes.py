@@ -50,6 +50,7 @@ class ProfileMenu(BaseModel):
 
 class RoomsMenuMain(BaseModel):
     text_control_room: str
+    text_control_room_url: str
     text_control_room_not_scheduler: str
     text_control_room_scheduler: str
     room_closed_uns: str
@@ -110,7 +111,7 @@ class Subscribe(BaseModel):
     subscribe_second_msg: str
     subscribe_third_msg: str
     room_invitation: str
-
+    invited_from_room_menu: str
 
 class Unsubscribe(BaseModel):
     unsubscribe_first_msg: str
@@ -212,6 +213,7 @@ class RoomMenuUserButtons(BaseModel):
     room_activate: str
     room_closed_con_san: str
     room_closed_con_rec: str
+    invite_friend: str
 
 
 class ConfigMenu(BaseModel):

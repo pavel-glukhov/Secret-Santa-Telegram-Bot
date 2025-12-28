@@ -6,7 +6,7 @@
         "allowed_actions": "Available actions:",
         "language_selection": "\uD83C\uDDEC\uD83C\uDDE7 First, choose the bot's language.\n\n",
         "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
-        "start_message": "Ho-ho-ho! It's time to play Secret Santa!\n\nCreate your room for friends, or join an existing one.",
+        "start_message": "🎅 Ho-ho-ho! Welcome to Secret Santa!\n\nCreate a cozy room for your friends 🎁\n or join an existing one and join the fun! ✨",
         "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile settings</b>.\n\n❗ <b>Otherwise, Santa won't be able to send you a gift.</b>\n\n",
         "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\nCurrent limitations:\nOne player can own only {room_user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
       },
@@ -39,6 +39,7 @@
       "rooms_menu": {
         "main": {
           "text_control_room": "<b>Room management: {room_name} ({room_number})</b>\n\n<b>Budget</b>: {room_budget}\n\n",
+          "text_control_room_url": "Invitation: {room_url}\n",
           "text_control_room_not_scheduler": "<b>The draw time has not yet been set.</b>",
           "text_control_room_scheduler": "<b>\uD83D\uDD53 The game in the current room is scheduled for {next_time_run}</b>\n\n",
           "room_closed_uns": "<b>The game in room {room_number} has ended!</b>\n\nUnfortunately, the number of players was insufficient for a full draw.\n",
@@ -88,9 +89,10 @@
           "room_is_not_exist_or_closed": "The room you entered does not exist, or the game is over.\nEnter a valid room number.",
           "room_is_not_exist_or_closed_invitation": "The room you entered does not exist, or the game is over.",
           "subscribe_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nEnter the room number you want to join.\n",
-          "subscribe_second_msg": "To join the room, write your wishes for the gift.\n\nMaybe you have a hobby and want something special?\n\nYour comments will help Secret Santa choose a gift for you.\n",
-          "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room <b>{room_number}</b>.\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B",
-          "room_invitation": "Ho Ho Ho! You've been invited to the room: <b>{room_name} ({room_id})</b> \uD83C\uDF85\n\nJoin the game by clicking enter and specifying your gift wishes."
+          "subscribe_second_msg": "\uD83C\uDF85 Ho-ho-ho!\n\n\uD83C\uDF81 What gift would make you smile?\n\nShare your hobbies or wishes — Secret Santa will take notes! ✨",
+          "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room: <b>{room_number}</b>.\n\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B",
+          "room_invitation": "\uD83C\uDF85 Ho-ho-ho!\n\nYou’ve been invited to the Secret Santa room: <b>{room_name} ({room_id})</b> \uD83C\uDF81\n\nClick Enter, share your gift wishes, and join the holiday fun! ✨",
+          "invited_from_room_menu":"Join the room to play Secret Santa \uD83C\uDF85 {room_url}"
         },
         "unsubscribe": {
           "unsubscribe_first_msg": "You left the room <b>{room_number}</b>.",
@@ -182,7 +184,8 @@
           "configuration": "Settings ⚒",
           "room_activate": "Activate room ✅",
           "room_closed_con_san": "Contact Santa",
-          "room_closed_con_rec": "Contact recipient"
+          "room_closed_con_rec": "Contact recipient",
+          "invite_friend": "Invite a friend ➕"
         },
         "config_menu": {
           "room_change_name": "Change room name ⚒",
