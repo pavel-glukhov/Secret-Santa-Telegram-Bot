@@ -39,7 +39,7 @@
       "rooms_menu": {
         "main": {
           "text_control_room": "<b>Бөлмесін басқару: {room_name} ({room_number})</b>\n\n<b>Бюджет</b>: {room_budget}\n\n",
-          "text_control_room_url": "Шақыру: {room_url}\n",
+          "text_control_room_url": "Шақыру: {room_url}\n\n",
           "text_control_room_not_scheduler": "<b>Жеребе уақыты әлі белгіленбеген.</b>",
           "text_control_room_scheduler": "<b>\uD83D\uDD53 Ағымдағы бөлмедегі ойын {next_time_run} уақытында жоспарланған</b>\n\n",
           "room_closed_uns": "<b>{room_number} бөлмесіндегі ойын аяқталды!</b>\n\nӨкінішке орай, ойыншылар саны толық жеребе үшін жеткіліксіз болды.\n",
