@@ -16,7 +16,7 @@ Supports 4 languages:
 ---
 ## Changelog
 
-`**v 0.4.3**
+**v 0.4.3**
 - Updated dialogues
 - Added 'invite friend' button in room's menu
 - Fixed some bugs`
