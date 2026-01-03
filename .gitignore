@@ -110,7 +110,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+.env.dev
+.env.stage
+.env.test
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -155,3 +157,10 @@ test.py
 /ngrok.bat
 /.env_stage
 /.env_prod
+Index: config/rclone/gdrive_key.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+/config/rclone/gdrive_key.json
+
