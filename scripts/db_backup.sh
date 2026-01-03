@@ -1,6 +1,6 @@
 #!/bin/bash
-PROJECT_DIR="/opt/secret-santa-bot"
-cd "$PROJECT_DIR"
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+cd "SCRIPT_DIR"
 export $(grep -v '^#' .env.dev | xargs)
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
