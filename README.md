@@ -146,30 +146,34 @@ Create `.env` based on `.env.example`.
 
 ## Environment Variables
 
-| Category | Variable | Description | Default Value | Notes |
-|--------|----------|-------------|---------------|-|
-| **Security** | `ENCRYPT_SECRET_KEY` | Base64-encoded 32-byte secret key used for data encryption | ❌ *none* | Required. Generate via `python manage.py generate_key` |
-| **Telegram Bot** | `TELEGRAM_TOKEN` | Telegram bot token from @BotFather | ❌ *none* | Required |
-|  | `TELEGRAM_LOGIN` | Bot username without `@` | ❌ *none* | Example: `my_bot_name` |
-|  | `SUPPORT_ACCOUNT` | Support contact (Telegram username) | ❌ *none* | Shown on About page |
-| **Room Configuration** | `ROOM_NUMBER_LENGTH` | Length of generated room ID | `6` | Allowed: `5–8` |
-|  | `USER_ROOMS_LIMIT` | Maximum rooms per user | `3` ||
-| **Database (PostgreSQL)** | `DATABASE_NAME` | PostgreSQL database name | ❌ *none* ||
-|  | `DATABASE_USER` | Database user | ❌ *none* ||
-|  | `DATABASE_PASSWORD` | Database password | ❌ *none* | ⚠️ keep secret|
-|  | `DATABASE_HOST` | Database host | `db` | `db` for Docker, `localhost` for local|
-|  | `DATABASE_PORT` | PostgreSQL port | `5432` ||
-|  | `POOL_SIZE` | Number of persistent DB connections | `5` ||
-|  | `MAX_OVERFLOW` | Max temporary connections beyond pool | `10` ||
-| **Redis** | `REDIS_HOST` | Redis host | `redis` | `redis` for Docker, `localhost` for local |
-|  | `REDIS_PORT` | Redis port | `6379` ||
-|  | `REDIS_DB` | Redis database index | `0` ||
-|  | `REDIS_PASSWORD` | Redis password | *(empty)* | If auth is disabled|
-| **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Domain name for webhook (no http/https) | ❌ *none* | Required for webhook |
-|  | `EMAIL` | Email for SSL certificates | ❌ *none* | Required for webhook |
-| **System** | `SERVER_TIMEZONE` | Server timezone | `Asia/Almaty` ||
+| Category | Variable | Description                                                | Default Value | Notes                                                                                                                |
+|--------|----------|------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------|
+| **Security** | `ENCRYPT_SECRET_KEY` | Base64-encoded 32-byte secret key used for data encryption | ❌ *none* | Required. Generate via `python manage.py generate_key`                                                               |
+| **Telegram Bot** | `TELEGRAM_TOKEN` | Telegram bot token from @BotFather                         | ❌ *none* | Required                                                                                                             |
+|  | `TELEGRAM_LOGIN` | Bot username without `@`                                   | ❌ *none* | Example: `my_bot_name`                                                                                               |
+|  | `TELEGRAM_CHAT_ID` | Chat ID of administrator                                   | ❌ *none* | required for sending errors during backups. The bot should be able to send messages to this ID. Example: `999999999` |
+|  | `SUPPORT_ACCOUNT` | Support contact (Telegram username)                        | ❌ *none* | Shown on About page                                                                                                  |
+| **Room Configuration** | `ROOM_NUMBER_LENGTH` | Length of generated room ID                                | `6` | Allowed: `5–8`                                                                                                       |
+|  | `USER_ROOMS_LIMIT` | Maximum rooms per user                                     | `3` |                                                                                                                      |
+| **Database (PostgreSQL)** | `DATABASE_NAME` | PostgreSQL database name                                   | ❌ *none* |                                                                                                                      |
+|  | `DATABASE_USER` | Database user                                              | ❌ *none* |                                                                                                                      |
+|  | `DATABASE_PASSWORD` | Database password                                          | ❌ *none* | ⚠️ keep secret                                                                                                       |
+|  | `DATABASE_HOST` | Database host                                              | `db` | `db` for Docker, `localhost` for local                                                                               |
+|  | `DATABASE_PORT` | PostgreSQL port                                            | `5432` |                                                                                                                      |
+|  | `POOL_SIZE` | Number of persistent DB connections                        | `5` |                                                                                                                      |
+|  | `MAX_OVERFLOW` | Max temporary connections beyond pool                      | `10` |                                                                                                                      |
+| **Redis** | `REDIS_HOST` | Redis host                                                 | `redis` | `redis` for Docker, `localhost` for local                                                                            |
+|  | `REDIS_PORT` | Redis port                                                 | `6379` |                                                                                                                      |
+|  | `REDIS_DB` | Redis database index                                       | `0` |                                                                                                                      |
+|  | `REDIS_PASSWORD` | Redis password                                             | *(empty)* | If auth is disabled                                                                                                  |
+| **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Domain name for webhook (no http/https)                    | ❌ *none* | Required for webhook                                                                                                 |
+|  | `EMAIL` | Email for SSL certificates                                 | ❌ *none* | Required for webhook                                                                                                 |
+| **System** | `SERVER_TIMEZONE` | Server timezone                                            | `Asia/Almaty` |                                                                                                                      |
 
-
+### Preparation
+When using Docker, run first **setup.sh** to create the necessary directories for the local backup.
+Docker compose scripts are written for local backup with backups copied to Google drive. 
+To backup to GDrive, you will need to create a service account and receive a token in json format.
 
 ### Deployment Modes
 

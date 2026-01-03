@@ -144,29 +144,39 @@
 Создайте `.env` согласно примеру `.env.example`.
 
 ## Environment Variables
-| Category | Variable | Description | Default Value | Notes |
-|--------|----------|-------------|---------------|---|
-| **Security** | `ENCRYPT_SECRET_KEY` | Base64-кодированный 32-байтовый секретный ключ для шифрования данных | ❌ *нет* | Обязателен. Генерация: `python manage.py generate_key` |
-| **Telegram Bot** | `TELEGRAM_TOKEN` | Токен Telegram-бота от @BotFather | ❌ *нет* | Обязателен |
-|  | `TELEGRAM_LOGIN` | Username бота без `@` | ❌ *нет* | Пример: `my_bot_name` |
-|  | `SUPPORT_ACCOUNT` | Контакт поддержки (Telegram) | ❌ *нет* | Отображается на странице About |
-| **Room Configuration** | `ROOM_NUMBER_LENGTH` | Длина генерируемого ID комнаты | `6` | Допустимо: `5–8` |
-|  | `USER_ROOMS_LIMIT` | Максимальное число комнат на пользователя | `3` | |
-| **Database (PostgreSQL)** | `DATABASE_NAME` | Название базы данных | ❌ *нет* | |
-|  | `DATABASE_USER` | Пользователь БД | ❌ *нет* ||
-|  | `DATABASE_PASSWORD` | Пароль пользователя БД | ❌ *нет* | ⚠️ хранить в секрете |
-|  | `DATABASE_HOST` | Хост БД | `db` | `db` — Docker, `localhost` — локально |
-|  | `DATABASE_PORT` | Порт PostgreSQL | `5432` ||
-|  | `POOL_SIZE` | Количество постоянных соединений в пуле | `5` | |
-|  | `MAX_OVERFLOW` | Макс. временных соединений сверх пула | `10` | |
-| **Redis** | `REDIS_HOST` | Хост Redis | `redis` | `redis` — Docker, `localhost` — локально |
-|  | `REDIS_PORT` | Порт Redis | `6379` ||
-|  | `REDIS_DB` | Номер базы Redis | `0` | |
-|  | `REDIS_PASSWORD` | Пароль Redis | *(пусто)* | Если не используется |
-| **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Домен для webhook (без http/https) | ❌ *нет* | Обязателен для webhook |
-|  | `EMAIL` | Email для Certbot | ❌ *нет* | Обязателен для webhook |
-| **System** | `SERVER_TIMEZONE` | Таймзона сервера | `Asia/Almaty` ||
+| Category | Variable | Description                                                          | Default Value | Notes                                                                                                                                   |
+|--------|----------|----------------------------------------------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| **Security** | `ENCRYPT_SECRET_KEY` | Base64-кодированный 32-байтовый секретный ключ для шифрования данных | ❌ *нет* | Обязателен. Генерация: `python manage.py generate_key`                                                                                  |
+| **Telegram Bot** | `TELEGRAM_TOKEN` | Токен Telegram-бота от @BotFather                                    | ❌ *нет* | Обязателен                                                                                                                              |
+|  | `TELEGRAM_LOGIN` | Username бота без `@`                                                | ❌ *нет* | Пример: `my_bot_name`                                                                                                                   |
+|  | `TELEGRAM_CHAT_ID` | Chat ID Администратора | ❌ *none* | Требуется для получения ошибок бекапа в случае возникновения проблем. Бот должен иметь права отправлять на этот ID. Пример: `999999999` |
+|  | `SUPPORT_ACCOUNT` | Контакт поддержки (Telegram)                                         | ❌ *нет* | Отображается на странице About                                                                                                          |
+| **Room Configuration** | `ROOM_NUMBER_LENGTH` | Длина генерируемого ID комнаты                                       | `6` | Допустимо: `5–8`                                                                                                                        |
+|  | `USER_ROOMS_LIMIT` | Максимальное число комнат на пользователя                            | `3` |                                                                                                                                         |
+| **Database (PostgreSQL)** | `DATABASE_NAME` | Название базы данных                                                 | ❌ *нет* |                                                                                                                                         |
+|  | `DATABASE_USER` | Пользователь БД                                                      | ❌ *нет* |                                                                                                                                         |
+|  | `DATABASE_PASSWORD` | Пароль пользователя БД                                               | ❌ *нет* | ⚠️ хранить в секрете                                                                                                                    |
+|  | `DATABASE_HOST` | Хост БД                                                              | `db` | `db` — Docker, `localhost` — локально                                                                                                   |
+|  | `DATABASE_PORT` | Порт PostgreSQL                                                      | `5432` |                                                                                                                                         |
+|  | `POOL_SIZE` | Количество постоянных соединений в пуле                              | `5` |                                                                                                                                         |
+|  | `MAX_OVERFLOW` | Макс. временных соединений сверх пула                                | `10` |                                                                                                                                         |
+| **Redis** | `REDIS_HOST` | Хост Redis                                                           | `redis` | `redis` — Docker, `localhost` — локально                                                                                                |
+|  | `REDIS_PORT` | Порт Redis                                                           | `6379` |                                                                                                                                         |
+|  | `REDIS_DB` | Номер базы Redis                                                     | `0` |                                                                                                                                         |
+|  | `REDIS_PASSWORD` | Пароль Redis                                                         | *(пусто)* | Если не используется                                                                                                                    |
+| **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Домен для webhook (без http/https)                                   | ❌ *нет* | Обязателен для webhook                                                                                                                  |
+|  | `EMAIL` | Email для Certbot                                                    | ❌ *нет* | Обязателен для webhook                                                                                                                  |
+| **System** | `SERVER_TIMEZONE` | Таймзона сервера                                                     | `Asia/Almaty` |                                                                                                                                         |
 
+
+###  Подготовка
+При использовании Docker, запустите сначала **setup.sh** для создания необходимых директорий для локального бекапа.
+Docker compose сценарии написаны для локального бекапа с копированием бекапов в Google drive.
+Для бекапа GDrive вам потребуется создать сервисный аккаунт и получить токен в формате json.
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
 ### Режимы запуска
 
