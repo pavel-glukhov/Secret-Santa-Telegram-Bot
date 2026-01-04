@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROJECT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-export $(grep -v '^#' .env.dev | xargs)
+export $(grep -v '^#' .env | xargs)
 
 echo "--- Project Initialization (Secure Version) ---"
 
