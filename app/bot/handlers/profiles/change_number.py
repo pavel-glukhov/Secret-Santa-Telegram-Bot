@@ -72,5 +72,5 @@ async def process_changing_owner(message: types.Message,
         await bot_message.edit_text(text=message_text, reply_markup=keyboard_inline)
         await state.clear()
     else:
-        message_text = lang.messages.profile_menu.change_number.error
+        message_text = lang.messages.profile_menu.change_number.error.format(text=message.text)
         return await bot_message.edit_text(text=message_text, reply_markup=cancel_keyboard_inline)
