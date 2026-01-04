@@ -149,7 +149,7 @@
 | **Security** | `ENCRYPT_SECRET_KEY` | Base64-кодированный 32-байтовый секретный ключ для шифрования данных | ❌ *нет* | Обязателен. Генерация: `python manage.py generate_key`                                                                                  |
 | **Telegram Bot** | `TELEGRAM_TOKEN` | Токен Telegram-бота от @BotFather                                    | ❌ *нет* | Обязателен                                                                                                                              |
 |  | `TELEGRAM_LOGIN` | Username бота без `@`                                                | ❌ *нет* | Пример: `my_bot_name`                                                                                                                   |
-|  | `TELEGRAM_CHAT_ID` | Chat ID Администратора | ❌ *none* | Требуется для получения ошибок бекапа в случае возникновения проблем. Бот должен иметь права отправлять на этот ID. Пример: `999999999` |
+|  | `TELEGRAM_CHAT_ID` | Chat ID Администратора                                               | ❌ *none* | Требуется для получения ошибок бекапа в случае возникновения проблем. Бот должен иметь права отправлять на этот ID. Пример: `999999999` |
 |  | `SUPPORT_ACCOUNT` | Контакт поддержки (Telegram)                                         | ❌ *нет* | Отображается на странице About                                                                                                          |
 | **Room Configuration** | `ROOM_NUMBER_LENGTH` | Длина генерируемого ID комнаты                                       | `6` | Допустимо: `5–8`                                                                                                                        |
 |  | `USER_ROOMS_LIMIT` | Максимальное число комнат на пользователя                            | `3` |                                                                                                                                         |
@@ -167,6 +167,7 @@
 | **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Домен для webhook (без http/https)                                   | ❌ *нет* | Обязателен для webhook                                                                                                                  |
 |  | `EMAIL` | Email для Certbot                                                    | ❌ *нет* | Обязателен для webhook                                                                                                                  |
 | **System** | `SERVER_TIMEZONE` | Таймзона сервера                                                     | `Asia/Almaty` |                                                                                                                                         |
+|  | `BACKUP_ROOT` | Локальная папка для бекапов postgres и redis                         | `/var/backups/secret-santa-bot` |                                                                                                                      |
 
 
 ###  Подготовка

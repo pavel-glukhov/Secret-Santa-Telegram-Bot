@@ -147,7 +147,7 @@ Create `.env` based on `.env.example`.
 ## Environment Variables
 
 | Category | Variable | Description                                                | Default Value | Notes                                                                                                                |
-|--------|----------|------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------|
+|--|----------|------------------------------------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------|
 | **Security** | `ENCRYPT_SECRET_KEY` | Base64-encoded 32-byte secret key used for data encryption | ❌ *none* | Required. Generate via `python manage.py generate_key`                                                               |
 | **Telegram Bot** | `TELEGRAM_TOKEN` | Telegram bot token from @BotFather                         | ❌ *none* | Required                                                                                                             |
 |  | `TELEGRAM_LOGIN` | Bot username without `@`                                   | ❌ *none* | Example: `my_bot_name`                                                                                               |
@@ -169,6 +169,7 @@ Create `.env` based on `.env.example`.
 | **Webhook & SSL (Certbot)** | `DOMAIN_NAME` | Domain name for webhook (no http/https)                    | ❌ *none* | Required for webhook                                                                                                 |
 |  | `EMAIL` | Email for SSL certificates                                 | ❌ *none* | Required for webhook                                                                                                 |
 | **System** | `SERVER_TIMEZONE` | Server timezone                                            | `Asia/Almaty` |                                                                                                                      |
+|  | `BACKUP_ROOT` | local folder for postgres and redis backups                | `/var/backups/secret-santa-bot` |                                                                                                                      |
 
 ### Preparation
 When using Docker, run first **setup.sh** to create the necessary directories for the local backup.
