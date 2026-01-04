@@ -7,8 +7,8 @@
         "language_selection": "\uD83C\uDDEC\uD83C\uDDE7 First, choose the bot's language.\n\n",
         "select_language_answer": "You have set the language to <b>{language}</b>. To start using the bot, press 'Continue'",
         "start_message": "🎅 Ho-ho-ho! Welcome to Secret Santa!\n\nCreate a cozy room for your friends 🎁\n or join an existing one and join the fun! ✨",
-        "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile settings</b>.\n\n❗ <b>Otherwise, Santa won't be able to send you a gift.</b>\n\n",
-        "about_message": "<b>Secret Santa</b> is a game often played before Christmas or New Year in teams, families, or among friends.\n\n  It's an adaptation of a game where you need to join one of the groups or create your own and invite your friends.\n  In each group, every participant becomes a Secret Santa for the person whose name they draw.\n  Then, each Secret Santa must prepare a gift for their recipient, remaining anonymous.\n  Gifts should be sent to the address provided during the draw.\n  At the end of the game, when all participants have received their gifts, players can reveal their secret identity and share their impressions of the gifts.\n\nThis bot is completely free.\n\n**Current limitations**:\nOne player can own only {room_user_rooms_count} rooms.\n\n  If you encounter errors or have questions, you can contact @{support_account}\n\n"
+        "menu_reminder": "❗ <b>Don't forget to update your contact information in the profile</b>.\n\n🎁 <b>Without address and phone number, Santa won't be able to send you a gift.</b>\n\n",
+        "about_message": "<b>Secret Santa</b> is a festive game held before New Year or Christmas among friends, colleagues, or family 🎄\n\n🎁 You can:\n— create your own room and invite friends\n— or join an existing one\n\nAfter the game starts, each participant is randomly assigned a recipient.\nYou become a Secret Santa for one of the players and prepare a gift for them anonymously ✨\n\n📦 The gift is sent to the address provided in the profile.\nAfter receiving the gifts, players can reveal their secret identities and share impressions.\n\n🤝 The bot is completely free.\n\n⚠️ Restrictions:\nOne user can own no more than {room_user_rooms_count} rooms.\n\n✉️ If you have questions or errors — contact @{support_account}"
       },
       "profile_menu": {
         "main_menu": {
@@ -16,7 +16,7 @@
           "profile_edit_message": "Choose what you want to change:"
         },
         "change_address": {
-          "change_address_first_msg": "For your Secret Santa to send you a package, please provide the address where the package should be sent and don't forget to include:\n\n<b>— Country</b>\n<b>— Region</b>\n<b>— City</b>\n<b>— Street</b>\n<b>— House</b>\n<b>— Apartment</b>\n<b>— Floor</b>*\n<b>— Intercom number if different from the apartment</b>\n<b>— Postal code</b>\n\n<b>For example: United Kingdom, Greater London, Westminster, Downing Street, House 10, Apt. 5, Floor 3, Postal code SW1A 2AA.</b>\n",
+          "change_address_first_msg": "For Secret Santa to send you a gift \uD83C\uDF81, provide the full delivery address.\n\nBe sure to include:\n<b>— Country</b>\n<b>— Region</b>\n<b>— City</b>\n<b>— Street</b>\n<b>— House</b>\n<b>— Apartment</b>\n<b>— Floor</b>*\n<b>— Intercom number, if different from apartment</b>\n<b>— Postal code</b>\n\n<b>Example: Russia, Moscow region, Fryazino, Pupkina st., 99, apt. 999, floor 25, postal code 123987.</b>\n",
           "change_address_second_msg": "Address changed.",
           "error": "Address data cannot exceed 150 characters. Try again."
         },
@@ -28,7 +28,7 @@
         "change_number": {
           "change_number_first_msg": "Provide your phone number so that postal services can notify you about the gift.\n\n<b>Enter your number using the format: +7|8(___)___-__-__ </b> \n<b>For example:</b> +7 700 111 11 11",
           "change_number_second_msg": "Number changed.",
-          "error": "<b>❌Invalid number format❌\n</b>Your message: {text}, try again.\nTry again.\n\n<b>Enter your number using the format: +7|8(___)___-__-__ </b> \n<b>For example:</b> +7 700 111 11 11"
+          "error": "<b>❌Invalid phone format❌\n</b>You entered: {text}, try again.\nTry again using format: <b>+7 or 8 (XXX) XXX-XX-XX</b> \n<b>Example:</b> +7 700 111 11 11"
         },
         "delete_information": {
           "delete_information_first_msg": "⚠️ Tap confirm if you really want to delete all your personal data.\n\n",
@@ -50,14 +50,14 @@
           "activate_msg": "The room has been reactivated."
         },
         "change_budget": {
-          "long_budget": "You entered a message that is too long for the budget.\nThe message cannot exceed 16 characters\nTo change your budget, send a new message.\n",
+          "long_budget": "Message too long ❌\n\nBudget cannot exceed 16 characters.\nPlease send a new value.",
           "change_budget_first_msg": "Specify a new budget for the players in your room for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
           "change_budget_second_msg": "The budget for room {room_number} has been updated.\n\n<b>New value</b>: {new_budget}"
         },
         "change_owner": {
           "user_is_not_exist": "This participant was not found.",
           "error": "This participant cannot be appointed as the room owner.",
-          "change_owner_room_first_msg": "Want to change the room owner?\nThe new owner must be a participant in the room.\n<b>Keep in mind, you will lose control of the room.</b>\n\n<b>To change the owner, write their nickname.</b>\n",
+          "change_owner_room_first_msg": "Do you want to transfer room ownership?\n\n⚠️ The new owner must be a participant of this room.\n⚠️ After the transfer, you will lose control of the room.\n\n<b>To continue, type the new owner's nickname.</b>",
           "change_owner_room_second_msg": "Ho-ho-ho! \uD83C\uDF85\n\nI changed the owner, now it's <b>{new_owner}</b>"
         },
         "settings_menu": {
@@ -66,13 +66,13 @@
         "create_new_room": {
           "limit": "<b>A new room cannot be created, as you have reached the limit.</b>\n\nYou can own up to {maximal_count_rooms} rooms.",
           "long_room_name": "You entered a name that is too long, please come up with another one.\nThe room name must not exceed 16 characters.\n",
-          "long_budget": "You entered a message that is too long for the budget.\nThe message cannot exceed 16 characters\nTo change your budget, send a new message.\n",
-          "create_new_room_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nWhat would you like to name your room?\nWrite its name, and we'll proceed\n\nThe name must not exceed 16 characters.\n",
-          "create_new_room_second_msg": "Accepted! Your room name is <b>{room_name}</b>\n\nNow specify the maximum budget for the Secret Santa gift.\nWrite the amount in any format, for example, 2000 tenge, 200 rubles, or $20\n\nThe message length should not exceed 16 characters.",
-          "create_new_room_third_msg": "Accepted! Your budget is <b>{room_budget}</b>\n\nAnd the last question:\nWrite your gift preferences. Perhaps you have a hobby, and you'd like something special?\n",
+          "long_budget": "Message too long ❌\n\nBudget cannot exceed 16 characters.\nPlease send a new value.",
+          "create_new_room_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nLet's create a new room \uD83C\uDF81\nType the name of your room.\n\n⚠️ Room name should not exceed 16 characters.\n",
+          "create_new_room_second_msg": "Great! 🎄\nRoom name: <b>{room_name}</b>\n\nNow set the maximum gift budget 🎁\nType the amount in any format:\nfor example 2000 KZT, 200 RUB or 20$\n\n⚠️ Message must not exceed 16 characters.",
+          "create_new_room_third_msg": "Almost ready ✨\n\nWrite your gift wishes.\nMaybe you have a hobby or an idea of what you would like to receive 🎁",
           "create_new_room_forth_msg": "Ho-ho-ho! \uD83C\uDF85\n\nThe room <b>\"{room_name}\"</b> has been created.\nHere is the room number <b>{room_number}</b>\nShare this code with your friends so they can join your game.\n\n",
           "create_new_room_additional_msg": "In the meantime, you can go back and update your profile.",
-          "join_room_url":"Or share this link with friends to join the room:\n\n{url}"
+          "join_room_url": "Or share this link with friends to join the room:\n\n{url}"
         },
         "delete_room": {
           "delete_room_first_msg": "❌<b>The room will be deleted without the possibility of recovery</b>.\n\nTo confirm the deletion of room <b>{room_number}</b>, enter <b>confirm</b> in the chat.\n\n ",
@@ -89,10 +89,10 @@
           "room_is_not_exist_or_closed": "The room you entered does not exist, or the game is over.\nEnter a valid room number.",
           "room_is_not_exist_or_closed_invitation": "The room you entered does not exist, or the game is over.",
           "subscribe_first_msg": "Ho-ho-ho! \uD83C\uDF85\n\nEnter the room number you want to join.\n",
-          "subscribe_second_msg": "\uD83C\uDF85 Ho-ho-ho!\n\n\uD83C\uDF81 What gift would make you smile?\n\nShare your hobbies or wishes — Secret Santa will take notes! ✨",
+          "subscribe_second_msg": "🎅 Ho-ho-ho!\n\n🎁 What gift would make you smile?\n\nTell us about your wishes or hobbies —\nSecret Santa will definitely consider them ✨",
           "subscribe_third_msg": "Ho-ho-ho! \uD83C\uDF85\n\nYou joined the room: <b>{room_number}</b>.\n\nNow you can play with your friends.\nStay tuned for announcements from the room owner.\n\nHave a great game! \uD83D\uDE0B",
           "room_invitation": "\uD83C\uDF85 Ho-ho-ho!\n\nYou’ve been invited to the Secret Santa room: <b>{room_name} ({room_id})</b> \uD83C\uDF81\n\nClick Enter, share your gift wishes, and join the holiday fun! ✨",
-          "invited_from_room_menu":"Join the room to play Secret Santa \uD83C\uDF85 {room_url}"
+          "invited_from_room_menu": "Join the room to play Secret Santa \uD83C\uDF85 {room_url}"
         },
         "unsubscribe": {
           "unsubscribe_first_msg": "You left the room <b>{room_number}</b>.",
@@ -107,7 +107,7 @@
       "game_menu": {
         "start_game": {
           "time_zone_inf": "⚠️ Your time zone is not set. To set the correct time, you need to specify your time zone, otherwise the server time will be used.",
-          "count_players": "<b>At least 3 participants are required to start the game</b>",
+          "count_players": "<b>At least 3 participants are required to start the game</b>\n\nInvite friends and try again 🎄",
           "time_not_set": "<b>Time is not set</b>\n\n<b>At least 3 participants are required to start the game</b>\n\n<b>Your time zone</b>: {timezone}",
           "time_set_to": "The mailing date is set for {datetime_set_to}",
           "expired_datetime": "❌ You have entered a past date. Please try again and specify a correct date and time for the draw. \n\n<b>Server time:</b> {current_time_str}\n<b>Your specified time:</b> {datetime_obj_str}",
@@ -224,7 +224,7 @@
     "message_formatter": {
       "address_is_not_specified": "The player did not provide their address, contact the participant via chat to clarify the information",
       "number_is_not_specified": "The player did not provide their contact number, contact the participant via chat to clarify the information",
-      "message_text": "------------\n<b>Hello {sender_name}!</b>\n<b>Congratulations, you have become a Secret Santa!!!!!</b> \uD83D\uDCA5\uD83D\uDCA5\n\n<b>Your recipient:</b>\n<b>Name:</b> {full_name}\n\n<b>Address:</b> {address}\n\n<b>Phone:</b> {number}\n\n<b>Gift wishes:</b> {receiver_wish}\n\n<b>Quickly run to the post office and send your gift!</b> \uD83C\uDFC3 \n------------\n"
+      "message_text": "------------\n<b>Hello, {sender_name}!</b> 🎅\n\n🎉 Congratulations!\nYou became <b>Secret Santa</b> ✨\n\n🎁 <b>Your recipient:</b>\n<b>Name:</b> {full_name}\n\n📦 <b>Address:</b>\n{address}\n\n📞 <b>Phone:</b>\n{number}\n\n💌 <b>Gift wishes:</b>\n{receiver_wish}\n\nGet your gift ready and spread the holiday spirit! 🎄\n------------"
     },
     "result_mailing": {
       "separator": "-----------",
